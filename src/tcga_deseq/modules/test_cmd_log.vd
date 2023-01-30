@@ -1,0 +1,48 @@
+sheet	col	row	longname	input	keystrokes	comment
+			open-file	/scr/dings/PEVO/NEW_downloads_3/DEseq_31_6/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/carboplatin_carboplatin,paclitaxel_cisplatin/DRUG_combi_complement_summary_dead_alive_INFO.tsv	o	
+DRUG_combi_complement_summary_dead_alive_INFO			describe-sheet		Shift+I	open Describe Sheet with descriptive statistics for all visible columns
+DRUG_combi_complement_summary_dead_alive_INFO			sheets-stack		Shift+S	open Sheets Stack: join or jump between the active sheets on the current stack
+DRUG_combi_complement_summary_dead_alive_INFO			columns-sheet		Shift+C	open Columns Sheet: edit column properties for current sheet
+DRUG_combi_complement_summary_dead_alive_INFO			transpose		Shift+T	open new sheet with rows and columns transposed
+DRUG_combi_complement_summary_dead_alive_INFO_T		キ	rename-cols-selected		gz^	set names of all visible columns to combined contents of selected rows (or current row)
+DRUG_combi_complement_summary_dead_alive_INFO_T		キ	delete-row		d	delete current row
+DRUG_combi_complement_summary_dead_alive_INFO_T	gender		sort-desc		]	sort descending by current column; replace any existing sort criteria 
+DRUG_combi_complement_summary_dead_alive_INFO_T	gender		sort-asc		[	sort ascending by current column; replace any existing sort criteria
+DRUG_combi_complement_summary_dead_alive_INFO_T	gender		select-col-regex	female	|	select rows matching regex in current column
+DRUG_combi_complement_summary_dead_alive_INFO_T	drugnames		select-col-regex	avastin	|	select rows matching regex in current column
+DRUG_combi_complement_summary_dead_alive_INFO_T	drugnames		select-col-regex	avastin	|	select rows matching regex in current column
+DRUG_combi_complement_summary_dead_alive_INFO_T	drugnames		select-col-regex	abastin*	|	select rows matching regex in current column
+DRUG_combi_complement_summary_dead_alive_INFO_T	drugnames		select-col-regex	erbitux	|	select rows matching regex in current column
+DRUG_combi_complement_summary_dead_alive_INFO_T		キ22	stoggle-row		t	toggle selection of current row
+DRUG_combi_complement_summary_dead_alive_INFO_T			stoggle-rows		gt	toggle selection of all rows
+DRUG_combi_complement_summary_dead_alive_INFO_T		キ22	stoggle-row		t	toggle selection of current row
+DRUG_combi_complement_summary_dead_alive_INFO_T			select-rows		gs	select all rows
+DRUG_combi_complement_summary_dead_alive_INFO_T			select-rows		gs	select all rows
+DRUG_combi_complement_summary_dead_alive_INFO_T			select-rows		gs	select all rows
+DRUG_combi_complement_summary_dead_alive_INFO_T			unselect-rows		gu	unselect all rows
+DRUG_combi_complement_summary_dead_alive_INFO_T	PROJECT		freq-col		Shift+F	open Frequency Table grouped on current column, with aggregations of other columns
+DRUG_combi_complement_summary_dead_alive_INFO_T_PROJECT_freq		キTCGA-LUSC	open-row		Enter	open sheet with copies of rows referenced in current row
+DRUG_combi_complement_summary_dead_alive_INFO_T_TCGA-LUSC			sheets-stack		Shift+S	open Sheets Stack: join or jump between the active sheets on the current stack
+sheets		キDRUG_combi_complement_summary_dead_alive_INFO_T_PROJECT_freq	delete-row		d	delete current row
+sheets		キDRUG_combi_complement_summary_dead_alive_INFO_T_TCGA-LUSC	open-row		Enter	open sheet referenced in current row
+DRUG_combi_complement_summary_dead_alive_INFO_T_TCGA-LUSC			sheets-stack		Shift+S	open Sheets Stack: join or jump between the active sheets on the current stack
+sheets		キDRUG_combi_complement_summary_dead_alive_INFO_T	open-row		Enter	open sheet referenced in current row
+			open-file	/scr/dings/PEVO/NEW_downloads_3/DEseq_31_5/gdc_manifest_20211029_data_release_31.0_active.tsv.gz	o	Open file or URL
+gdc_manifest_20211029_data_release_31.0_active			sheets-stack		Shift+S	open Sheets Stack: join or jump between the active sheets on the current stack
+sheets		キgdc_manifest_20211029_data_release_31.0_active	open-row		Enter	open sheet referenced in current row
+gdc_manifest_20211029_data_release_31.0_active	id		select-col-regex	A	|	select rows matching regex in current column
+gdc_manifest_20211029_data_release_31.0_active			unselect-rows		gu	unselect all rows
+gdc_manifest_20211029_data_release_31.0_active	project_id		select-col-regex	cesc	|	select rows matching regex in current column
+gdc_manifest_20211029_data_release_31.0_active	project_id		select-col-regex	hnsc	|	select rows matching regex in current column
+gdc_manifest_20211029_data_release_31.0_active	project_id		select-col-regex	lusc	|	select rows matching regex in current column
+gdc_manifest_20211029_data_release_31.0_active			dup-selected		"	open duplicate sheet with only selected rows
+gdc_manifest_20211029_data_release_31.0_active_selectedref	project_id		freq-col		Shift+F	open Frequency Table grouped on current column, with aggregations of other columns
+gdc_manifest_20211029_data_release_31.0_active_selectedref	acl		freq-col		Shift+F	open Frequency Table grouped on current column, with aggregations of other columns
+gdc_manifest_20211029_data_release_31.0_active_selectedref_acl_freq		キ[b'open']	open-row		Enter	open sheet with copies of rows referenced in current row
+gdc_manifest_20211029_data_release_31.0_active_selectedref_[b'open']	project_id		freq-col		Shift+F	open Frequency Table grouped on current column, with aggregations of other columns
+gdc_manifest_20211029_data_release_31.0_active_selectedref_[b'open']	filename		select-col-regex	counts	|	select rows matching regex in current column
+gdc_manifest_20211029_data_release_31.0_active_selectedref_[b'open']			dup-selected		"	open duplicate sheet with only selected rows
+gdc_manifest_20211029_data_release_31.0_active_selectedref_[b'open']_selectedref			sheets-stack		Shift+S	open Sheets Stack: join or jump between the active sheets on the current stack
+sheets		キgdc_manifest_20211029_data_release_31.0_active_selectedref_[b'open']_selectedref	open-row		Enter	open sheet referenced in current row
+gdc_manifest_20211029_data_release_31.0_active_selectedref_[b'open']_selectedref		0	select-row		s	select current row
+gdc_manifest_20211029_data_release_31.0_active_selectedref_[b'open']_selectedref		0	unselect-row		u	unselect current row

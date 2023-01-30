@@ -1,0 +1,514 @@
+	TCGA-CESC	TCGA-HNSC	TCGA-LUSC	TCGA-ESCA	TCGA-BRCA	TCGA-GBM	TCGA-OV	TCGA-LUAD	TCGA-UCEC	TCGA-KIRC	TCGA-LGG	TCGA-THCA	TCGA-PRAD	TCGA-SKCM	TCGA-COAD	TCGA-STAD	TCGA-BLCA	TCGA-LIHC	TCGA-KIRP	TCGA-SARC	TCGA-PAAD	TCGA-PCPG	TCGA-READ	TCGA-TGCT	TCGA-THYM	TCGA-KICH	TCGA-ACC	TCGA-MESO	TCGA-UVM	TCGA-DLBC	TCGA-UCS	TCGA-CHOL
+cisplatin	104.0	65.0						2.0	4.0							2.0				1.0	1.0				1.0			2.0				
+carboplatin,paclitaxel	5.0	26.0	14.0	3.0			66.0	19.0	108.0								2.0														17.0	
+5-fluorouracil,cisplatin	5.0	2.0		2.0												5.0																
+cisplatin,gemcitabine	3.0		9.0					2.0									49.0	2.0		1.0								1.0				4.0
+carboplatin	3.0	6.0	3.0				5.0	2.0	3.0															3.0							3.0	
+carboplatin,cisplatin,paclitaxel	3.0						15.0		5.0																1.0						2.0	
+paclitaxel	2.0	1.0			2.0			3.0	3.0																						1.0	
+cisplatin,paclitaxel,topotecan hcl	1.0																															
+carboplatin,cyclophosphamide,doxorubicin	1.0																															
+carboplatin,gemcitabine,irinotecan,paclitaxel	1.0																															
+5-fluorouracil,carboplatin,cisplatin,paclitaxel	1.0																															
+5-fluorouracil,amifostine,cisplatin	1.0																															
+topotecan	1.0																															
+aloxi,cisplatin	1.0																															
+bleomycin,carboplatin,doxorubicin,gemcitabine	1.0																															
+carboplatin,gemcitabine,vinorelbine,xeloda	1.0																															
+erbitux	1.0	9.0																														
+[not available]	1.0	11.0	8.0	1.0	5.0		2.0	7.0	2.0				1.0	17.0		2.0	6.0	5.0		1.0	2.0	1.0	1.0					2.0				
+avastin,carboplatin,cisplatin,paclitaxel	1.0																															
+cisplatin,paclitaxel	1.0			1.0			13.0																									
+bleomycin,cisplatin,hydrocortisone,mitomycin c,vincristine	1.0																															
+[unknown]		5.0															1.0			1.0	1.0		1.0									
+cisplatin,vectibix		5.0																														
+carboplatin,erbitux,paclitaxel		4.0																														
+carboplatin,cisplatin,erbitux,paclitaxel		3.0																														
+cisplatin,erbitux		3.0																														
+carboplatin,cisplatin		2.0																														
+docetaxel,erbitux		2.0																														
+5-fluorouracil,carboplatin,cisplatin,docetaxel,erbitux,paclitaxel		1.0																														
+[not available],carboplatin,erbitux,methotrexate,paclitaxel,pemetrexed,xeloda		1.0																														
+carboplatin,cisplatin,pemetrexed		1.0						6.0																				1.0				
+erbitux,paclitaxel		1.0																														
+carboplatin,cisplatin,docetaxel,rigosertib		1.0																														
+carboplatin,docetaxel,erbitux,methotrexate,paclitaxel		1.0																														
+bevacizumab,carboplatin,cisplatin,docetaxel,imc-a12,oxaliplatin,paclitaxel,pemetrexed		1.0																														
+5-fluorouracil,carboplatin,erbitux,paclitaxel		1.0																														
+carboplatin,cisplatin,erbitux		1.0																														
+carboplatin,cisplatin,vectibix		1.0																														
+at-101,carboplatin,docetaxel,erbitux		1.0																														
+carboplatin,docetaxel		1.0	3.0				4.0		4.0																							
+cisplatin,docetaxel		1.0	10.0					8.0																								
+erbitux,everolimus		1.0																														
+methotrexate		1.0																														
+cisplatin,hsc vaccine injection,vorinostat,xeloda		1.0																														
+carboplatin,iressa		1.0																														
+cisplatin,docetaxel,xeloda		1.0																														
+cisplatin,erbitux,paclitaxel		1.0																														
+carboplatin,lapatinib,paclitaxel		1.0																														
+carboplatin,gemcitabine,methotrexate		1.0																														
+carboplatin,irinotecan,paclitaxel		1.0																														
+carboplatin,cisplatin,xeloda,zometa		1.0																														
+docetaxel,erbitux,px-866		1.0																														
+cisplatin,erbitux,eribulin		1.0																														
+cisplatin,docetaxel,gemcitabine,oxaliplatin		1.0															1.0															
+5-fluorouracil,cisplatin,docetaxel		1.0																														
+cisplatin,vinorelbine			23.0					13.0																								
+carboplatin,vinorelbine			8.0																													
+cisplatin,etoposide			7.0					9.0																4.0	2.0							
+carboplatin,gemcitabine			5.0	1.0			3.0	2.0									14.0															
+cisplatin,pemetrexed			3.0					15.0																				14.0				
+gemcitabine			2.0					2.0					1.0				4.0	2.0		2.0	61.0											4.0
+cisplatin,docetaxel,gemcitabine			2.0														1.0															
+carboplatin,gemcitabine,paclitaxel			2.0	1.0			8.0	2.0																								
+carboplatin,docetaxel,paclitaxel			2.0				8.0		3.0																						2.0	
+carboplatin,docetaxel,gemcitabine			2.0																													
+carboplatin,cisplatin,vinorelbine			2.0																													
+capecitabine				8.0											4.0	3.0					1.0											
+capecitabine,cisplatin				8.0																												
+5-fluorouracil,cisplatin,epirubicin				2.0												8.0																
+5-fluorouracil				2.0											11.0	41.0					2.0		18.0									
+folfiri,folfox				1.0																												
+etoposide				1.0																												
+5-fluorouracil,oxaliplatin				1.0																												
+carboplatin,paclitaxel,xeloda				1.0																												
+5-fluorouracil,docetaxel,oxaliplatin				1.0																												
+5-fluorouracil,leucovorin calcium				1.0																	1.0											
+5-fluorouracil,leucovorin				1.0											3.0	11.0							1.0									
+5-flourouracil,cisplatin,docetaxel,oxaliplatin				1.0																												
+arimidex					68.0																											
+tamoxifen					45.0																											
+cytoxan,docetaxel					23.0																											
+adriamycin,cytoxan,paclitaxel					19.0																											
+cyclophosphamide,doxorubicin,paclitaxel					16.0																											
+arimidex,cyclophosphamide,doxorubicin,paclitaxel					10.0																											
+adriamycin,cytoxan					9.0													1.0														
+cyclophosphamide,doxorubicin,paclitaxel,tamoxifen					9.0																											
+adriamycin,cytoxan,docetaxel					9.0																											
+adriamycin,cytoxan,paclitaxel,tamoxifen					8.0																											
+letrozole					8.0																											
+adriamycin+cyclophosphamide					7.0																											
+arimidex,cytoxan,docetaxel					7.0																											
+femara					7.0																											
+cyclophosphamide,doxorubicin					7.0																											
+cyclophosphamide,docetaxel,tamoxifen					6.0																											
+cytoxan,doxorubicin,paclitaxel					6.0																											
+arimidex,tamoxifen					6.0																											
+5-fluorouracil,cyclophosphane,doxorubicin,tamoxifen					6.0																											
+5-fluorouracil,cyclophosphamide,doxorubicin,tamoxifen					6.0																											
+adriamycin,cytoxan,docetaxel,tamoxifen					5.0																											
+cytoxan,docetaxel,tamoxifen					5.0																											
+cyclophosphamide,docetaxel					5.0																											
+arimidex,cyclophosphamide,docetaxel					5.0																											
+5-fluorouracil,cyclophosphamide,docetaxel,epirubicin					5.0																											
+adriamycin,arimidex,cytoxan,paclitaxel					5.0																											
+cytoxan,doxorubicin					4.0																											
+cyclophosphamide,docetaxel,doxorubicin					4.0																											
+cytoxan,doxorubicin,paclitaxel,tamoxifen					4.0																											
+5-fluorouracil,cyclophosphamide,epirubicin					4.0																											
+5-fluorouracil,cyclophosphamide,methotrexate					4.0																											
+5-fluorouracil,arimidex,cyclophosphamide,methotrexate					4.0																											
+5-flourouracil,cyclophosphamide,doxorubicin					3.0																											
+adriamycin,cyclophosphamide					3.0																											
+adriamycin,cytoxan,docetaxel,femara					3.0																											
+5-fluorouracil,cyclophosphamide,docetaxel,epirubicin,exemestane					3.0																											
+5-fluorouracil,cyclophosphamide,methotrexate,tamoxifen					3.0																											
+carboplatin,docetaxel,trastuzumab					3.0																											
+cyclophosphamide,doxorubicin,paclitaxel,tamoxifen,trastuzumab					3.0																											
+cyclophosphamide,doxorubicin,paclitaxel (protein-bound)					2.0																											
+cytoxan,doxorubicin,letrozole,paclitaxel,tamoxifen					2.0																											
+herceptin,paclitaxel					2.0																											
+cyclophosphamide,doxorubicin,tamoxifen					2.0																											
+adriamycin,arimidex,cytoxan,docetaxel					2.0																											
+cytoxan,doxorubicin,tamoxifen					2.0																											
+5-fluorouracil,cyclophosphane,doxorubicin					2.0																											
+adriamycin,arimidex,cytoxan,tamoxifen					2.0																											
+5-flourouracil,cyclophosphamide,doxorubicin,paclitaxel					2.0																											
+5-fluorouracil,arimidex,cyclophosphamide,methotrexate,tamoxifen					2.0																											
+adriamycin,cytoxan,herceptin,paclitaxel					2.0																											
+adriamycin,cytoxan,tamoxifen					2.0																											
+arimidex,cytoxan,docetaxel,tamoxifen					2.0																											
+nolvadex					2.0																											
+5-fluorouracil,adriamycin,cytoxan,paclitaxel					2.0																											
+arimidex,carboplatin,docetaxel,trastuzumab					2.0																											
+arimidex,herceptin,paclitaxel					2.0																											
+[not available],tamoxifen					2.0																											
+docetaxel					2.0															1.0												
+letrozole,tamoxifen					2.0																											
+5-fluorouracil,cytoxan,epirubicin,paclitaxel					2.0																											
+5-fluorouracil,cyclophosphamide,epirubicin,tamoxifen					2.0																											
+arimidex,cytoxan,doxorubicin					2.0																											
+5-fluorouracil,cyclophosphamide,doxorubicin					2.0																1.0											
+carboplatin,docetaxel,herceptin					2.0																											
+doxorubicine+cyclophosphamide,tamoxifen					2.0																											
+docetaxel,tamoxifen					2.0																											
+temodar						23.0					94.0			2.0																		
+temozolomide						11.0					85.0																					
+dexamethasone						6.0																										
+avastin,temodar						5.0					7.0																					
+avastin,temozolomide						4.0																										
+carboplatin,doxil,paclitaxel							7.0		7.0																						1.0	
+carboplatin,doxil,gemcitabine,paclitaxel,topotecan							6.0																									
+carboplatin,paciltaxel							5.0																									
+carboplatin,paclitaxel,tamoxifen							4.0																									
+carboplatin,cisplatin,doxil,paclitaxel,topotecan							4.0																									
+cisplatin,docetaxel,paclitaxel							3.0																									
+carboplatin,cisplatin,paciltaxel							3.0																									
+carboplatin,femara,paclitaxel							3.0																									
+carbo,paclitaxel,topotecan							3.0																									
+carboplatin,cisplatin,docetaxel,paclitaxel							3.0	2.0																								
+carboplatin,docetaxel,doxil,gemcitabine,paclitaxel,topotecan							2.0																									
+carboplatin,doxil,gemcitabine,paclitaxel							2.0																									
+carboplatin,cisplatin,docetaxel,doxil,gemcitabine,paclitaxel,topotecan							2.0																									
+carboplatin,liposomal doxorubicin,paclitaxel							2.0																									
+carboplatin,cisplatin,doxil,gemcitabine,paclitaxel,topotecan							2.0																									
+carboplatin,paclitaxel,topotecan							2.0																									
+carboplatin,cisplatin,cytoxan,paclitaxel							2.0																									
+avastin,carboplatin,cisplatin,cytoxan,doxil,gemcitabine,paclitaxel,topotecan,vinorelbine							2.0																									
+carboplatin,doxil,paclitaxel,topotecan							2.0																									
+carboplatin,cisplatin,gemcitabine,paclitaxel							2.0																									
+carboplatin,cytoxan							2.0																									
+carbo,paclitaxel							2.0																									
+carboplatin,pemetrexed								10.0											1.0									4.0				
+tarceva								7.0																								
+cisplatin,vinblastine								3.0																								
+carboplatin,paclitaxel,pemetrexed								3.0																								
+chemo, nos								3.0													2.0											
+cisplatin,etoposide,gefitinib								2.0																								
+carboplatin,pemetrexed,tarceva								2.0																								
+avastin,carboplatin,paclitaxel,pemetrexed								2.0																								
+carboplatin,paclitaxel,tarceva								2.0																								
+cisplatin,gemcitabine,vinorelbine								2.0																								
+megace									9.0																							
+carboplatin,doxorubicin,paclitaxel									4.0																							
+carboplatin & paclitaxel									3.0																							
+cisplatin,doxorubicin,paclitaxel									3.0																							
+carboplatin and paclitaxel									2.0																							
+adriamycin,carboplatin,cisplatin,paclitaxel									2.0																							
+adriamycin,cisplatin,paclitaxel									2.0																							
+sunitinib										7.0									1.0							1.0						
+interferon										5.0				17.0					1.0													
+sutent										5.0									2.0													
+interleukin-2										4.0				2.0																		
+pazopanib										3.0									1.0													
+sutent (sunitinib)										3.0																						
+sorafenib										2.0								14.0	1.0							1.0	1.0					
+oncophage										2.0																						
+nexavar										2.0								3.0														
+lomustine,procarbazine,vincristine											8.0																					
+bevacizumab,temozolomide											6.0																					
+bevacizumab,irinotecan,temozolomide											4.0																					
+temozolamide											3.0																					
+hydroxyurea,pcv											2.0																					
+avastin,carboplatin,cpt-11,temodar,vp-16											2.0																					
+bevacizumab,lomustine,temozolomide											2.0																					
+lomustine,procarbazine,temozolomide,vincristine											2.0																					
+ccnu,temodar											2.0																					
+synthroid												13.0																				
+levothyroxine												12.0																				
+cytomel,synthroid												5.0																				
+cytomel,levothyroxine												4.0																				
+doxorubicin												2.0								3.0												
+levoxyl												2.0																				
+cytomel,levoxyl												2.0																				
+cytomel												1.0																				
+cytomel,levothroid,synthroid												1.0																				
+armour thyroid												1.0																				
+lupron													12.0																			
+eligard													6.0																			
+casodex,lupron													6.0																			
+zoladex													3.0																			
+leuprolide													3.0																			
+lhrh agonist													3.0																			
+casodex,zoladex													3.0																			
+casodex,trelstar													2.0																			
+abiraterone,leuprolide acetate													2.0																			
+casodex,eligard,lupron													2.0																			
+casodex,eligard													2.0																			
+leuprorelin													2.0																			
+trenantone													1.0																			
+casodex,docetaxel,lupron													1.0																			
+lupron,zoladex													1.0																			
+degarelix,docetaxel,jevtana,lupron													1.0																			
+casodex,leuprolide acetate													1.0																			
+leuprolide acetate													1.0																			
+bicalutamide,lupron													1.0																			
+bicalutamide													1.0																			
+leuprolide acetate,lupron													1.0																			
+bicalutamide,leuprorelin,zoledronic acid													1.0																			
+casodex,leuprolide													1.0																			
+goserelin													1.0																			
+casodex,luprolide depot,lupron													1.0																			
+casodex,goserelin													1.0																			
+"lhrh agonist and anti-androgens ""combined androgen blockade"""													1.0																			
+cabazitaxel,casodex,docetaxel,zoladex													1.0																			
+bicalutamid													1.0																			
+casodex													1.0																			
+abiraterone,cabazitaxel,carboplatin,leuprolide acetate													1.0																			
+leuprorelin,triptorelin													1.0																			
+casodex,lupron,nilutamide													1.0																			
+abiraterone,leuprolide,lupron													1.0																			
+leuprolide,leuprolide acetate													1.0																			
+firmagon													1.0																			
+casodex,ketoconazole,lupron													1.0																			
+dacarbazine														9.0																		
+ipilimumab														8.0																		
+interferon alpha														5.0																		
+vemurafenib														4.0																		
+fotemustine														3.0															4.0			
+sylatron														2.0																		
+mel-44														2.0																		
+dacarbazine,vincristine														2.0																		
+carboplatin,dacarbazine														2.0																		
+5-fluorouracil,leucovorin,oxaliplatin															32.0	3.0							14.0									
+5-fluorouracil,folinic acid,oxaliplatin															24.0								7.0									
+xeloda															11.0	5.0							4.0				1.0					
+5-fluorouracil,bevacizumab,folinic acid,irinotecan															3.0																	
+5-fluorouracil,bevacizumab,oxaliplatin															3.0																	
+folfox															3.0								2.0									
+5-fluorouracil,erbitux,leucovorin,oxaliplatin															3.0																	
+5-fluorouracil,folinic acid															2.0								3.0									
+capecitabine,oxaliplatin															2.0																	
+5- fu,5-fluorouracil,leucovorin,oxaliplatin															2.0																	
+5-fluorouracil,bevacizumab,folinic acid,irinotecan,oxaliplatin															2.0								1.0									
+5-fluorouracil,bevacizumab,leucovorin,oxaliplatin															2.0																	
+5-fluorouracil,avastin,irinotecan,leucovorin,oxaliplatin															2.0																	
+5-fluorouracil,folinic acid,irinotecan															2.0																	
+5-fluorouracil,etoposide,leucovorin																9.0																
+capecitabine,cisplatin,epirubicin																5.0																
+5-flourouracil,cisplatin,epirubicin																5.0																
+5-fluorouracil,cisplatin,folinic acid																4.0																
+doxifluridine																4.0																
+copolang,didox																3.0																
+ts-1																2.0																
+dexamethasone,epirubicin,oxaliplatin,xeloda																2.0																
+adriamycin,cisplatin,methotrexate,vinblastine																	4.0															
+cisplatin,doxorubicin,methotrexate,vinblastine																	3.0															
+bcg																	3.0															
+gemcitabine,platinum																	2.0															
+carboplatin,cisplatin,gemcitabine																	2.0		1.0									2.0				
+cisplatin,gemcitabine,paclitaxel																	2.0															
+- zactima,cisplatin,docetaxel +,gemcitabine,ifosfamide,paclitaxel																	1.0															
+cisplatin,doxorubicin,methotrexate,tarceva,vinblastine																	1.0															
+cisplatnin,gemcitabine																	1.0															
+bcg,cisplatin,gemcitabine,saha,vorinostat																	1.0															
+gemcitabine and cisplatin																	1.0															
+cisplatin,ifosfamide,mesna,paclitaxel																	1.0															
+5-fluorouracil,carboplatin																	1.0															
+etoposide,paclitaxel																	1.0															
+docetaxel,doxorubicin,halichondrin b,ifosfamide,mesna																	1.0															
+ipilimumab,nivolumab																	1.0															
+avastin,cisplatin,doxorubicin,methotrexate,vinblastine																	1.0															
+cddp,gemcitabine																	1.0															
+cisplatin,ifosfamide,paclitaxel																	1.0															
+adriamycin,carboplatin,cisplatin,gemcitabine,methotrexate,vinblastine																	1.0															
+[not available],cisplatin,docetaxel,gemcitabine																	1.0															
+carboplatin,etopside																	1.0															
+adriamycin (doxorubicin),cisplatin,gemcitabine,halichondrin,ifosfamide,paclitaxel,temsirolimus,vinorelbine																	1.0															
+cisplatin,doxorubicin,gemcitabine,methotrexate,vinblastine																	1.0															
+bcg, intravesicular,gemcitabine,platinol																	1.0															
+bacillus calmette-guerin (bcg),doxobubicin																	1.0															
+carboplatin,doxorubicin,etoposide																	1.0															
+[not available],cisplatin,fosaprepitant,gemcitabine																	1.0															
+cisplatin,gemcitabine,ifosfamide,paclitaxel																	1.0															
+cisplatin,doxorubicin,gemcitabine,ifosfamide,methotrexate,vinblastine																	1.0															
+naxavar																		3.0														
+5-fluorouracil,[not available],oxaliplatin,sorafenib																		1.0														
+sorafenib,sunitinib																		1.0														
+adriamycin,gemcitabine,mitomycin c,tamoxifen																		1.0														
+regorafenib,sarafenib																		1.0														
+alvesin																		1.0														
+sorafinib ( nexavar)																		1.0														
+hec.1 - sorafenib vs sorafenib plus doxorubicin																		1.0														
+cisplatin,gemcitabine,sorafenib,temsirolimus																		1.0														
+abt-888,ly228820,sorafenib,temozolomide																		1.0														
+doxorubicin,everolimus, gemcitabine, and cisplatin,sorafenib																		1.0														
+abt-888 and temozolomide,sorafenib,temozolomide																		1.0														
+everolimus,naxavar,som 230																		1.0														
+everolimus																			1.0													
+afinitor,sutent																			1.0													
+adriamycin,cytoxan,rituxan,vincristine																			1.0													
+psma dna vaccine,sunitinib,temsirolimus																			1.0													
+intron a																			1.0													
+naxavar,sunitinib																			1.0													
+afinitor																			1.0													
+sorafenib,temsirolimus																			1.0													
+17-aag																			1.0													
+sutent,temsirolimus																			1.0													
+temsirolimus																			1.0													
+sunitinib,temsirolimus																			1.0													
+bevacizumab,sorafenib,sunitinib,temsirolimus																			1.0							1.0						
+sorafenib,sunitinib,temsirolimus																			1.0													
+docetaxel,gemcitabine																				14.0												
+adriamycin																				5.0												
+doxil																				3.0												
+adriamycin,ifosfamide																				2.0												
+docetaxel,gemcitabine,pd 0332991																				2.0												
+docetaxel,gemcitabine,pazopanib																				2.0												
+adriamycin,docetaxel,gemcitabine,ifosfamide																				2.0												
+ifosfamide																				2.0											1.0	
+mln8237,morab-004																				1.0												
+doxil,gemcitabine																				1.0												
+doxorubicin,gleevec,raloxifene,sorafenib,sulindac,tamoxifen																				1.0												
+cisplatin,dacarbazine,doxil,ifosfamide,sorafenib,vorinostat																				1.0												
+adriamycin,docetaxel,femara,gemcitabine																				1.0												
+adriamycin,etoposide,ifosfamide																				1.0												
+adriamycin,ap-23573 (ariad),dacarbazine (dtic),docetaxel,enoticumab,et-743,ezn-2968,gemcitabine,pemetrexed,threshold-302																				1.0												
+dacarbazine,docetaxel,doxil,doxorubicin,gemcitabine,ifosfamide,pazopanib																				1.0												
+docetaxel,doxorubicin,gemcitabine,ifosfamide																				1.0												
+adriamycin,dacarbazine,ifosfamide																				1.0												
+doxil,ifosfamide																				1.0												
+adriamycin,docetaxel,gemcitabine																				1.0												
+adriamycin,carboplatin,docetaxel,gemcitabine,ifosfamide																				1.0												
+megace,tamoxifen																				1.0												
+adriamycin,doxil,ifosfamide																				1.0												
+docetaxel,gemcitabine,liposomal doxorubicin																				1.0												
+avastin,everolimus,tivozanib																				1.0												
+ifosfamide,pd 0332991																				1.0												
+docetaxel,doxorubicin,gemcitabine																				1.0												
+adriamycin,ifosfamide,mesna																				1.0												
+adriamycin,dacarbazine,docetaxel,gemcitabine,ifosfamide,pazopanib,trabectedin																				1.0												
+adriamycin,docetaxel,dtic, dacarbazine,gemcitabine,pazopanib																				1.0												
+adriamycin,dacarbazine,docetaxel,gemcitabine																				1.0												
+dacarbazine,docetaxel,doxorubicin,et-743,gemcitabine,pazopanib																				1.0												
+adriamycin,docetaxel,gemcitabine,ifosfamide,temozolomide																				1.0												
+doxil,everolimus,gemcitabine,pazopanib,r1507																				1.0												
+doxirubicin,gemcitabine																				1.0												
+adriamycin,docetaxel,gemcitabine,ifosfamide,letrozole																				1.0												
+[not available],bevacizumab,doxetaxel,gemcitabine,trabectedin,valproic acid																				1.0												
+adriamycin,docetaxel,doxil,gemcitabine,ifosfamide																				1.0												
+5-fluorouracil,gemcitabine																					8.0											
+gemcitabine,xeloda																					5.0											
+5-fluorouracil,gemcitabine,irinotecan,leucovorin,oxaliplatin																					2.0											
+5-fluorouracil,gemcitabine,irinotecan,leucovorin,oxaliplatin,paclitaxel																					2.0											
+5-fluorouracil,gemcitabine,leucovorin,oxaliplatin																					2.0											
+5-fluorouracil,gemcitabine,oxaliplatin																					2.0											
+capecitabine,docetaxel,gemcitabine																					1.0											
+gemcitabine,oxaliplatin																					1.0											
+gemcitabine,paclitaxel																					1.0											
+5-fluorouracil,cisplatin,gemcitabine																					1.0											
+5-fluorouracil,folinic acid,gemcitabine,irinotecan,oxaliplatin																					1.0											
+5-fluorouracil,carboplatin,gemcitabine,leucovorin,oxaliplatin																					1.0											
+5-fluorouracil,camptosar,eloxatin,gemcitabine,leucovorin																					1.0											
+5-fluorouracil,folinic acid,gemcitabine,irinotecan hydrochloride,oxaliplatin																					1.0											
+5-fluorouracil,irinotecan,oxaliplatin																					1.0											
+5-fluorouracil,capecitabine,gemcitabine,oxaliplatin																					1.0											
+5-fluorouracil,dexamethasone,gemcitabine,megace,oxaliplatin																					1.0											
+5-fluorouracil,[unknown],gemcitibine,irinotecan,leucovorin,oxaliplatin																					1.0											
+5-fluorouracil,gemcitabine,irinotecan,leucovorin,oxaliplatin,xeloda																					1.0											
+gemcitabine injection																					1.0											
+5-fluorouracil,capecitabine,gemcitabine,irinotecan,oxaliplatin																					1.0											
+5-fluorouracil,gemcitabine,irinotecan hydrochloride,leucovorin calcium,oxaliplatin																					1.0											
+5-fluorouracil,gemcitabine,leucovorin,oxaliplatin,paclitaxel,xeloda																					1.0											
+5-fluorouracil,[not available],gemcitabine																					1.0											
+5-fluorouracil,capecitabine,gemcitabine																					1.0											
+5-fluorouracil,gemcitabine hcl,paclitaxel																					1.0											
+5-fluorouracil,gemcitabine,irinotecan,leucovorin																					1.0											
+capecitabine,gemcitabine																					1.0											1.0
+fu7,gemcitabine,leucovorin																					1.0											
+cyclophosphamide,dacarbazine,gemcitabine,vincristine																						1.0										
+cyclophosphamide, vincristine, and dacarbazine																						1.0										
+cytoxan, vincristine and dacarbazine																						1.0										
+temodar,xeloda																						1.0										
+5-fluorouracil,leucovorin calcium,oxaliplatin																							3.0									
+5-fluorouracil,folinic acid,irinotecan,oxaliplatin																							2.0									
+mayo 425-20																							2.0									
+capecitabine -xeloda																							1.0									
+bevacizumab,capecitabine,oxaliplatin																							1.0									
+5-fluorouracil,leucovorin,oxaliplatin,xeloda																							1.0									
+5-fluorouracil,leucovorin calcium,oxaliplatin,pegfilgrastim																							1.0									
+5-fluorouracil,bevacizumab,capecitabine,gemcitabine,irinotecan,leucovorin,mitomycin,oxaliplatin																							1.0									
+5-fluorouracil,etoposide,leucovorin,xeloda																							1.0									
+bevacizumab,capecitabine																							1.0									
+5-fluorouracil,leuocvorin,oxaliplatin																							1.0									
+5-fluorouracil,oxaliplatin,polyplatillen																							1.0									
+oxaliplatin,xeloda																							1.0									
+5-fluorouracil,bevacizumab,irinotecan hcl,leucovorin,oxaliplatin																							1.0									
+ placebo study,5-fluorouracil,aflibercept,avastin,bevacizumab,camptosar,fudr (floxuridine),irinotecan,leucovorin,oxaliplatin																							1.0									
+bevacizumab																							1.0									
+bevacizumab,capecitabine,irinotecan																							1.0									
+[unknown],zoledronic acid																							1.0									
+5-fluorouracil,avastin,leucovorin,oxaliplatin,xeloda																							1.0									
+5-fluorouracil,bevacizumab,folinic acid																							1.0									
+folinic acid																							1.0									
+bleomycin,cisplatin,etoposide																								46.0								
+bleomycin																								3.0								
+bleomycin,etoposide,platinum																								1.0								
+cisplatin,etoposide,ifosfamid																								1.0								
+bleomycin,etoposide,ifosfamide,paclitaxel,platinum																								1.0								
+bleomycin,cisplatin,gemox,ifosfamide																								1.0								
+bleomycin,cisplatin,etoposid																								1.0								
+azathioprine																									2.0							
+cisplatin,cyclophosphamide,doxorubicin,pemetrexed																									1.0							
+bevacizumab,sunitinib,temsirolimus																										1.0						
+bevacizumab,sutent,temsirolimus																										1.0						
+avastin,sorafenib																										1.0						
+thalidomide																										1.0						
+lymphocyte infusion,ptk-zk																										1.0						
+avastin,carboplatin,cisplatin,doxorubicin,etoposide,mitotane,streptozocin																											1.0					
+ketoconazole,sunitinib																											1.0					
+adriamycin,carboplatin,cisplatin,etoposide																											1.0					
+porfimer sodium (photofin)																												4.0				
+2-[1-hexyloxyethyl]-2-devinyl pyropheophorbide-alpha (hpph or photochlor)																												4.0				
+porfimer sodium (photofrin)																												3.0				
+[not available],carboplatin,pemetrexed																												3.0				
+dasatinib																												2.0				
+[not available],cisplatin,pemetrexed																												2.0				
+tetrathiomolybdate																												2.0				
+porfimer sodium(photofin)																												1.0				
+[unknown],cisplatin,gemcitabine																												1.0				
+cediranib,dasatinib																												1.0				
+tivantinib (arq-197)																												1.0				
+adriamycin,cisplatin,pemetrexed																												1.0				
+cisplatin,gemcitabine,pemetrexed																												1.0				
+dasatinib,gemcitabine,r1507,tarceva																												1.0				
+cisplatin,gemcitabine,pemetrexed,sutent																												1.0				
+bevacizumab,carboplatin,cisplatin,dasatinib,doxorubicin,everolimus,imatinib,pemetrexed,temsirolimus																												1.0				
+carboplatin,cisplatin,everolimus,gemcitabine,pemetrexed,vinorelbine																												1.0				
+cisplatin,pemetrexed,wt-1 vaccine																												1.0				
+cisplatin, pemetrexed,dasatinib,vorinostat																												1.0				
+carboplatin,gl-onc1,pemetrexed																												1.0				
+cisplatin,dasatinib,pemetrexed																												1.0				
+[not available],carboplatin,gemcitabine,pemetrexed																												1.0				
+cediranib,cisplatin,dasatinib,pemetrexed																												1.0				
+cisplatin,pemetrexed,tetrathiomolybdate																												1.0				
+amatuximab (morab-009),cisplatin,ds-8273a,gdc-0980,pemetrexed,tivantinib (arq-197)																												1.0				
+ciclofosfamida,doxorubicina,prednisona,rituximab,vincristina																														7.0		
+cyclophosphamide,doxorubicin,prednisone,rituximab,vincristine																														4.0		
+adriamycin,cyclophosphamide,prednisone,vincristine																														3.0		
+chop,rituximab																														3.0		
+epoch,rituximab																														2.0		
+cyclophosphamide,hydroxydaunomycin,methotrexate,oncovin,prednisolone,rituximab																														2.0		
+cyclophosphamide,doxorubicin,predisone,rituximab,vincristine																														1.0		
+bleomycin,cyclophosphamide,doxorubicin,etoposide,vincristine																														1.0		
+cyclophosphamide,hydroxydaunomycin,oncovin,prednisolone,rituximab,vincristine																														1.0		
+ciclofosfamida,doxorubicina,intrathecal methotrexate,prednisona,rituximab,vincristina																														1.0		
+cyclophosphamide,doxorubicin,vinblastine																														1.0		
+ciclofosfamida,prednisona,rituximab,vincristina																														1.0		
+[not available],ciclofosfamida,cisplatim,doxorubicina,etoposide,metilprednisona,prednisona,rituximab,vincristina																														1.0		
+cyclophosphamide,doxorubicin,rituximab,vincristine																														1.0		
+cyclophosphamide,doxorubicin,intrathecal methotrexate,prednisone,rituximab,vincristine																														1.0		
+cvad,ice,o-ice,ofatumumab																														1.0		
+adriamycin,cyclophosphamide,prednisolone,vincristine																														1.0		
+bortezomib,carboplatin,cyclophosphamide,cytarabine,decadron,dexamethasone,doxorubicin,gemcitabine,revlimid,rituximab,vincristine,vinorelbine																														1.0		
+chop,epoch,rituximab																														1.0		
+ leucovorin,high dose methotrexate w																														1.0		
+bleomycin,cyclophosphamide,dacarbazine,dexamethasone,doxorubicin,etoposide,mitoxantrone,vincristine																														1.0		
+adriamycin,cytoxan,doxil,prednisone,rituximab,vincristine																														1.0		
+adriamycin,cytoxan,rituximab,vincristine																														1.0		
+adriamycin,cytoxan,prednisone,vincristine																														1.0		
+cisplatin,cyclophosphamide,cytarabine,dexamethasone,doxorubicin,rituximab,vincristine																														1.0		
+adriamycin,carboplatin,cyclophosphamide,dexamethasone,high dose ara-c,prednisone,rituxan,vincristine																														1.0		
+cyclophosphamide,hydroxydaunomycin,oncovin,prednisolone,rituximab																														1.0		
+bleomycin,cytoxan,il-2,prednisone,thiotepa,vincristine,vp-16																														1.0		
+cisplatin,ifosfamide																															2.0	
+carboplatin,cisplatin,ifosfamide,mesna,paclitaxel																															1.0	
+adriamycin,cisplatin,cytoxan,ifosfamide,mesna,paclitaxel																															1.0	
+adriamycin,cisplatin,cyclophosphamide																															1.0	
+carboplatin,ifosfamide,paclitaxel																															1.0	
+ifosfamide,paclitaxel																															1.0	
+ifex,mesna,paclitaxel																															1.0	
+carboplatin,docetaxel,gemcitabine,paclitaxel																															1.0	
+avastin,carboplatin,paclitaxel																															1.0	
+carboplatin,ifosfamide																															1.0	
