@@ -1,0 +1,14 @@
+configfile: "config.yaml"
+
+rule download_helpfiles:
+    """
+    this rule will download the gdc_manifest and the gtf annotation file,
+    md5checksum checks are performed
+    """
+    output:
+        "{output_path}/metadata/{output_file}"
+    script:
+        "scripts/download_help_files.py"
+
+
+
