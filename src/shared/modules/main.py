@@ -2,7 +2,7 @@ import os
 import click
 from shared.modules import choose_therapy
 from shared.modules import download_with_api
-
+import snakemake
 
 SCRIPT_PATH = os.path.split(__file__)[0]
 with open(os.path.join(SCRIPT_PATH, 'version.txt'), 'r') as f:
@@ -16,11 +16,11 @@ def print_version(ctx, param, value):
     ctx.exit()
 
 
-CWD = os.environ.get('PWD')
+HOME = os.getenv('HOME')
 
 
 @click.command()
-@click.option('--out_path', '-o', default=os.path.join(CWD, 'metilene_data'),
+@click.option('--out_path', '-o', default=os.path.join(HOME, 'TCGA-pipelines'),
               show_default=True,
               help='path to save the result files')
 @click.option('--project', '-p', default=[], multiple=True,
@@ -30,11 +30,17 @@ CWD = os.environ.get('PWD')
 @click.option('--drugs', '-d', default=[], multiple=True, show_default=False,
               help='drug(s), like: -d drug1 -d drug2 ' +
               'or drugcombination(s), like: -d drug1,drug2')
+@click.option('--cores', '-c', default=1, multiple=False, show_default=True,
+              type=int, help='number of cores provided to snakemake',
+              required=False)
+@click.option('--execute', '-e', default=['Deseq2', 'metilene'], multiple=True,
+              show_default=True, help='choose which pipeline shall be\
+              executed')
 @click.option('--version', '-v',
               help='printing out version information: {}'.format(version),
               is_flag=True, callback=print_version,
               expose_value=False, is_eager=True)
-def call_with_options(out_path, project, drugs):
+def call_with_options(out_path, project, drugs, cores, execute):
     '''
     "metilene_pipeline" a tool to choose, harvest and analyse methylation data
     of the TCGA-projects with help of the metilene package.\n
@@ -55,11 +61,12 @@ def call_with_options(out_path, project, drugs):
         $ python main_metilene.py --help
     '''
     OUTPUT_PATH = out_path
-    print("\nOUTPUT_PATH:\n", OUTPUT_PATH)
+    print("\nOUTPUT_PATH:\t\t", OUTPUT_PATH)
     # SCRIPT_PATH = script_path
     SCRIPT_PATH = os.path.split(__file__)[0]
-    print("\nSCRIPT_PATH:\n", SCRIPT_PATH)
+    print("SCRIPT_PATH:\t\t", SCRIPT_PATH)
     # check if the main_metilene.py exist in the SCRIPT_PATH:
+    print("PIPELINES executed:\t", execute)
     if len(project) == 0:
         PROJECT = choose_therapy.Choose_project()
         PROJECT = sorted(map(str.upper, PROJECT))
@@ -70,45 +77,59 @@ def call_with_options(out_path, project, drugs):
     else:
         DRUGS = sorted(map(str.lower, drugs))
 
-    print('PROJECT:\t', PROJECT)
-    print('DRUGS:\t\t', DRUGS)
+    print('PROJECT:\t\t', PROJECT)
+    print('DRUGS:\t\t\t', DRUGS)
 
-    # Snakefile_path = os.path.join(SCRIPT_PATH, os.path.pardir, 'Snakefile')
+    shared_workdir = os.path.join(
+        os.path.split(os.path.split(SCRIPT_PATH)[0])[0], 'shared')
+    Snakemake_all_files = []
+
     Snakefile_path = os.path.join(os.path.split(SCRIPT_PATH)[0], 'Snakefile')
-    workdir = os.path.split(Snakefile_path)[0] # config_path = os.path.join(SCRIPT_PATH, os.path.pardir, 'config.yaml')
-    # downloading the manifest file and the gtf file
-    mani = 'gdc_manifest_20211029_data_release_31.0_active.tsv.gz'
-    mani_path = os.path.join(OUTPUT_PATH, 'metadata', mani)
-    download_with_api.download_GDC_manifest(Snakefile_path, mani_path, workdir)
-    gtf_path = os.path.join(OUTPUT_PATH, 'metadata',
-                            'gencode.v36.annotation.gtf.gz')
-    # important to hand over the workdir, the CWD can be anywhere, the workdir
-    # is derived from the scriptpath
-    download_with_api.download_GDC_manifest(Snakefile_path, gtf_path, workdir)
+    config_file_shared = os.path.join(shared_workdir, 'config.yaml')
 
+    # help files for both pipelines, like:
+    # OUTPUT_PATH/metadata/gdc_manifest_20211029_data_release_31...,
+    # gencode.v36.annotation
+    help_file_list = download_with_api.download_GDC_manifest(
+        OUTPUT_PATH, config_file_shared)
+    Snakemake_all_files = Snakemake_all_files + help_file_list
+    # once we have to call snakemake in prior, s.t. the manifest file is
+    # present on which all the following selections are done on, make sure that
+    # here the dryrun flag is not set to False
+    snakemake.snakemake(snakefile=Snakefile_path, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False)
 
+    # auxfiles for both pipelines:
+    # OUTPUT_PATH/PROJECT/aux_files/nationwidechildrens.....
+    aux_file_list = download_with_api.download_aux_files(OUTPUT_PATH, PROJECT,
+                                                         config_file_shared)
 
+    Snakemake_all_files = Snakemake_all_files + aux_file_list
 
-    # if no -A and -D specified, ask here whether to just download raw data or
-    # do both download and analyse steps:
-    # if download_data and analyse_data:
-    #     function = (100,)
-    # if download_data and not analyse_data:
-    #     function = (1, 2, 3, 4)  # until creating table:
-    #     # meta_info_druglist_merged_drugs_combined.tsv and download all data
-    # if analyse_data and not download_data:  # all the rest
-    #     function = (5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)
-    # # if the first 5 fct are skipped (because those projects are
-    # # downloaded already), the info in the snakemake_config.yaml would miss,
-    # # because all those log entries are skipped also. if just -A is set,
-    # # we must look up all those files and write it in the config
+    # translate here the applied pipeline which shall be executet:
+    # Datafiles: OUTPUT_PATH/PROJECT/Diffexpression/PROJECT_data_files/...
+    def map_execute(pipeline):
+        if pipeline == 'Deseq2':
+            return 'htseq'
+        elif pipeline == 'metilene':
+            return 'HumanMethylation450'
 
-    # whats set so far are the projects and drugs, still needed analyse options
-    # and OUTPUT_PATH
-    # if not analyse_data and not download_data and not function:
-    #     OUTPUT_PATH, function, analyse_data,\
-    #         download_data = choose_therapy.Choose_path_and_option(
-    #             OUTPUT_PATH, PROJECT, DRUGS, function, SCRIPT_PATH,
-    #             analyse_data, download_data)
+    data_file_list = []
+    file_types = map(map_execute, execute)
+    for file_type in file_types:
+        data_file_list = (data_file_list +
+                          download_with_api.download_data_files(
+                              OUTPUT_PATH, PROJECT, config_file_shared,
+                              file_type))
 
-    # OUTPUT_PATH = OUTPUT_PATH.rstrip(os.sep)
+    Snakemake_all_files = Snakemake_all_files + data_file_list
+    print('running snakemake with\n')
+    print(f'Snakefile_path:\t{Snakefile_path}')
+    print(f'shared_workdir:\t{shared_workdir}')
+    print(f'Snakemake_all_files:\t{Snakemake_all_files}')
+    print(f'cores:\t, {cores}')
+
+    snakemake.snakemake(snakefile=Snakefile_path, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=True)

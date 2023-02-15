@@ -1,3 +1,9 @@
+manifest_file:
+  - gdc_manifest_20211029_data_release_31.0_active.tsv.gz
+
+gtf:
+  - gencode.v36.annotation.gtf.gz
+
 gdc_manifest_20211029_data_release_31.0_active.tsv.gz:  # outfilename
   - gdc_manifest_20211029_data_release_31.0_active.tsv.gz # filename on server
   - 26d406d171e43f470ba338f4ec480cc0  # md5

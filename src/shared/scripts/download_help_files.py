@@ -1,6 +1,10 @@
 import requests
 import os
 import subprocess
+"""
+a different script is needed than for the datafilse, their UUID and md5sums are
+taken out of the manifest file downloaded by this script here
+"""
 # get the belonging md5sum out of the config file
 out_file = snakemake.wildcards[1]
 out_dest = snakemake.output[0]
@@ -24,4 +28,8 @@ with open(out_dest, 'wb') as f:
 md5sum_file = subprocess.check_output(
     ['md5sum', out_dest]).decode('utf-8').split(' ')[0]
 if md5sum_file == md5sum:
-    print(f'md5sum of\n{md5sum}\nis verified')
+    print(f'md5sum of file {out_dest} with\n{md5sum}\nis verified')
+else:
+    print(f'cannot confirm md5sum of file {out_dest}!!!')
+    breakpoint()
+

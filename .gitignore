@@ -128,3 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 src/shared/.snakemake/
+src/shared/modules/not_needed/

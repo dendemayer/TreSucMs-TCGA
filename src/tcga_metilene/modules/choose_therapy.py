@@ -161,6 +161,7 @@ def Choose_drugs(SCRIP_PATH, PROJECTS):
         # metilene run:
         drug_list.append(drug_hash[int(i)])
 
+    drug_list = sorted(map(str.lower, drug_list))
     return(drug_list)
 
 

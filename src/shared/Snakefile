@@ -10,5 +10,37 @@ rule download_helpfiles:
     script:
         "scripts/download_help_files.py"
 
+rule download_aux_files:
+    """
+    this rule loads the aux files for both pipelines:
+    those are the 
+    nationwidechildrens.org....
+    files
+    nationwidechildrens.org_auxiliary_cesc.txt
+    """
+    input:
+        expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file'])
+    output:
+        "{output_path}/{project}/aux_files/{output_file}"
+    conda:
+        "envs/pandas.yaml"
+    script:
+        "scripts/download_files.py"
 
+rule download_data_files:
+    """
+    datafiles loaded via script
+    """
+    input:
+        expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file'])
+    output:
+        "{output_path}/{project}/data_files/{output_file}"
+    conda:
+        "envs/pandas.yaml"
+    script:
+        "scripts/download_files.py"
 
+#rule merge_meta_tables:
+#    """
+#    merging meta files to connect case id with the datafiles
+#    """
