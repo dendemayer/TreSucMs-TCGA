@@ -33,12 +33,11 @@ def get_multi_proj_drug_merge_tables(wildcards):
     we need every single proj merged table:
     "{output_path}/{project}/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv"
     """
-    projects = wildcards[1]
     final_list = []
     projects = wildcards[1].split('_')
     for project in projects:
         final_list.append(
-                os.path.join(wildcards[0], project, wildcards[1], 'merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv')) 
+                os.path.join(wildcards[0], project, wildcards[2], 'merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv')) 
     return final_list
 
 #rule all:
@@ -100,7 +99,7 @@ rule merge_meta_tables:
         "{output_path}/{project}/{pipeline}/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv"
     conda:
         "envs/pandas.yaml"
-    wildcard_constraints: # important to not match singleproject patterns
+    wildcard_constraints: # important to just match singleproject patterns
         project = "[A-Z]*-[A-Z]*"
     script:
         "scripts/create_merged_tables.py"
@@ -120,3 +119,7 @@ rule merge_meta_tables_multiproj:
         "envs/pandas.yaml"
     script:
         "scripts/create_merged_tables_multi.py"
+    # not possible to invoke the conda env with the run statement
+    #run:
+    #    import pandas as pd
+    #    pd.concat([pd.read_table(i) for i in input]).to_csv(output[0], sep='\t', index=False)

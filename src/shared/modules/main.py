@@ -167,7 +167,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
             OUTPUT_PATH, projects, pipeline,'merged_meta_files',
             'meta_info_druglist_merged_drugs_combined.tsv'))
 
-    # Snakemake_all_files = Snakemake_all_files + merged_drugs_combined_list
+    Snakemake_all_files = Snakemake_all_files + merged_drugs_combined_list
 
     snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
