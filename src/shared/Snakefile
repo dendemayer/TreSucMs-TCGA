@@ -1,4 +1,50 @@
 configfile: "config.yaml"
+import glob
+import os
+import pandas as pd
+
+def get_aliquot_table(wildcards):
+    proj_suffix = wildcards[1].split('-')[1].lower()
+    OUTPUT_PATH = wildcards[0]
+    project = wildcards[1]
+    #pipeline = wildcards[2] # not needed in input
+    suppl_2 = f'{OUTPUT_PATH}/{project}/aux_files/nationwidechildrens.org_biospecimen_aliquot_{proj_suffix}.txt'
+    suppl_3 = f'{OUTPUT_PATH}/{project}/aux_files/nationwidechildrens.org_clinical_drug_{proj_suffix}.txt'
+    suppl_4 = f'{OUTPUT_PATH}/{project}/aux_files/nationwidechildrens.org_clinical_patient_{proj_suffix}.txt'
+    # IMPORTANT they are not working clinical tables in the repo, (just
+    # concerning CESC) ,the right ones are those:
+    # nationwidechildrens.org_clinical_patient_cesc.txt_1
+    # nationwidechildrens.org_clinical_follow_up_v4.0_cesc.txt_1 for now just
+    # overwrite the first loaded file with the new one (that are those where 2
+    # diff filenames are given for one specific uuid
+    DF_temp = pd.read_table(os.path.join(OUTPUT_PATH, 'metadata', config['manifest_file'][0]))
+    DF_temp = DF_temp[DF_temp['filename'].str.contains(f'nationwidechildrens.org_clinical_follow_up_v.*_{proj_suffix}.txt')]['filename']
+    follow_up_table = DF_temp[~DF_temp.str.contains('nte')].sort_values(ascending=False).iloc[0]
+    suppl_5 = f'{OUTPUT_PATH}/{project}/aux_files/{follow_up_table}'
+    suppl_6 = f'{OUTPUT_PATH}/{project}/aux_files/nationwidechildrens.org_biospecimen_sample_{proj_suffix}.txt'
+    final_list = [suppl_2, suppl_3, suppl_4, suppl_5, suppl_6]
+    return final_list
+
+def get_multi_proj_drug_merge_tables(wildcards):
+    """
+    wildcard structure like:
+    ['/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines', 'TCGA-CESC_TCGA-HNSC',
+    'carboplatn,paclitaxel_cisplatin', 'male', 'cutoff_0', 'threshold_0']
+    we need every single proj merged table:
+    "{output_path}/{project}/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv"
+    """
+    projects = wildcards[1]
+    final_list = []
+    projects = wildcards[1].split('_')
+    for project in projects:
+        final_list.append(
+                os.path.join(wildcards[0], project, wildcards[1], 'merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv')) 
+    return final_list
+
+#rule all:
+#    input:
+#        '/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-CESC/Deseq2/merged_meta_files/merged_meta_tables.tsv'
+
 
 rule download_helpfiles:
     """
@@ -9,6 +55,7 @@ rule download_helpfiles:
         "{output_path}/metadata/{output_file}"
     script:
         "scripts/download_help_files.py"
+
 
 rule download_aux_files:
     """
@@ -40,7 +87,36 @@ rule download_data_files:
     script:
         "scripts/download_files.py"
 
-#rule merge_meta_tables:
-#    """
-#    merging meta files to connect case id with the datafiles
-#    """
+rule merge_meta_tables:
+    """
+    merging meta files to connect case id with the datafiles
+    """
+    input:
+        "resources/GCv36_Manifests/{project}.tsv",
+        get_aliquot_table,  # input[1-5]
+        expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file']), # input[0]
+    output:
+        "{output_path}/{project}/{pipeline}/merged_meta_files/merged_meta_tables.tsv",
+        "{output_path}/{project}/{pipeline}/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv"
+    conda:
+        "envs/pandas.yaml"
+    wildcard_constraints: # important to not match singleproject patterns
+        project = "[A-Z]*-[A-Z]*"
+    script:
+        "scripts/create_merged_tables.py"
+
+rule merge_meta_tables_multiproj:
+    """
+    take the single project meta_info_druglist_merged_drugs_combined.tsv  and
+    concat them in multiproj dirs
+    """
+    input:
+        get_multi_proj_drug_merge_tables
+    output:
+        "{output_path}/{projects}/{pipeline}/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv"
+    wildcard_constraints: # make clear, that we want to include here multiproj
+        projects = "[A-Z]*-[A-Z]*_.*"
+    conda:
+        "envs/pandas.yaml"
+    script:
+        "scripts/create_merged_tables_multi.py"

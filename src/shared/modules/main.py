@@ -2,6 +2,8 @@ import os
 import click
 from shared.modules import choose_therapy
 from shared.modules import download_with_api
+from tcga_metilene.modules import main_metilene
+from tcga_deseq.modules import main_deseq
 import snakemake
 
 SCRIPT_PATH = os.path.split(__file__)[0]
@@ -33,6 +35,12 @@ HOME = os.getenv('HOME')
 @click.option('--cores', '-c', default=1, multiple=False, show_default=True,
               type=int, help='number of cores provided to snakemake',
               required=False)
+@click.option('--cutoff', '-C', default=0, multiple=False, show_default=True,
+              type=int, help='Cut-off parameter',
+              required=False)
+@click.option('--threshold', '-t', default=0, multiple=False, show_default=True,
+              type=int, help='threshold parameter',
+              required=False)
 @click.option('--execute', '-e', default=['Deseq2', 'metilene'], multiple=True,
               show_default=True, help='choose which pipeline shall be\
               executed')
@@ -40,7 +48,8 @@ HOME = os.getenv('HOME')
               help='printing out version information: {}'.format(version),
               is_flag=True, callback=print_version,
               expose_value=False, is_eager=True)
-def call_with_options(out_path, project, drugs, cores, execute):
+def call_with_options(out_path, project, drugs, cores, execute, cutoff,
+                      threshold):
     '''
     "metilene_pipeline" a tool to choose, harvest and analyse methylation data
     of the TCGA-projects with help of the metilene package.\n
@@ -74,17 +83,21 @@ def call_with_options(out_path, project, drugs, cores, execute):
         PROJECT = sorted(map(str.upper, project))
     if len(drugs) == 0:
         DRUGS = choose_therapy.Choose_drugs(SCRIPT_PATH, PROJECT)
+        DRUGS = sorted(map(str.upper, DRUGS))
     else:
         DRUGS = sorted(map(str.lower, drugs))
 
     print('PROJECT:\t\t', PROJECT)
     print('DRUGS:\t\t\t', DRUGS)
+    print(f'cores:\t\t\t{cores}')
+    print(f'cutoff:\t\t\t{cutoff}')
+    print(f'threshold:\t\t{threshold}')
 
     shared_workdir = os.path.join(
         os.path.split(os.path.split(SCRIPT_PATH)[0])[0], 'shared')
     Snakemake_all_files = []
 
-    Snakefile_path = os.path.join(os.path.split(SCRIPT_PATH)[0], 'Snakefile')
+    Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], 'Snakefile')
     config_file_shared = os.path.join(shared_workdir, 'config.yaml')
 
     # help files for both pipelines, like:
@@ -96,7 +109,7 @@ def call_with_options(out_path, project, drugs, cores, execute):
     # once we have to call snakemake in prior, s.t. the manifest file is
     # present on which all the following selections are done on, make sure that
     # here the dryrun flag is not set to False
-    snakemake.snakemake(snakefile=Snakefile_path, targets=Snakemake_all_files,
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
                         force_incomplete=True, dryrun=False)
 
@@ -124,12 +137,47 @@ def call_with_options(out_path, project, drugs, cores, execute):
                               file_type))
 
     Snakemake_all_files = Snakemake_all_files + data_file_list
-    print('running snakemake with\n')
-    print(f'Snakefile_path:\t{Snakefile_path}')
-    print(f'shared_workdir:\t{shared_workdir}')
-    print(f'Snakemake_all_files:\t{Snakemake_all_files}')
-    print(f'cores:\t, {cores}')
 
-    snakemake.snakemake(snakefile=Snakefile_path, targets=Snakemake_all_files,
+    merged_tables_list = []
+    # applied to the snakemake rule merge_meta_tables:, it also creates the
+    # meta_info_druglist_merged_drugs_combined.tsv tables
+    for proj in PROJECT:
+        for pipeline in execute:
+            merged_tables_list.append(os.path.join(
+                OUTPUT_PATH, proj, pipeline,'merged_meta_files',
+                'merged_meta_tables.tsv'))
+
+    # merged_tables_list = [os.path.join(
+    #     OUTPUT_PATH, x,
+    #     'merged_meta_files', 'merged_meta_tables.tsv') for x in PROJECT]
+    # add the merged and processed metatables: specific on pipeline:
+    Snakemake_all_files = Snakemake_all_files + merged_tables_list
+
+    print('running snakemake with\n')
+    print(f'Snakefile:\t{Snakefile}')
+    print(f'shared_workdir:\t{shared_workdir}')
+    # print(f'Snakemake_all_files:\t{Snakemake_all_files}')
+
+    # also add the multi proj meta_info_druglist_merged_drugs_combined.tsv
+    # which is just the concatenation of the single proj pendants:
+    projects = '_'.join(PROJECT)
+    merged_drugs_combined_list = []
+    for pipeline in execute:
+        merged_drugs_combined_list.append(os.path.join(
+            OUTPUT_PATH, projects, pipeline,'merged_meta_files',
+            'meta_info_druglist_merged_drugs_combined.tsv'))
+
+    # Snakemake_all_files = Snakemake_all_files + merged_drugs_combined_list
+
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=True)
+                        force_incomplete=True, dryrun=False)
+    #########################################################################
+    #########################################################################
+    # from here the shared modules and Snakemake scripts are getting pipeline
+    # specific, hand over all outputfiles created so far and enter the pipeline
+    # specific main files:
+    # main_metilene.entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
+    #                         cutoff, threshold, cores)
+
+

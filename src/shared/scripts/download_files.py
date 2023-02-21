@@ -19,7 +19,9 @@ if isinstance(UUID, pd.Series):
 else:
     UUID_list = [(DF_mani.set_index('filename').loc[aux_file, 'id'])]
 
-suffix = 1
+# suffix = 1 # this suffix was used to differntiate same filenames for same
+# uuid, not needed for now, just occurs in cesc and is working if the first
+# file is overwritten by the second
 for UUID in UUID_list:
     while True:
         # it happens that we have 2 different UUID for the exact same filename
@@ -55,22 +57,22 @@ for UUID in UUID_list:
             #     print(f'(trying {5-iterations} times again...)')
             #     print('waiting 5 Minutes before new attempt')
             #     continue
-                # time.sleep(300)
-                # try:
-                #     try:
-                #         response = requests.post(
-                #             data_endpt, data=json.dumps(
-                #                 params), headers={"Content-Type": "application/json"})
-                #     #  *** TypeError: Object of type Series is not JSON serializable
-                #     except TypeError:
-                #         print(f'cannot find aux file {aux_out}, skipping:')
-                #         breakpoint()
-                #         open(aux_out, 'a').close()
-                #         os._exit(0)
-                #     response_head_cd = response.headers["Content-Disposition"]
-                # except KeyError:
-                #     iterations += 1
-            os._exit(0)
+            #     time.sleep(300)
+            #     try:
+            #         try:
+            #             response = requests.post(
+            #                 data_endpt, data=json.dumps(
+            #                     params), headers={"Content-Type": "application/json"})
+            #         #  *** TypeError: Object of type Series is not JSON serializable
+            #         except TypeError:
+            #             print(f'cannot find aux file {aux_out}, skipping:')
+            #             breakpoint()
+            #             open(aux_out, 'a').close()
+            #             os._exit(0)
+            #         response_head_cd = response.headers["Content-Disposition"]
+            #     except KeyError:
+            #         iterations += 1
+            # os._exit(0)
 
     # if the connection breaks while writing the file, just try again until its
     # working again
@@ -87,15 +89,15 @@ for UUID in UUID_list:
                 continue
     # now the md5sum can be checked:
     md5sum = DF_mani.set_index('id').loc[UUID, 'md5']
-    md5sum_file = subprocess.check_output( ['md5sum', aux_out]).decode('utf-8').split(' ')[0]
+    md5sum_file = subprocess.check_output(['md5sum', aux_out]).decode('utf-8').split(' ')[0]
     if md5sum_file == md5sum:
         print(f'md5sum of file {aux_out} with:\n{md5sum}\nis verified')
     else:
         print(f'cannot confirm md5sum of file {aux_out}!!!')
         breakpoint()
 
-    aux_out = aux_out + '_' + str(suffix)
-    suffix += 1
+    # aux_out = aux_out + '_' + str(suffix)
+    # suffix += 1
 
 
 # unpack all auxiliary files and put them into PROJECT/aux_files/ dir:

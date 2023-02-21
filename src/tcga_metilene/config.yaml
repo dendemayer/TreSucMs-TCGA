@@ -1,7 +1,7 @@
 # those files are needed for both, deseq and metilene, they are specified in
 # the shared Snakefile dir
-#api_manifest:
-#  - gdc_manifest_20211029_data_release_31.0_active.tsv.gz
+api_manifest:
+  - gdc_manifest_20211029_data_release_31.0_active.tsv.gz
 
 #md5sum_mani:
 #  - 26d406d171e43f470ba338f4ec480cc0
