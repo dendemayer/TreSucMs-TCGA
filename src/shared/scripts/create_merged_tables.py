@@ -244,9 +244,27 @@ complete_DF = aliq_mani_drug_sample_DF.merge(patient_DF, on='bcr_patient_uuid')
 # lowercase the vital_status and gender infos:
 complete_DF['vital_status'] = complete_DF['vital_status'].str.lower()
 complete_DF['gender'] = complete_DF['gender'].str.lower()
-# in rare cases duplicates arose, they lead to the same filename and can
+# in rare cases duplicates arise, they lead to the same filename and can
 # be dropped here:
 complete_DF.drop_duplicates(subset='bcr_patient_uuid', inplace=True)
+# also add the survivaltime, followup and death_days_to into years:
+# survivaltime            ║ NaN            ║ death_days_to
+# years_to_last_follow_up ║ 3.0219178      ║ last_contact_days_to
+# age_at_diagnosis        ║ 64.561643      ║ age_at_diagnosis
+# age_at_diagnosis is already given in years
+
+def days_to_years(value):
+    try:
+        year = float(value) / 365
+        return year
+    except ValueError:
+        return pd.NA
+
+# make years out of last_concact_days_to col:
+complete_DF['survivaltime'] = complete_DF['death_days_to'].apply(
+    days_to_years)
+complete_DF['years_to_last_follow_up'] = complete_DF[
+    'last_contact_days_to'].apply(days_to_years)
 complete_DF.to_csv(complete_path, sep='\t', index=False)
 print(f'saved {complete_path}')
 

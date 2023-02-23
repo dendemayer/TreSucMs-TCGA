@@ -35,8 +35,8 @@ HOME = os.getenv('HOME')
 @click.option('--cores', '-c', default=1, multiple=False, show_default=True,
               type=int, help='number of cores provided to snakemake',
               required=False)
-@click.option('--cutoff', '-C', default=0, multiple=False, show_default=True,
-              type=int, help='Cut-off parameter',
+@click.option('--cutoff', '-C', default=[0], multiple=True, show_default=True,
+              type=float, help='Cut-off parameter',
               required=False)
 @click.option('--threshold', '-t', default=0, multiple=False, show_default=True,
               type=int, help='threshold parameter',
@@ -87,10 +87,19 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     else:
         DRUGS = sorted(map(str.lower, drugs))
 
+    cutoffs = list(cutoff)
+    for index, cutoff in enumerate(cutoff):
+        print(index, cutoff)
+        if cutoff % 1 == 0:
+            cutoffs[index] = round(cutoff)
+    if not 0 in cutoffs:
+        cutoffs.append(0)
+    cutoffs = sorted(cutoffs)
+
     print('PROJECT:\t\t', PROJECT)
     print('DRUGS:\t\t\t', DRUGS)
     print(f'cores:\t\t\t{cores}')
-    print(f'cutoff:\t\t\t{cutoff}')
+    print(f'cutoff:\t\t\t{cutoffs}')
     print(f'threshold:\t\t{threshold}')
 
     shared_workdir = os.path.join(
@@ -169,15 +178,15 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
 
     Snakemake_all_files = Snakemake_all_files + merged_drugs_combined_list
 
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False)
+    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    #                     workdir=shared_workdir, cores=cores, forceall=False,
+    #                     force_incomplete=True, dryrun=False)
     #########################################################################
     #########################################################################
     # from here the shared modules and Snakemake scripts are getting pipeline
-    # specific, hand over all outputfiles created so far and enter the pipeline
-    # specific main files:
-    # main_metilene.entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
-    #                         cutoff, threshold, cores)
+    # specific, hand over all outputfiles requested so far and enter the
+    # pipeline specific main files:
+    main_metilene.entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
+                            cutoffs, threshold, cores)
 
 

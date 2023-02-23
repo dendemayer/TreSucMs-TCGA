@@ -7,24 +7,8 @@ include: "../shared/Snakefile"
 #    input:
 #        "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-CESC_TCGA-HNSC/metilene/metilene_input_table/carboplatn,paclitaxel_cisplatin/male/cutoff_0/threshold_0/summary_for_metilene.tsv"
 #breakpoint()
-def get_summary_multi_proj(wildcards):
-    """
-    wildcard structure like:
-    ['/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines', 'TCGA-CESC_TCGA-HNSC',
-    'carboplatn,paclitaxel_cisplatin', 'male', 'cutoff_0', 'threshold_0']
-    we need every single proj merged table:
-    "{output_path}/{project}/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv"
 
-    """
-    final_list = []
-    projects = wildcards[1].split('_')
-    for project in projects:
-        final_list.append(
-                os.path.join(wildcards[0], project, wildcards[1], wildcards[2],
-                             wildcards[3], wildcards[4], wildcards[5]))
-    return final_list
-
-rule create_summary_table_single_project:
+rule create_summary_table:
     """
     according to the flag composition the (projects, drugs) and the metadata
     given (dead/alive, female/male) create metilene input tables
@@ -32,14 +16,14 @@ rule create_summary_table_single_project:
     input:
         "{output_path}/{project}/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv"
     output:
-        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/{threshold}/summary_for_metilene.tsv"
+        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv.gz",
+        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv.gz"
     conda:
-        "../shared/envs/pandas.yaml"
+        "../shared/envs/pandas_natsort.yaml"
     script:
         "scripts/create_summary_table.py"
 
-#rule create_summary_table_multi_project:
-    #"""
+#rule create_summary_table_multi_project: #"""
     #according to the flag composition the (projects, drugs) and the metadata
     #given (dead/alive, female/male) create metilene input tables
     #"""
