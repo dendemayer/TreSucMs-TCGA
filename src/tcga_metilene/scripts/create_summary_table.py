@@ -117,7 +117,7 @@ def write_final_DFs(DF, out_file):
     else:
         DF_final = pd.DataFrame()
     # print(f'writing {out_file}')
-    DF_final.to_csv(out_file, sep='\t', compression='gzip')
+    DF_final.to_csv(out_file, sep='\t')
 
 write_final_DFs(DF_meta_filtered_2, out_file)
 write_final_DFs(DF_complement, out_file_complement)

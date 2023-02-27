@@ -80,7 +80,7 @@ rule download_data_files:
     input:
         expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file'])
     output:
-        "{output_path}/{project}/data_files/{output_file}"
+        "{output_path}/{project}/{pipeline}/data_files/{output_file}"
     conda:
         "envs/pandas.yaml"
     script:

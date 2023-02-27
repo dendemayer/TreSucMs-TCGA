@@ -36,9 +36,6 @@ for UUID in UUID_list:
         except Exception as e:
             print(f'Exception {e} with file {aux_out}, retrying')
             continue
-            # breakpoint()
-            # open(aux_out, 'a').close()
-            # os._exit(0)
 
         # The file name can be found in the header within the
         # Content-Disposition key.
@@ -49,30 +46,6 @@ for UUID in UUID_list:
             iterations = 0
             print(f'problems while loading {aux_file}, retrying')
             continue
-            # while iterations < 5:
-            #     print(f'problems while loading {aux_file}')
-            #     print('TCGA GDC dataportal not reachable at the moment\
-            #         check the website: https://portal.gdc.cancer.gov/\
-            #         for potentially network maintenance news and try again later')
-            #     print(f'(trying {5-iterations} times again...)')
-            #     print('waiting 5 Minutes before new attempt')
-            #     continue
-            #     time.sleep(300)
-            #     try:
-            #         try:
-            #             response = requests.post(
-            #                 data_endpt, data=json.dumps(
-            #                     params), headers={"Content-Type": "application/json"})
-            #         #  *** TypeError: Object of type Series is not JSON serializable
-            #         except TypeError:
-            #             print(f'cannot find aux file {aux_out}, skipping:')
-            #             breakpoint()
-            #             open(aux_out, 'a').close()
-            #             os._exit(0)
-            #         response_head_cd = response.headers["Content-Disposition"]
-            #     except KeyError:
-            #         iterations += 1
-            # os._exit(0)
 
     # if the connection breaks while writing the file, just try again until its
     # working again

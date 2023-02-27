@@ -124,7 +124,10 @@ aliq_mani_DF = pd.merge(aliq_DF, mani_DF, on='bcr_aliquot_uuid')
 
 
 def apply_list(value):
-    # print(drug)
+    # combined therapies are joined via '_' thats not allowed to be part of the
+    # name, replace with '-'
+    value = value.replace('_', '-')
+    # correct wrong spellings:
     if re.search("palixtaxel", value):
         return "paclitaxel"
     if re.search("premetrexed", value):

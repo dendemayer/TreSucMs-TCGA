@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 #configfile: 'config.yaml'
 
 include: "../shared/Snakefile"
@@ -7,45 +8,123 @@ include: "../shared/Snakefile"
 #    input:
 #        "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-CESC_TCGA-HNSC/metilene/metilene_input_table/carboplatn,paclitaxel_cisplatin/male/cutoff_0/threshold_0/summary_for_metilene.tsv"
 #breakpoint()
+def get_data_files(wildcards):
+    OUTPUT_PATH = wildcards[0]
+    project = wildcards[1].split('_')
+    DF_temp = pd.read_table(os.path.join(OUTPUT_PATH, 'metadata', config['manifest_file'][0]))
+    DF_temp.set_index('project_id').loc[project, 'filename'].str.contains('HumanMethylation450')
+    DF_temp = DF_temp[DF_temp['filename'].str.contains(
+        'HumanMethylation450')].set_index(
+                'project_id').loc[project, 'filename']
+    DF_temp = DF_temp.to_frame()
+    DF_temp.reset_index(inplace=True)
+    DF_temp['filepath'] = OUTPUT_PATH + '/' + DF_temp['project_id'] + '/metilene/'+ 'data_files' + '/' + DF_temp['filename']
+    data_path_list = DF_temp['filepath'].to_list()
+    return data_path_list
+
 
 rule create_summary_table:
     """
     according to the flag composition the (projects, drugs) and the metadata
     given (dead/alive, female/male) create metilene input tables
+    # every data file for the belonging project must be loaded, since not just
+    # the selection of drugs is invoked, but also the complement
     """
     input:
-        "{output_path}/{project}/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv"
+        "{output_path}/{project}/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv",
+        get_data_files, 
     output:
-        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv.gz",
-        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv.gz"
+        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
+        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv"
     conda:
         "../shared/envs/pandas_natsort.yaml"
+    threads:  # although no threads are applied, limit the process since the table creations needs a lot of ram
+        5
     script:
         "scripts/create_summary_table.py"
 
-#rule create_summary_table_multi_project: #"""
-    #according to the flag composition the (projects, drugs) and the metadata
-    #given (dead/alive, female/male) create metilene input tables
-    #"""
-    #input:
-        #get_summary_multi_proj
-    #output:
-        #"{output_path}/{projects}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/{threshold}/summary_for_metilene.tsv"
-    #conda:
-        #"../shared/envs/pandas.yaml"
-    #script:
-        #"scripts/create_summary_table.py"
+rule create_metilene_out:
+    """
+    # we do not use the conda metilene but use our provided bin and script:
+    # the commands could be:
+    metilene -m 3 -M 1000 -d 0.03 -a alive -b dead summary_for_metilene.tsv | sort -V -k1,1 -k2,2n > metilene_out_sorted.tsv
+    perl metilene_output.pl -q metilene_out_sorted.tsv -a 'alive' -b 'dead' -c 3 -d 0.03
+    # for both metilene and the filter script:
+    -d	minimum mean methylation difference (>=) (default:0.1)
+    # metilene specific:
+    -M, --maxdist	Integer	300	The allowed nt distance between two CpGs within a DMR
+    -m, --mincpgs	Integer	10	The minimum # of CpGs in a DMR
+    # filter specific
+    -c	minimum (>=) CpGs (default:10)
+    {complement} can here either be just metilene or metilene_complement
 
-#rule create_metilene_out:
+    """
+    input:
+        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_{complement}.tsv",
+    output:
+        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_out_sorted.tsv", 
+        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_qval.0.05.out", 
+        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_qval.0.05.pdf", 
+        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_qval.0.05.bedgraph", 
+    conda:
+        "envs/metilene.yaml"
+    threads:
+        10
+    script:
+        "scripts/create_metilene_out.py"
+
+#rule create_metilene_out_complement:
+#    input:
+#        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv",
+#    output:
+#        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_complement_out_sorted.tsv", 
+#        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_complement_qval.0.05.out", 
+#        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_complement_qval.0.05.pdf", 
+#        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_complement_qval.0.05.bedgraph", 
+#    conda:
+#        "envs/metilene.yaml"
+#    threads:
+#        10
+#    script:
+#        "scripts/create_metilene_out.py"
+
+
+#rule metilene_bed_intersect:
 #    """
-#    according to the flag composition the (projects, drugs) and the metadata
-#    given (dead/alive, female/male) create metilene input tables
+#    intersect the regions given in ...out with the positions in ...tsv
 #    """
 #    input:
-#        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/{threshold}/summary_for_metilene.tsv"
+#        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_out_sorted-m_{m}-M_{M}-d_{d}.tsv", 
+#        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene-m_{m}-M_{M}-d_{d}_qval.0.05.out", 
+#        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene-m_{m}-M_{M}-d_{d}_qval.0.05.pdf", 
+#        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene-m_{m}-M_{M}-d_{d}_qval.0.05.bedgraph", 
 #    output:
-#        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/summary_for_metilene.tsv"
+#        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_out_sorted-m_{m}-M_{M}-d_{d}_intersected.tsv", 
+#    # the commands could be:
+#    metilene -m 3 -M 1000 -d 0.03 -a alive -b dead summary_for_metilene.tsv | sort -V -k1,1 -k2,2n > metilene_out_sorted.tsv
+#    perl $CONDA_PREFIX/bin/metilene_output.pl -q metilene_out_sorted.tsv -a 'alive' -b 'dead' -c 3 -d 0.03                                                                                                                                                                            
+#    # for both metilene and the filter script:
+#    -d	minimum mean methylation difference (>=) (default:0.1)
+#    # metilene specific:
+#    -M, --maxdist	Integer	300	The allowed nt distance between two CpGs within a DMR
+#    -m, --mincpgs	Integer	10	The minimum # of CpGs in a DMR
+#    # filter specific
+#    -c	minimum (>=) CpGs (default:10)
+#    # with both the conda version and the provided binary metilene, althogh
+#    # both being the version 0.2-8, have infinite values for q_value, mean g1
+#    chr1 | 826851  | 827747  | 1  |↓286554917820017469…| 10 | 0.044944   | 0.14683   | -3.7711e+299 | -1.3445e+300 ║
+#    chr1 | 72282926| 72284988| 1  | inf                | 11 | 0.00802    | 1         | -nan         | -6.1892e+299 ║
+#    chr1 | 2461470…| 2461471…| 1  | inf                | 3  | 0.40932    | 1         | inf          | 0.60228      ║
+#    best working is binary with t=10
+#    """
+#    input:
+#        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv"
+#    output:
+#        "{output_path}/{project}/metilene/metilene_output_complement/{drug_combi}/{gender}/{cutoff}/{mincpgs}_{maxdist}_metilene_out_sorted.tsv",
+#        "{output_path}/{project}/metilene/metilene_output_complement/{drug_combi}/{gender}/{cutoff}/metilene_qval.{p_val}.bedgraph",
+#        "{output_path}/{project}/metilene/metilene_output_complement/{drug_combi}/{gender}/{cutoff}/metilene_qval.{p_val}.out",
+#        "{output_path}/{project}/metilene/metilene_output_complement/{drug_combi}/{gender}/{cutoff}/metilene_qval.{p-val}.pdf"
 #    conda:
-#        "../shared/envs/pandas.yaml"
+#        "envs/metilene.yaml"
 #    script:
 #        "scripts/create_metilene_out.py"

@@ -76,6 +76,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     print("SCRIPT_PATH:\t\t", SCRIPT_PATH)
     # check if the main_metilene.py exist in the SCRIPT_PATH:
     print("PIPELINES executed:\t", execute)
+    project = [i.strip() for i in project]
     if len(project) == 0:
         PROJECT = choose_therapy.Choose_project()
         PROJECT = sorted(map(str.upper, PROJECT))
@@ -83,19 +84,20 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
         PROJECT = sorted(map(str.upper, project))
     if len(drugs) == 0:
         DRUGS = choose_therapy.Choose_drugs(SCRIPT_PATH, PROJECT)
-        DRUGS = sorted(map(str.upper, DRUGS))
+        DRUGS = sorted(map(str.lower, DRUGS))
     else:
         DRUGS = sorted(map(str.lower, drugs))
 
     cutoffs = list(cutoff)
     for index, cutoff in enumerate(cutoff):
-        print(index, cutoff)
         if cutoff % 1 == 0:
             cutoffs[index] = round(cutoff)
     if not 0 in cutoffs:
         cutoffs.append(0)
     cutoffs = sorted(cutoffs)
 
+    # temp=("-p TCGA-CESC" "-p TCGA-HNSC" "-p TCGA-LUSC" "-p TCGA-ESCA" "-p TCGA-BRCA" "-p TCGA-GBM" "-p TCGA-OV" "-p TCGA-LUAD" "-p TCGA-UCEC" "-p TCGA-KIRC" "-p TCGA-LGG" "-p TCGA-THCA" "-p TCGA-PRAD" "-p TCGA-SKCM" "-p TCGA-COAD" "-p TCGA-STAD" "-p TCGA-BLCA" "-p TCGA-LIHC" "-p TCGA-KIRP" "-p TCGA-SARC" "-p TCGA-PAAD" "-p TCGA-PCPG" "-p TCGA-READ" "-p TCGA-TGCT" "-p TCGA-THYM" "-p TCGA-KICH" "-p TCGA-ACC" "-p TCGA-MESO" "-p TCGA-UVM" "-p TCGA-DLBC" "-p TCGA-UCS" "-p TCGA-CHOL")
+    # temp=("-p TCGA-CESC" "-p TCGA-HNSC")
     print('PROJECT:\t\t', PROJECT)
     print('DRUGS:\t\t\t', DRUGS)
     print(f'cores:\t\t\t{cores}')
@@ -161,7 +163,6 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     #     'merged_meta_files', 'merged_meta_tables.tsv') for x in PROJECT]
     # add the merged and processed metatables: specific on pipeline:
     Snakemake_all_files = Snakemake_all_files + merged_tables_list
-
     print('running snakemake with\n')
     print(f'Snakefile:\t{Snakefile}')
     print(f'shared_workdir:\t{shared_workdir}')
