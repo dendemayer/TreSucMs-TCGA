@@ -51,23 +51,24 @@ HOME = os.getenv('HOME')
 def call_with_options(out_path, project, drugs, cores, execute, cutoff,
                       threshold):
     '''
-    "metilene_pipeline" a tool to choose, harvest and analyse methylation data
-    of the TCGA-projects with help of the metilene package.\n
+    tcga pipelines a tool to choose, harvest and analyse methylation and rna
+    count data of the TCGA-projects with help of the package metilene and
+    DEseq2.\n
 
-    Build and activate the provided conda env:
+    # Build and activate the provided conda env:
 
-        $ conda env create -f metilene_env.yaml
+    #     $ conda env create -f metilene_env.yaml
 
-        $ conda activate metilene_pipeline
+    #     $ conda activate metilene_pipeline
 
-    call the script without any options to enter the interactive mode and set
-    each option step by step:
+    # call the script without any options to enter the interactive mode and set
+    # each option step by step:
 
-        $ python main_metilene.py
+    #     $ python main_metilene.py
 
-    print help page:
+    # print help page:
 
-        $ python main_metilene.py --help
+    #     $ python main_metilene.py --help
     '''
     OUTPUT_PATH = out_path
     print("\nOUTPUT_PATH:\t\t", OUTPUT_PATH)
@@ -114,15 +115,17 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # help files for both pipelines, like:
     # OUTPUT_PATH/metadata/gdc_manifest_20211029_data_release_31...,
     # gencode.v36.annotation
-    help_file_list = download_with_api.download_GDC_manifest(
+    help_file_list = download_with_api.download_help_files(
         OUTPUT_PATH, config_file_shared)
     Snakemake_all_files = Snakemake_all_files + help_file_list
     # once we have to call snakemake in prior, s.t. the manifest file is
     # present on which all the following selections are done on, make sure that
     # here the dryrun flag is not set to False
+    # TODO uncomment this !!!
     snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False)
+                        force_incomplete=True, dryrun=False, use_conda=True)
+    # TODO uncomment this !!!
 
     # auxfiles for both pipelines:
     # OUTPUT_PATH/PROJECT/aux_files/nationwidechildrens.....
@@ -158,9 +161,6 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
                 OUTPUT_PATH, proj, pipeline,'merged_meta_files',
                 'merged_meta_tables.tsv'))
 
-    # merged_tables_list = [os.path.join(
-    #     OUTPUT_PATH, x,
-    #     'merged_meta_files', 'merged_meta_tables.tsv') for x in PROJECT]
     # add the merged and processed metatables: specific on pipeline:
     Snakemake_all_files = Snakemake_all_files + merged_tables_list
     print('running snakemake with\n')

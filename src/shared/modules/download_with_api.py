@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from yaml import safe_load
-def download_GDC_manifest(OUTPUT_PATH, config_file_shared):
+def download_help_files(OUTPUT_PATH, config_file_shared):
     """
     # creating the file names which should be requested through Snakemake
     downloading manifest file and the gtf annotation file from TCGA:

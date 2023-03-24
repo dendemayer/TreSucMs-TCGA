@@ -52,6 +52,8 @@ rule download_helpfiles:
     """
     output:
         "{output_path}/metadata/{output_file}"
+    conda:
+        "envs/request.yaml"
     script:
         "scripts/download_help_files.py"
 
@@ -63,6 +65,8 @@ rule download_aux_files:
     nationwidechildrens.org....
     files
     nationwidechildrens.org_auxiliary_cesc.txt
+    # the same scrip like in download_data_files rule can be used, the output
+    # path is different
     """
     input:
         expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file'])
@@ -71,7 +75,7 @@ rule download_aux_files:
     conda:
         "envs/pandas.yaml"
     script:
-        "scripts/download_files.py"
+        "scripts/download_data_files.py"
 
 rule download_data_files:
     """
@@ -84,7 +88,7 @@ rule download_data_files:
     conda:
         "envs/pandas.yaml"
     script:
-        "scripts/download_files.py"
+        "scripts/download_data_files.py"
 
 rule merge_meta_tables:
     """

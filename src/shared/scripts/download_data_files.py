@@ -22,12 +22,12 @@ else:
 # suffix = 1 # this suffix was used to differntiate same filenames for same
 # uuid, not needed for now, just occurs in cesc and is working if the first
 # file is overwritten by the second
-for UUID in UUID_list:
+for i in range(0, len(UUID_list)):
     while True:
         # it happens that we have 2 different UUID for the exact same filename
         # (?!?) -> save both, the first name is then saved as expected and
         data_endpt = "https://api.gdc.cancer.gov/data/"
-        params = {"ids": UUID}
+        params = {"ids": UUID_list[i]}
         try:
             response = requests.post(
                 data_endpt, data=json.dumps(
@@ -61,13 +61,14 @@ for UUID in UUID_list:
                 time.sleep(300)
                 continue
     # now the md5sum can be checked:
-    md5sum = DF_mani.set_index('id').loc[UUID, 'md5']
+    md5sum = DF_mani.set_index('id').loc[UUID_list[i], 'md5']
     md5sum_file = subprocess.check_output(['md5sum', aux_out]).decode('utf-8').split(' ')[0]
     if md5sum_file == md5sum:
         print(f'md5sum of file {aux_out} with:\n{md5sum}\nis verified')
     else:
         print(f'cannot confirm md5sum of file {aux_out}!!!')
-        breakpoint()
+        print(f'repeated download of file {aux_out}')
+        i -= 1
 
     # aux_out = aux_out + '_' + str(suffix)
     # suffix += 1
