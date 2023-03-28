@@ -45,7 +45,7 @@ PROJECT = snakemake.wildcards.project
 try:
     # DF_summary = pd.read_table(meta_info)
     DF_met_out = pd.read_table(qval_out, header=None)
-    DF_met_input = pd.read_table(metilene_input)
+    DF_met_input = pd.read_table(metilene_input, na_values='.').dropna(how='any')
     # if the DF_met_out DF is empty, nothing can be intersected, independent of
     # the content of the metilene input (metilene_input) table, at this point, an
     # empty DF out can be written as result of this step
@@ -60,21 +60,10 @@ except Exception as e:
     os._exit(0)
 
 
-# out of this input table, read the first input file to get the annotations
-try:
-    first_UUID = DF_met_input.columns[2].split(';')[1]
-except Exception as e:
-    breakpoint()
-# data_tail = DF_summary.set_index('bcr_patient_uuid').loc[first_UUID,'filename']
-# data_mid = os.path.join('metilene', 'data_files')
-# data_path = os.path.join(OUTPUT_PATH, PROJECT, data_mid, data_tail)
-# DF_data = pd.read_table(data_path)
 
 DF_met_input['End'] = DF_met_input['Start'] + 1
 DF_met_input = pd.concat([DF_met_input.loc[:, ['Chromosome', 'Start', 'End']], DF_met_input.drop(['Chromosome', 'Start', 'End'], axis=1)], axis=1).sort_values(['Chromosome', 'Start'], key=natsort_keygen())
 
-# DF_data_bed = pd.concat([DF_data.loc[:, ['Chromosome','Start', 'End']], DF_data.drop(['Chromosome','Start', 'End'], axis=1)], axis=1).sort_values(['Chromosome', 'Start'], key=natsort_keygen())
-# DF_data_bed = DF_data_bed[~(DF_data_bed['Chromosome'] == '*')]
 
 #######
 # first plot the distribution of betavalues of the regions found
@@ -102,6 +91,18 @@ DF_met_inp_out.columns = MI
 
 DF_met_inp_out['region'] = DF_met_inp_out.apply(return_region_entry, axis=1)
 DF_met_inp_out = DF_met_inp_out.set_index('region', append=True)
+
+# also regions are reportet, which do not have any beta value at all, they
+# would cause errors while plotting the DMRs
+# region chr19_58228367_58228578
+# '/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_paclitaxel/female_male/cutoff_0/metilene_complement_intersect.tsv'
+# range_ = 'chr19_58228367_58228578'
+# DF_met_inp_out.loc[(slice(None), slice(None), slice(None), range_), :]
+# problem solved with dropping not present betavalues whilst reading in the
+# input for metilene:
+# DF_met_input = pd.read_table(metilene_input, na_values='.').dropna(how='all')
+# if intersected_out=='/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_paclitaxel/female_male/cutoff_0/metilene_complement_intersect.tsv':
+    # breakpoint()
 DF_met_inp_out.to_csv(intersected_out, sep='\t')
 
 # to read it correctly with the MI use header and index_col:

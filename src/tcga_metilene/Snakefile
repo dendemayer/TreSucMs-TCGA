@@ -31,7 +31,7 @@ rule create_summary_table:
     # the selection of drugs is invoked, but also the complement
     """
     input:
-        "{output_path}/{project}/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv",
+        "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
         get_data_files, 
     output:
         "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
@@ -74,6 +74,9 @@ rule create_metilene_out:
         "scripts/create_metilene_out.py"
 
 rule metilene_intersect_tables:
+    """
+    intersecting the qval.0.05.out tables (holding DMRs) with the beta value files with which the are created with
+    """
     input:
         qval_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_qval.0.05.out", 
         #meta_info = "{output_path}/{project}/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv",
@@ -95,3 +98,16 @@ rule metilene_plot_DMR_regions:
     conda:
         "envs/seaborn_plot.yaml"
     script:
+        "scripts/plot_DMR_regions.py"
+
+rule metilene_DMR_lifeline_plots:
+    input:
+        metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_intersect.tsv",
+        meta_table = "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
+    output:
+        lifeline_out_pdf = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/{complement}_intersect_lifeline_plot_{range}.pdf",
+        lifeline_out_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/{complement}_intersect_lifeline_plot_{range}.tsv",
+    conda:
+        "envs/lifelines.yaml"
+    script:
+        "scripts/create_lifeline_plots.py"

@@ -38,8 +38,8 @@ HOME = os.getenv('HOME')
 @click.option('--cutoff', '-C', default=[0], multiple=True, show_default=True,
               type=float, help='Cut-off parameter',
               required=False)
-@click.option('--threshold', '-t', default=0, multiple=False, show_default=True,
-              type=int, help='threshold parameter',
+@click.option('--threshold', '-t', default=[0], multiple=True, show_default=True,
+              type=float, help='threshold parameter',
               required=False)
 @click.option('--execute', '-e', default=['Deseq2', 'metilene'], multiple=True,
               show_default=True, help='choose which pipeline shall be\
@@ -90,12 +90,20 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
         DRUGS = sorted(map(str.lower, drugs))
 
     cutoffs = list(cutoff)
-    for index, cutoff in enumerate(cutoff):
+    for index, cutoff in enumerate(cutoffs):
         if cutoff % 1 == 0:
             cutoffs[index] = round(cutoff)
     if not 0 in cutoffs:
         cutoffs.append(0)
     cutoffs = sorted(cutoffs)
+
+    thresholds = list(threshold)
+    for index, threshold in enumerate(thresholds):
+        if threshold % 1 == 0:
+            thresholds[index] = round(threshold)
+    if not 0 in thresholds:
+        thresholds.append(0)
+    threshold = sorted(thresholds)
 
     # temp=("-p TCGA-CESC" "-p TCGA-HNSC" "-p TCGA-LUSC" "-p TCGA-ESCA" "-p TCGA-BRCA" "-p TCGA-GBM" "-p TCGA-OV" "-p TCGA-LUAD" "-p TCGA-UCEC" "-p TCGA-KIRC" "-p TCGA-LGG" "-p TCGA-THCA" "-p TCGA-PRAD" "-p TCGA-SKCM" "-p TCGA-COAD" "-p TCGA-STAD" "-p TCGA-BLCA" "-p TCGA-LIHC" "-p TCGA-KIRP" "-p TCGA-SARC" "-p TCGA-PAAD" "-p TCGA-PCPG" "-p TCGA-READ" "-p TCGA-TGCT" "-p TCGA-THYM" "-p TCGA-KICH" "-p TCGA-ACC" "-p TCGA-MESO" "-p TCGA-UVM" "-p TCGA-DLBC" "-p TCGA-UCS" "-p TCGA-CHOL")
     # temp=("-p TCGA-CESC" "-p TCGA-HNSC")
@@ -122,9 +130,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # present on which all the following selections are done on, make sure that
     # here the dryrun flag is not set to False
     # TODO uncomment this !!!
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True)
+    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    #                     workdir=shared_workdir, cores=cores, forceall=False,
+    #                     force_incomplete=True, dryrun=True, use_conda=True)
     # TODO uncomment this !!!
 
     # auxfiles for both pipelines:
@@ -157,9 +165,11 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # meta_info_druglist_merged_drugs_combined.tsv tables
     for proj in PROJECT:
         for pipeline in execute:
-            merged_tables_list.append(os.path.join(
-                OUTPUT_PATH, proj, pipeline,'merged_meta_files',
-                'merged_meta_tables.tsv'))
+            for cutoff in cutoffs:
+                cutoff = 'cutoff_' + str(cutoff)
+                merged_tables_list.append(os.path.join(
+                    OUTPUT_PATH, proj, pipeline,'merged_meta_files', cutoff,
+                    'merged_meta_tables.tsv'))
 
     # add the merged and processed metatables: specific on pipeline:
     Snakemake_all_files = Snakemake_all_files + merged_tables_list
@@ -173,16 +183,20 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     projects = '_'.join(PROJECT)
     merged_drugs_combined_list = []
     for pipeline in execute:
-        merged_drugs_combined_list.append(os.path.join(
-            OUTPUT_PATH, projects, pipeline,'merged_meta_files',
-            'meta_info_druglist_merged_drugs_combined.tsv'))
+        for cutoff in cutoffs:
+            cutoff = 'cutoff_' + str(cutoff)
+            merged_drugs_combined_list.append(os.path.join(
+                OUTPUT_PATH, projects, pipeline,'merged_meta_files', cutoff,
+                'meta_info_druglist_merged_drugs_combined.tsv'))
 
     Snakemake_all_files = Snakemake_all_files + merged_drugs_combined_list
 
+    # TODO uncomment this !!!
     # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
     #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=False)
+    #                     force_incomplete=True, dryrun=True)
     #########################################################################
+    # TODO uncomment this !!!
     #########################################################################
     # from here the shared modules and Snakemake scripts are getting pipeline
     # specific, hand over all outputfiles requested so far and enter the

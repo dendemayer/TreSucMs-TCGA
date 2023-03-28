@@ -258,10 +258,20 @@ complete_DF.drop_duplicates(subset='bcr_patient_uuid', inplace=True)
 
 def days_to_years(value):
     try:
-        year = float(value) / 365
+        year = abs(float(value)) / 365
         return year
     except ValueError:
         return pd.NA
+
+####
+# TODO:
+#     what went wrong here:
+# (Pdb) complete_DF.set_index('bcr_patient_uuid').loc['264b3066-b77b-4375-9847-adcf22dbc438', :]['last_contact_days_to']
+# '-10'
+# -> using abs:
+        # year = abs(float(value)) / 365
+####
+
 
 # make years out of last_concact_days_to col:
 complete_DF['survivaltime'] = complete_DF['death_days_to'].apply(

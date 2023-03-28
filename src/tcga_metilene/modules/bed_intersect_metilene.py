@@ -39,13 +39,13 @@ def return_plot_DMR_regions_plot(metilene_intersect_tables):
                     ).index.to_list()})
     # to each intersect table, we hold the DMR belonging to it, now populate
     # the pdf out filenames:
-    pdf_file_list = []
+    metilene_plots = []
     for filename in DMR_dict.keys():
         for DMR in DMR_dict[filename]:
-            pdf_file_list.append(
+            metilene_plots.append(
                 filename.replace('.tsv', f'_boxplot_beta_value_{DMR}.pdf'))
-            pdf_file_list.append(
+            metilene_plots.append(
                 filename.replace(
                     '.tsv', f'_lineplot_median_beta_value_{DMR}.pdf'))
 
-    return pdf_file_list
+    return metilene_plots

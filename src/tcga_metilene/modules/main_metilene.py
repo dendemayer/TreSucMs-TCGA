@@ -3,7 +3,7 @@ import os
 from tcga_metilene.modules import create_summary_table
 from tcga_metilene.modules import create_metilene_out
 from tcga_metilene.modules import bed_intersect_metilene
-from tcga_metilene.modules import lifeline_tables
+from tcga_metilene.modules import create_lifeline_plot
 
 """
 coming from src/shared/modules/main.py
@@ -38,6 +38,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
             OUTPUT_PATH, PROJECT, DRUGS, cutoffs)
 
     Snakemake_all_files = Snakemake_all_files + metilene_intersect_tables
+    # Snakemake_all_files = Snakemake_all_files + ['/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_paclitaxel/female_male/cutoff_0/metilene_complement_intersect.tsv']
 
     # ## up to this point, every download, preprocessing and metilene analyse
     # steps including intersection of DMR with the original beta_value input
@@ -47,9 +48,9 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     ### make sure that this snakemake process is completed before starting
     ### consecutive processes
     # TODO uncomment this !!!
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True)
+    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    #                     workdir=shared_workdir, cores=cores, forceall=False,
+    #                     force_incomplete=True, dryrun=True, use_conda=True)
     # TODO uncomment this !!!
 
     # forcerun=['/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-HNSC/metilene/metilene_output/carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv'])
@@ -62,13 +63,23 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
 
     metilene_plots = bed_intersect_metilene.return_plot_DMR_regions_plot(
         metilene_intersect_tables)
+
     # Start Snakemake_all_files new over, since the rest must be created at
     # this point and the DAG resolvement is faster than
     Snakemake_all_files = metilene_plots
+
+    # the lifeline regression is the first step where the threshold is invoked,
+    # for every so far created metilene out, create a lifeline for each
+    # threshold (the applied metilene_plots list already contains the cutoff
+    # permutation...)
+    lifeline_plots = create_lifeline_plot.create_lifeline_plots(
+        metilene_plots, threshold)
+
+    Snakemake_all_files = Snakemake_all_files + lifeline_plots
+
     snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, debug=False,
-                        use_conda=True)
+                        force_incomplete=True, dryrun=False, use_conda=True, )
     # lifeline_tables = lifeline_tables
 
 # # ##### main_metilene ############

@@ -12,8 +12,7 @@ range_ = snakemake.wildcards.range
 # # FrozenList(['Chromosome', 'Start', 'End', 'region'])
 # # (Pdb) DF_DMR.columns.names
 # # FrozenList(['vital_status', 'case_id', 'drugs', 'gender', 'projects'])
-DF_DMR = pd.read_table(
-    met_int_path, header=[0, 1, 2, 3, 4], index_col=[0, 1, 2, 3], na_values='.').dropna()
+DF_DMR = pd.read_table( met_int_path, header=[0, 1, 2, 3, 4], index_col=[0, 1, 2, 3], na_values='.')
 # out of the MI index parse the regions:
 # # (Pdb) DF_DMR.index.names
 # # FrozenList(['Chromosome', 'Start', 'End', 'region'])
@@ -31,7 +30,17 @@ palette_len = len(project_list) * 2
 # def return_plot_DMR_regions_plot(metilene_intersect_tables): in modules/bed_intersect_metilene.py
 # for range_ in range_list:
 # limit the DF to the recent region:
-DF_to_plot = DF_DMR.loc[(slice(None), slice(None), slice(None), range_), :]
+try:
+    DF_to_plot = DF_DMR.loc[(slice(None), slice(None), slice(None), range_), :]
+except Exception as e:
+    # KeyError('chr19_58228367_58228578') in meta table TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_paclitaxel/female_male/cutoff_0/metilene_complement_intersect.tsv
+ # vital_status |          |          |                         | alive              | dead               | dead
+ # chr19        | 58228368 | 58228369 | chr19_58228367_58228578 | .                  | .                  | .
+ # chr19        | 58228412 | 58228413 | chr19_58228367_58228578 | .                  | .                  | .
+ # chr19        | 58228437 | 58228438 | chr19_58228367_58228578 | .                  | .                  | .
+ # chr19        | 58228439 | 58228440 | chr19_58228367_58228578 | .                  | .                  | .
+ # --> found ranges for cases for which we dont have the
+    print(e)
 DF_to_plot_median = DF_to_plot.groupby( by=['vital_status', 'projects'], axis=1).median().reset_index('Start')
 projects_list = [ i[4] for i in DF_to_plot.columns]
 vital_array = [ i[0] for i in DF_to_plot.columns]

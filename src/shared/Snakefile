@@ -27,6 +27,7 @@ def get_aliquot_table(wildcards):
 
 def get_multi_proj_drug_merge_tables(wildcards):
     """
+    # to create the aggregated meta table over all projects, return the single project meta tables:
     wildcard structure like:
     ['/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines', 'TCGA-CESC_TCGA-HNSC',
     'carboplatn,paclitaxel_cisplatin', 'male', 'cutoff_0', 'threshold_0']
@@ -37,12 +38,12 @@ def get_multi_proj_drug_merge_tables(wildcards):
     projects = wildcards[1].split('_')
     for project in projects:
         final_list.append(
-                os.path.join(wildcards[0], project, wildcards[2], 'merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv')) 
+                os.path.join(wildcards[0], project, wildcards[2], 'merged_meta_files', wildcards[3], 'meta_info_druglist_merged_drugs_combined.tsv')) 
     return final_list
 
 #rule all:
 #    input:
-#        '/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-CESC/Deseq2/merged_meta_files/merged_meta_tables.tsv'
+#        "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv",
 
 
 rule download_helpfiles:
@@ -56,7 +57,6 @@ rule download_helpfiles:
         "envs/request.yaml"
     script:
         "scripts/download_help_files.py"
-
 
 rule download_aux_files:
     """
@@ -99,8 +99,8 @@ rule merge_meta_tables:
         get_aliquot_table,  # input[1-5]
         expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file']), # input[0]
     output:
-        "{output_path}/{project}/{pipeline}/merged_meta_files/merged_meta_tables.tsv",
-        "{output_path}/{project}/{pipeline}/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv"
+        "{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/merged_meta_tables.tsv",
+        "{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv"
     conda:
         "envs/pandas.yaml"
     wildcard_constraints: # important to just match singleproject patterns
@@ -116,7 +116,7 @@ rule merge_meta_tables_multiproj:
     input:
         get_multi_proj_drug_merge_tables
     output:
-        "{output_path}/{projects}/{pipeline}/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv"
+        "{output_path}/{projects}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv"
     wildcard_constraints: # make clear, that we want to include here multiproj
         projects = "[A-Z]*-[A-Z]*_.*"
     conda:
