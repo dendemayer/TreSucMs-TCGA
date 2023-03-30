@@ -48,9 +48,9 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     ### make sure that this snakemake process is completed before starting
     ### consecutive processes
     # TODO uncomment this !!!
-    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=True, use_conda=True)
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True)
     # TODO uncomment this !!!
 
     # forcerun=['/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-HNSC/metilene/metilene_output/carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv'])
@@ -77,9 +77,11 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
 
     Snakemake_all_files = Snakemake_all_files + lifeline_plots
 
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    # TODO
+    snakemake.snakemake(snakefile=Snakefile, targets=lifeline_plots,
                         workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True, )
+                        force_incomplete=True, dryrun=False, use_conda=True, quiet=True)
+    # TODO
     # lifeline_tables = lifeline_tables
 
 # # ##### main_metilene ############

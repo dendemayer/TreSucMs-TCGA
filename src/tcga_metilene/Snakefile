@@ -111,3 +111,12 @@ rule metilene_DMR_lifeline_plots:
         "envs/lifelines.yaml"
     script:
         "scripts/create_lifeline_plots.py"
+
+rule check_DMR_with_background:
+    """
+
+    """
+    input:
+
+
+

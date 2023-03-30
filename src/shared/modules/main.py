@@ -130,9 +130,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # present on which all the following selections are done on, make sure that
     # here the dryrun flag is not set to False
     # TODO uncomment this !!!
-    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=True, use_conda=True)
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True)
     # TODO uncomment this !!!
 
     # auxfiles for both pipelines:
@@ -192,9 +192,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     Snakemake_all_files = Snakemake_all_files + merged_drugs_combined_list
 
     # TODO uncomment this !!!
-    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=True)
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False)
     #########################################################################
     # TODO uncomment this !!!
     #########################################################################
