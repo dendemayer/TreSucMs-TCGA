@@ -4,6 +4,7 @@ from tcga_metilene.modules import create_summary_table
 from tcga_metilene.modules import create_metilene_out
 from tcga_metilene.modules import bed_intersect_metilene
 from tcga_metilene.modules import create_lifeline_plot
+from tcga_metilene.modules import create_lifeline_plots_validation
 
 """
 coming from src/shared/modules/main.py
@@ -77,16 +78,23 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
 
     Snakemake_all_files = Snakemake_all_files + lifeline_plots
 
+    # merge the DMR related plots threshold specific lifeline plots and not
+    # threshold specific DMR box and lineplots:
     merged_plots = [os.path.join(j, 'metilene_merged_lifeline_plot.pdf') for j in list(set([os.path.split(i)[0] for i in lifeline_plots]))]
     merged_plots = merged_plots + [os.path.join(j, 'metilene_merged_boxplot_beta_value.pdf') for j in list(set([os.path.split(os.path.split(i)[0])[0] for i in lifeline_plots]))]
     merged_plots = merged_plots + [os.path.join(j, 'metilene_merged_lineplot_median_beta_value.pdf') for j in list(set([os.path.split(os.path.split(i)[0])[0] for i in lifeline_plots]))]
 
     Snakemake_all_files = Snakemake_all_files + merged_plots
+
+    # validation plots for the found DMRs:
+    validation_plots = create_lifeline_plots_validation.validation_plots(lifeline_plots)
+
+    Snakemake_all_files = Snakemake_all_files + validation_plots
     # TODO
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    snakemake.snakemake(snakefile=Snakefile, targets=validation_plots,
                         workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True, printshellcmds=True)
+                        force_incomplete=True, dryrun=False, use_conda=True,
+                        printshellcmds=True,  rerun_triggers='mtime')
     # TODO
-    # lifeline_tables = lifeline_tables
 
 # # ##### main_metilene ############

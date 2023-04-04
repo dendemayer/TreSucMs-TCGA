@@ -30,20 +30,20 @@ python /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/
     tcga_metilene/scripts/create_lifeline_plots.py
 """
 
-# meta_table = snakemake.input.meta_table
-# met_table = snakemake.input.metilene_intersect
-# DMR = snakemake.wildcards.range
-# lifeline_out_pdf = snakemake.output.lifeline_out_pdf
-# lifeline_out_tsv = snakemake.output.lifeline_out_tsv
-# threshold = snakemake.wildcards.threshold
+meta_table = snakemake.input.meta_table
+met_table = snakemake.input.metilene_intersect
+DMR = snakemake.wildcards.range
+lifeline_out_pdf = snakemake.output.lifeline_out_pdf
+lifeline_out_tsv = snakemake.output.lifeline_out_tsv
+threshold = snakemake.wildcards.threshold
 
-meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-met_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/metilene_intersect.tsv"
-DMR = "chr10_122878683_122880376"
-lifeline_out_pdf = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_1/metilene_intersect_lifeline_plot_chr10_122878683_122880376.pdf"
-lifeline_out_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_1/metilene_intersect_lifeline_plot_chr10_122878683_122880376.tsv"
-threshold = "threshold_1"
-# ->>>
+# meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+# met_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/metilene_intersect.tsv"
+# DMR = "chr10_122878683_122880376"
+# lifeline_out_pdf = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_1/metilene_intersect_lifeline_plot_chr10_122878683_122880376.pdf"
+# lifeline_out_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_1/metilene_intersect_lifeline_plot_chr10_122878683_122880376.tsv"
+# threshold = "threshold_1"
+# # ->>>
 # > /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/.snakemake/scripts/tmppd019qrh.create_lifeline_plots.py(192)<module>()
 # -> print(e)
 # (Pdb) e
@@ -76,7 +76,6 @@ DF_metilene = DF_metilene.loc[(slice(None), slice(None), slice(None), DMR), :]
 # threshold % over or under the median
 thresh = float(threshold.split('_')[1])
 # set every beta value which is to close to the median to pd.NA:
-breakpoint()
 def apply_thresh(row):
     median = row.median()
     beta_val_max = row.max()
@@ -89,6 +88,7 @@ def apply_thresh(row):
 DF_metilene = DF_metilene.apply(apply_thresh, axis=1)
 
 #############################################
+#### IMPORTANT T check!!!
 # get the used cases out of the meta_table:
 used_cases = [ i[1] for i in DF_metilene.columns]
 DF_meta = DF_meta.set_index('bcr_patient_uuid').loc[used_cases, :]
@@ -118,6 +118,7 @@ DF_metilene.drop(labels=index_to_delete, axis=1, level=1, inplace=True)
 DF_meta = DF_meta[T.notna()]
 ### this is not threshold related, its a check, whether we have all T values
 ### available for the set we are interested in !!!
+#### IMPORTANT T check!!!
 #################################################################
 
 # the groups are representing the cases which are either higher or lower
@@ -187,8 +188,8 @@ if DF_plot.value_counts().index.nunique() != 2:
     pd.DataFrame(
         columns=['case_id', 'drugs', 'gender', 'projects', 'UP_or_DOWN',
                  'beta_value', 'vital_status', 'survivaltime',
-                 'years_to_last_follow_up', 'T', 'E',
-                 'median', 'DMR']).to_csv(lifeline_out_tsv, sep='\t', index=False)
+                 'years_to_last_follow_up', 'T', 'E', 'median', 'DMR',
+                 'p_value']).to_csv(lifeline_out_tsv, sep='\t', index=False)
 else:
     cases_to_keep = [i[1] for i in DF_plot.index]
     DF_meta = DF_meta.loc[cases_to_keep]

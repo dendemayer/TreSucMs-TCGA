@@ -155,13 +155,16 @@ rule compare_background:
     - the two validation KM plots groups treated vs untreated 
 
     """
-    #input:
-    #    metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
-    #    meta_table = "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
-    #output:
-    #    lifeline_out_pdf = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{range}.pdf",
-    #    lifeline_out_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{range}.tsv",
-    #conda:
-    #    "envs/lifelines.yaml"
-    #script:
-    #    "scripts/create_lifeline_plots.py"
+    input:
+        metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
+        meta_table = "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
+    output:
+        # /scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_2/threshold_10/metilene_intersect_lifeline_DOWN_val_plot_chr8_140238482_140238568.pdf
+        UP_val_plot = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_UP_val_plot_{range}.pdf",
+        UP_val_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_UP_val_plot_{range}.tsv",
+        DOWN_val_plot = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_DOWN_val_plot_{range}.pdf",
+        DOWN_val_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_DOWN_val_plot_{range}.tsv",
+    conda:
+        "envs/lifelines.yaml"
+    script:
+        "scripts/create_lifeline_plots_validation.py"
