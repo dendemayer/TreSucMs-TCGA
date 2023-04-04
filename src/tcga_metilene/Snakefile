@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import glob
 #configfile: 'config.yaml'
 
 include: "../shared/Snakefile"
@@ -35,7 +36,7 @@ rule create_summary_table:
         get_data_files, 
     output:
         "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
-        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv"
+        #"{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv"
     conda:
         "../shared/envs/pandas_natsort.yaml"
     threads:  # although no threads are applied, limit the process since the table creations needs a lot of ram
@@ -60,12 +61,12 @@ rule create_metilene_out:
 
     """
     input:
-        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_{complement}.tsv",
+        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
     output:
-        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_out_sorted.tsv", 
-        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_qval.0.05.out", 
-        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_qval.0.05.pdf", 
-        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_qval.0.05.bedgraph", 
+        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_out_sorted.tsv", 
+        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05.out", 
+        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05.pdf", 
+        "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05.bedgraph", 
     conda:
         "envs/metilene.yaml"
     threads:
@@ -78,12 +79,12 @@ rule metilene_intersect_tables:
     intersecting the qval.0.05.out tables (holding DMRs) with the beta value files with which the are created with
     """
     input:
-        qval_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_qval.0.05.out", 
+        qval_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05.out", 
         #meta_info = "{output_path}/{project}/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv",
         # is this actually needed?
-        metilene_input = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_{complement}.tsv",
+        metilene_input = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
     output:
-        out_file = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_intersect.tsv"
+        out_file = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv"
     conda:
         "envs/pandas_bedtools.yaml"
     script:
@@ -91,10 +92,10 @@ rule metilene_intersect_tables:
 
 rule metilene_plot_DMR_regions:
     input:
-        metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_intersect.tsv"
+        metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv"
     output:
-        range_box_plot = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_intersect_boxplot_beta_value_{range}.pdf",
-        range_line_plot = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_intersect_lineplot_median_beta_value_{range}.pdf" 
+        range_box_plot = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_boxplot_beta_value_{range}.pdf",
+        range_line_plot = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_lineplot_median_beta_value_{range}.pdf" 
     conda:
         "envs/seaborn_plot.yaml"
     script:
@@ -102,21 +103,65 @@ rule metilene_plot_DMR_regions:
 
 rule metilene_DMR_lifeline_plots:
     input:
-        metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{complement}_intersect.tsv",
+        metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
         meta_table = "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
     output:
-        lifeline_out_pdf = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/{complement}_intersect_lifeline_plot_{range}.pdf",
-        lifeline_out_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/{complement}_intersect_lifeline_plot_{range}.tsv",
+        lifeline_out_pdf = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{range}.pdf",
+        lifeline_out_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{range}.tsv",
     conda:
         "envs/lifelines.yaml"
     script:
         "scripts/create_lifeline_plots.py"
 
-rule check_DMR_with_background:
-    """
+#merge  the lifeline pdfs together:
+def get_plots_to_aggregate(wildcards):
+    return glob.glob(f'{wildcards.output_path}/{wildcards.project}/metilene/metilene_output/{wildcards.drug_combi}/{wildcards.gender}/{wildcards.cutoff_and_or_threshold}/metilene_intersect_{wildcards.plot_type}_*.pdf')
 
-    """
+rule merge_DMR_plots:
     input:
+        get_plots_to_aggregate
+    output:
+        merged_pdf = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff_and_or_threshold}/metilene_merged_{plot_type}.pdf",
+        #"metilene_intersect_[lifeline_plot]_{range}.pdf",  -> metilene_merged_{plot_type}.pdf
+        #"metilene_intersect_[boxplot_beta_value]_{range}.pdf",  -> metilene_merged_{plot_type}.pdf
+        #"metilene_intersect_[lineplot_median_beta_value]_{range}.pdf"   -> metilene_merged_{plot_type}.pdf
+    conda:
+        "envs/qpdf.yaml"
+    shell:
+        "qpdf --empty --pages {input} -- {output}"
+        #qpdf --empty --pages Linux.pdf ShellIntro.pdf -- new.pdf
 
+rule compare_background:
+    """
+    based on the found DMRs, check those DMRs for the following sets:
+                                              |  initial DMR  |      
+                                              |---------------|
+                                              |               | 
+                                              |     ja        |
+                                              |   /    \      |
+                                    cisplatin?|--        KM   |   
+                                   /          |   \    /      |
+                               hoch           |    nein       |
+                              /               |               |
+    - KP including every case:                |               |
+                              \               |               |
+                               tief           |     ja        |
+                                   \          |   /    \      |
+                                    cisplatin?|--        KM   |   
+                                              |   \    /      |   
+                                              |    nein       |
 
+    - the initial DMR KM plot groups beta value UP and DOWN for treated cases
+    - the two validation KM plots groups treated vs untreated 
 
+    """
+    #input:
+    #    metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
+    #    meta_table = "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
+    #output:
+    #    lifeline_out_pdf = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{range}.pdf",
+    #    lifeline_out_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{range}.tsv",
+    #conda:
+    #    "envs/lifelines.yaml"
+    #script:
+    #    "scripts/create_lifeline_plots.py"

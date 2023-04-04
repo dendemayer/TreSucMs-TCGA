@@ -45,9 +45,11 @@ vital_table_path = snakemake.input[4]
 # nationwidechildrens.org_biospecimen_sample_cesc.txt
 sample_table_path = snakemake.input[5]
 
-drug_out_path = snakemake.output[0]
-complete_path = snakemake.output[1]
+# drug_out_path = snakemake.output[0]
+complete_path = snakemake.output[0]
 
+cutoff = snakemake.wildcards.cutoff
+cutoff = float(cutoff.split('_')[1])
 # we filter the output on the pipeline applied on, if Deseq2, than we filter
 # the table on htseq files, if metilene, than we use the HumanMethylation450
 PROJECT = [snakemake.wildcards[1]]
@@ -230,8 +232,8 @@ for nupi in not_uniq_patient_index:
 # combined drug therapies are now joined in one row per patient, temp save
 # that table:
 
-drug_DF.to_csv(drug_out_path, sep='\t', index=False)
-print(f'saved {drug_out_path}')
+# drug_DF.to_csv(drug_out_path, sep='\t', index=False)
+# print(f'saved {drug_out_path}')
 
 # why is this needed again? -> because its the only link we have between
 # case_id and the filenames... no not within aliq, that can be left begind...
@@ -263,14 +265,6 @@ def days_to_years(value):
     except ValueError:
         return pd.NA
 
-####
-# TODO:
-#     what went wrong here:
-# (Pdb) complete_DF.set_index('bcr_patient_uuid').loc['264b3066-b77b-4375-9847-adcf22dbc438', :]['last_contact_days_to']
-# '-10'
-# -> using abs:
-        # year = abs(float(value)) / 365
-####
 
 
 # make years out of last_concact_days_to col:
@@ -278,6 +272,31 @@ complete_DF['survivaltime'] = complete_DF['death_days_to'].apply(
     days_to_years)
 complete_DF['years_to_last_follow_up'] = complete_DF[
     'last_contact_days_to'].apply(days_to_years)
+
+# apply the cutoff parameter:
+
+if cutoff > 0:
+    # first get the id's of the cases in which the change shall be performed:
+    # dead cases in which survivaltime is greater then the cutoff
+    try:
+        DF_temp = complete_DF[complete_DF['vital_status'] == 'dead']
+        id_list = DF_temp[DF_temp['survivaltime'] > cutoff]['bcr_patient_uuid'].to_list()
+        # then change vital state to alive
+        complete_DF.set_index('bcr_patient_uuid', inplace=True)
+        complete_DF.loc[id_list, 'vital_status'] = 'alive'
+        complete_DF.loc[ id_list, 'years_to_last_follow_up'] = complete_DF.loc[ id_list, 'survivaltime']
+        complete_DF.loc[id_list, 'survivaltime'] = pd.NA
+        complete_DF.reset_index(inplace=True)
+    except Exception as e:
+        print(f'while cutoff {cutoff} invokening, no cases found suitable for it')
+        print('continuing')
+# with the cutoff changes, the bcr_patient_uuid is the first col, harmonize
+# that also in meta_tables without cutoff adjustment
+else:
+    complete_DF = complete_DF.set_index('bcr_patient_uuid')
+    complete_DF = complete_DF.reset_index()
+
+
 complete_DF.to_csv(complete_path, sep='\t', index=False)
 print(f'saved {complete_path}')
 

@@ -23,20 +23,16 @@ def return_metilene_tables(OUTPUT_PATH, PROJECT, DRUGS, cutoffs):
         for gender in gender_list:
             for cutoff in cutoffs:
                 cutoff = 'cutoff_' + str(cutoff)
-                for complement in ['', '_complement']:
-                # for d in ds:
-                    # for M in Ms:
-                        # for m in ms:
-                    temp_list_met.append(
-                        os.path.join(
-                            OUTPUT_PATH, project, 'metilene',
-                            'metilene_output', drugs, gender, cutoff,
-                            'metilene' + complement + '_out_sorted.tsv'))
-                            # f'metilene_out_sorted-m_{str(m)}-M_{str(M)}-d_{str(d)}.tsv'))
-                    temp_list_met_filtered.append(  # metilene-m_3-M_1000-d_0.03_qval.0.05.out
-                        os.path.join(
-                            OUTPUT_PATH, project, 'metilene',
-                            'metilene_output', drugs, gender, cutoff,
-                            'metilene' + complement + '_qval.0.05.out'))
-                            # f'metilene-m_{str(m)}-M_{str(M)}-d_{str(d)}_qval.0.05.out'))
+                temp_list_met.append(
+                    os.path.join(
+                        OUTPUT_PATH, project, 'metilene',
+                        'metilene_output', drugs, gender, cutoff,
+                        'metilene_out_sorted.tsv'))
+                        # f'metilene_out_sorted-m_{str(m)}-M_{str(M)}-d_{str(d)}.tsv'))
+                temp_list_met_filtered.append(  # metilene-m_3-M_1000-d_0.03_qval.0.05.out
+                    os.path.join(
+                        OUTPUT_PATH, project, 'metilene',
+                        'metilene_output', drugs, gender, cutoff,
+                        'metilene_qval.0.05.out'))
+                        # f'metilene-m_{str(m)}-M_{str(M)}-d_{str(d)}_qval.0.05.out'))
     return temp_list_met + temp_list_met_filtered

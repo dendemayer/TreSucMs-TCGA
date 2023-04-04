@@ -130,9 +130,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # present on which all the following selections are done on, make sure that
     # here the dryrun flag is not set to False
     # TODO uncomment this !!!
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True)
+    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    #                     workdir=shared_workdir, cores=cores, forceall=False,
+    #                     force_incomplete=True, dryrun=False, use_conda=True)
     # TODO uncomment this !!!
 
     # auxfiles for both pipelines:
@@ -160,19 +160,6 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
 
     Snakemake_all_files = Snakemake_all_files + data_file_list
 
-    merged_tables_list = []
-    # applied to the snakemake rule merge_meta_tables:, it also creates the
-    # meta_info_druglist_merged_drugs_combined.tsv tables
-    for proj in PROJECT:
-        for pipeline in execute:
-            for cutoff in cutoffs:
-                cutoff = 'cutoff_' + str(cutoff)
-                merged_tables_list.append(os.path.join(
-                    OUTPUT_PATH, proj, pipeline,'merged_meta_files', cutoff,
-                    'merged_meta_tables.tsv'))
-
-    # add the merged and processed metatables: specific on pipeline:
-    Snakemake_all_files = Snakemake_all_files + merged_tables_list
     print('running snakemake with\n')
     print(f'Snakefile:\t{Snakefile}')
     print(f'shared_workdir:\t{shared_workdir}')
@@ -192,9 +179,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     Snakemake_all_files = Snakemake_all_files + merged_drugs_combined_list
 
     # TODO uncomment this !!!
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False)
+    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    #                     workdir=shared_workdir, cores=cores, forceall=False,
+    #                     force_incomplete=True, dryrun=False, use_conda=True)
     #########################################################################
     # TODO uncomment this !!!
     #########################################################################

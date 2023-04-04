@@ -98,8 +98,9 @@ rule merge_meta_tables:
         "resources/GCv36_Manifests/{project}.tsv",
         get_aliquot_table,  # input[1-5]
         expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file']), # input[0]
+        "scripts/create_merged_tables.py",
     output:
-        "{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/merged_meta_tables.tsv",
+        #"{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/merged_meta_tables.tsv",
         "{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv"
     conda:
         "envs/pandas.yaml"

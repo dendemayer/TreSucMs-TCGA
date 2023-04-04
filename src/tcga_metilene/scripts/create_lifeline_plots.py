@@ -30,19 +30,19 @@ python /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/
     tcga_metilene/scripts/create_lifeline_plots.py
 """
 
-meta_table = snakemake.input.meta_table
-met_table = snakemake.input.metilene_intersect
-DMR = snakemake.wildcards.range
-lifeline_out_pdf = snakemake.output.lifeline_out_pdf
-lifeline_out_tsv = snakemake.output.lifeline_out_tsv
-threshold = snakemake.wildcards.threshold
+# meta_table = snakemake.input.meta_table
+# met_table = snakemake.input.metilene_intersect
+# DMR = snakemake.wildcards.range
+# lifeline_out_pdf = snakemake.output.lifeline_out_pdf
+# lifeline_out_tsv = snakemake.output.lifeline_out_tsv
+# threshold = snakemake.wildcards.threshold
 
-# meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/merged_meta_files/cutoff_1/meta_info_druglist_merged_drugs_combined.tsv"
-# met_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_1/metilene_complement_intersect.tsv"
-# DMR = "chr10_100267244_100268030"
-# lifeline_out_pdf = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_1/threshold_10/metilene_complement_intersect_lifeline_plot_chr10_100267244_100268030.pdf"
-# lifeline_out_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_1/threshold_10/metilene_complement_intersect_lifeline_plot_chr10_100267244_100268030.tsv"
-# threshold = "threshold_10"
+meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+met_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/metilene_intersect.tsv"
+DMR = "chr10_122878683_122880376"
+lifeline_out_pdf = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_1/metilene_intersect_lifeline_plot_chr10_122878683_122880376.pdf"
+lifeline_out_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_1/metilene_intersect_lifeline_plot_chr10_122878683_122880376.tsv"
+threshold = "threshold_1"
 # ->>>
 # > /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/.snakemake/scripts/tmppd019qrh.create_lifeline_plots.py(192)<module>()
 # -> print(e)
@@ -76,6 +76,7 @@ DF_metilene = DF_metilene.loc[(slice(None), slice(None), slice(None), DMR), :]
 # threshold % over or under the median
 thresh = float(threshold.split('_')[1])
 # set every beta value which is to close to the median to pd.NA:
+breakpoint()
 def apply_thresh(row):
     median = row.median()
     beta_val_max = row.max()
@@ -219,7 +220,6 @@ else:
 
     DF = pd.concat([kmf_UP.survival_function_, kmf_DOWN.survival_function_],
                    axis=1)
-    DF['p_value'] = p_value
     DF_beta = DF_beta.to_frame()
     DF_beta.columns = ['beta_value']
     DF_beta = DF_beta.reset_index(level=[0,2,3,4], drop=True)
@@ -229,5 +229,6 @@ else:
     DF = pd.concat([DF_plot, DF_beta, DF_meta], axis=1)
     DF['median'] = median
     DF['DMR'] = DMR
+    DF['p_value'] = p_value
     DF.index.name = 'case_id'
     DF.to_csv(lifeline_out_tsv, sep='\t')

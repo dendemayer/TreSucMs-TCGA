@@ -9,14 +9,13 @@ def return_bed_interesect_metilene_files(OUTPUT_PATH, PROJECT, DRUGS, cutoffs):
         PROJECT.append('_'.join(sorted([x.upper() for x in PROJECT])))
     for project in PROJECT:
         for gender in ['female', 'male', 'female_male']:
-            for complement in ['', '_complement']:
-                for cutoff in cutoffs:
-                    cutoff = f'cutoff_{str(cutoff)}'
-                    file_list.append(
-                        os.path.join(
-                            OUTPUT_PATH, project,
-                            'metilene/metilene_output', drugs, gender,
-                            cutoff, f'metilene{complement}_intersect.tsv'))
+            for cutoff in cutoffs:
+                cutoff = f'cutoff_{str(cutoff)}'
+                file_list.append(
+                    os.path.join(
+                        OUTPUT_PATH, project,
+                        'metilene/metilene_output', drugs, gender,
+                        cutoff, f'metilene_intersect.tsv'))
     return file_list
 
 
