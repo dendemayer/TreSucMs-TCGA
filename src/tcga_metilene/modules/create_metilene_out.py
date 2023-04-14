@@ -2,7 +2,7 @@ import os
 import copy
 
 
-def return_metilene_tables(OUTPUT_PATH, PROJECT, DRUGS, cutoffs):
+def return_metilene_tables(OUTPUT_PATH, PROJECTS, DRUGS, cutoffs):
     """
     the 3 parameters dont have to be set explisitly, take an inclusive
     paramter set and filter later on those cols
@@ -12,13 +12,13 @@ def return_metilene_tables(OUTPUT_PATH, PROJECT, DRUGS, cutoffs):
     """
     drugs = '_'.join(DRUGS)
     gender_list = ['female', 'male', 'female_male']
-    PROJECT_temp = copy.deepcopy(PROJECT)
-    if len(PROJECT) > 1:
-        projects = '_'.join(PROJECT_temp)
-        PROJECT_temp.append(projects)
+    # PROJECT_temp = copy.deepcopy(PROJECT)
+    # if len(PROJECT) > 1:
+    #     projects = '_'.join(PROJECT_temp)
+    #     PROJECT_temp.append(projects)
     temp_list_met = []
     temp_list_met_filtered = []
-    for project in PROJECT_temp:  # PROJECT_temp contains alread the single proj and the
+    for project in PROJECTS:  # PROJECTS contains alread the single proj and the
         # combination out of them (TCGA-CESC_TCGA-HNSC)
         for gender in gender_list:
             for cutoff in cutoffs:

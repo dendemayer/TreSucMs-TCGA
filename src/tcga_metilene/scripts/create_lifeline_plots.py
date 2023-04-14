@@ -1,12 +1,14 @@
 import pandas as pd
+import sys
+import os
 # from methyl import set_logger
 # from lifelines.datasets import load_waltons
 import matplotlib.pyplot as plt
 from lifelines import KaplanMeierFitter
 from decimal import Decimal
-from lifelines.statistics import logrank_test
+# from lifelines.statistics import logrank_test
 from lifelines.plotting import add_at_risk_counts
-
+from lifelines import CoxPHFitter
 """
 follow lifeline succession from patients with detected DMR
 - needed, metadata:f.e.:
@@ -29,20 +31,44 @@ considered meaningful.
 python /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/
     tcga_metilene/scripts/create_lifeline_plots.py
 """
+#################################################
+sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 
 meta_table = snakemake.input.meta_table
-met_table = snakemake.input.metilene_intersect
-DMR = snakemake.wildcards.range
+metilene_intersect = snakemake.input.metilene_intersect
+DMR = snakemake.wildcards.DMR
 lifeline_out_pdf = snakemake.output.lifeline_out_pdf
 lifeline_out_tsv = snakemake.output.lifeline_out_tsv
 threshold = snakemake.wildcards.threshold
 
-# meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-# met_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/metilene_intersect.tsv"
-# DMR = "chr10_122878683_122880376"
-# lifeline_out_pdf = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_1/metilene_intersect_lifeline_plot_chr10_122878683_122880376.pdf"
-# lifeline_out_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_1/metilene_intersect_lifeline_plot_chr10_122878683_122880376.tsv"
-# threshold = "threshold_1"
+print('# snakemake inputs:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+
+print('# snakemake output:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+
+print('# snakemake wildcards:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+#######################################################################
+
+######################################################################
+
+# # snakemake inputs:
+# metilene_intersect = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_2/metilene_intersect.tsv"
+# meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-HNSC/metilene/merged_meta_files/cutoff_2/meta_info_druglist_merged_drugs_combined.tsv"
+# script_file = "../tcga_metilene/scripts/create_lifeline_plots.py"
+# # snakemake output:
+# lifeline_out_pdf = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_2/threshold_10/metilene_intersect_lifeline_plot_chr1_43146725_43147956.pdf"
+# lifeline_out_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_2/threshold_10/metilene_intersect_lifeline_plot_chr1_43146725_43147956.tsv"
+# # snakemake wildcards:
+# output_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3"
+# project = "TCGA-HNSC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "male"
+# cutoff = "cutoff_2"
+# threshold = "threshold_10"
+# DMR = "chr1_43146725_43147956"
+
 # # ->>>
 # > /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/.snakemake/scripts/tmppd019qrh.create_lifeline_plots.py(192)<module>()
 # -> print(e)
@@ -58,15 +84,9 @@ threshold = snakemake.wildcards.threshold
 #     raise ValueError("Cannot index with multidimensional key")
 # ValueError: Cannot index with multidimensional key
 
-print(f'meta_table = "{meta_table}"')
-print(f'met_table = "{met_table}"')
-print(f'DMR = "{DMR}"')
-print(f'lifeline_out_pdf = "{lifeline_out_pdf}"')
-print(f'lifeline_out_tsv = "{lifeline_out_tsv}"')
-print(f'threshold = "{threshold}"')
 
 DF_meta = pd.read_table(meta_table, usecols=['bcr_patient_uuid', 'survivaltime', 'years_to_last_follow_up', 'vital_status'])
-DF_metilene = pd.read_table(met_table, header=[0,1,2,3,4], index_col=[0,1,2,3], na_values='.').dropna()
+DF_metilene = pd.read_table(metilene_intersect, header=[0,1,2,3,4], index_col=[0,1,2,3], na_values='.').dropna()
 # limit the DF_metilene to the recent range:
 DF_metilene = DF_metilene.loc[(slice(None), slice(None), slice(None), DMR), :]
 
@@ -86,6 +106,9 @@ def apply_thresh(row):
     return row_thresh
 
 DF_metilene = DF_metilene.apply(apply_thresh, axis=1)
+# throw away positions where after thresh appliance the start positions just hold
+# NA
+DF_metilene.dropna(how='all', inplace=True)
 
 #############################################
 #### IMPORTANT T check!!!
@@ -139,20 +162,28 @@ for start in starts:
 
     ## also T and E must be adjusted here correctly
     DF_meta_temp = DF_meta[~DF_meta.index.isin(cases_to_delete)]
-    T=DF_meta_temp['T']
+    T = DF_meta_temp['T']
     E = DF_meta_temp['vital_status'] == 'dead' #  E is a either boolean or binary array
 
-    DF_temp = DF_metilene_temp.loc[
-        (slice(None), start, slice(None), slice(None)), :].apply(
-            lambda x: 'UP' if float(x) > median else 'DOWN' )
-    UP_bool = (DF_temp == 'UP').values
-    DOWN_bool = (DF_temp == 'DOWN').values
+    # S_temp is supposed to be a Series, since we access one start postitin
+    # within the DMR:
+    S_temp = DF_metilene_temp.loc[ (slice(None), start, slice(None), slice(None)), :].apply( lambda x: 'UP' if float(x) > median else 'DOWN' )
+    # UP_bool = (S_temp == 'UP').values
+    # DOWN_bool = (S_temp == 'DOWN').values
+    DF_temp_2 = S_temp.to_frame().reset_index()
+    DF_temp_2['T'] = T.values
+    DF_temp_2['E'] = E.values
+    DF_temp_2['UP'] = DF_temp_2[0].apply(lambda x: True if x=='UP' else False)
     try:
-        results = logrank_test(T[UP_bool], T[DOWN_bool], E[UP_bool], E[DOWN_bool])
+        # results = logrank_test(T[UP_bool], T[DOWN_bool], E[UP_bool], E[DOWN_bool])
+        # changing to the cox regression test: -> see lifeine hint on https://lifelines.readthedocs.io/en/latest/lifelines.statistics.html
+        # and further reading on: https://discourse.datamethods.org/t/when-is-log-rank-preferred-over-univariable-cox-regression/2344
+        cph = CoxPHFitter().fit(DF_temp_2.loc[:, ['UP', 'T', 'E']], 'T', 'E')
     except Exception as e:
         continue
         print(e)
-    p_value = results.p_value
+    p_value = cph.summary['p'].values[0]
+    # p_value = results.p_value
     pvalue_list.append(p_value)
 
 # take the lowest p_value,
@@ -189,7 +220,8 @@ if DF_plot.value_counts().index.nunique() != 2:
         columns=['case_id', 'drugs', 'gender', 'projects', 'UP_or_DOWN',
                  'beta_value', 'vital_status', 'survivaltime',
                  'years_to_last_follow_up', 'T', 'E', 'median', 'DMR',
-                 'p_value']).to_csv(lifeline_out_tsv, sep='\t', index=False)
+                 'p_value', 'start']).to_csv(lifeline_out_tsv, sep='\t', index=False)
+    os._exit(0)
 else:
     cases_to_keep = [i[1] for i in DF_plot.index]
     DF_meta = DF_meta.loc[cases_to_keep]
@@ -199,11 +231,7 @@ else:
     DOWN_bool = (DF_plot == 'DOWN').values
     fig, ax = plt.subplots(figsize=(8, 6))
     kmf_UP = KaplanMeierFitter()
-    try:
-        kmf_UP.fit(T[UP_bool], E[UP_bool], label='UP')
-    except Exception as e:
-        breakpoint()
-        print(e)
+    kmf_UP.fit(T[UP_bool], E[UP_bool], label='UP')
     ax = kmf_UP.plot_survival_function(ax=ax)
 
     kmf_DOWN = KaplanMeierFitter()
@@ -231,5 +259,6 @@ else:
     DF['median'] = median
     DF['DMR'] = DMR
     DF['p_value'] = p_value
+    DF['start'] = starts[plot_index]
     DF.index.name = 'case_id'
     DF.to_csv(lifeline_out_tsv, sep='\t')

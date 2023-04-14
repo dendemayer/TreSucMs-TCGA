@@ -188,6 +188,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # from here the shared modules and Snakemake scripts are getting pipeline
     # specific, hand over all outputfiles requested so far and enter the
     # pipeline specific main files:
+    breakpoint()
     main_metilene.entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
                             cutoffs, threshold, cores)
 

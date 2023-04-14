@@ -1,10 +1,11 @@
 import pandas as pd
+import os
 import seaborn as sns
 from matplotlib import pyplot as plt
 met_int_path = snakemake.input.metilene_intersect
 pdf_boxplot_out = snakemake.output.range_box_plot
 pdf_lineplot_out = snakemake.output.range_line_plot
-range_ = snakemake.wildcards.range
+range_ = snakemake.wildcards.DMR
 # pdf_out = met_int_path.replace('tsv', 'pdf')
 
 # make use of MI:
@@ -12,7 +13,7 @@ range_ = snakemake.wildcards.range
 # # FrozenList(['Chromosome', 'Start', 'End', 'region'])
 # # (Pdb) DF_DMR.columns.names
 # # FrozenList(['vital_status', 'case_id', 'drugs', 'gender', 'projects'])
-DF_DMR = pd.read_table( met_int_path, header=[0, 1, 2, 3, 4], index_col=[0, 1, 2, 3], na_values='.')
+DF_DMR = pd.read_table(met_int_path, header=[0, 1, 2, 3, 4], index_col=[0, 1, 2, 3], na_values='.')
 # out of the MI index parse the regions:
 # # (Pdb) DF_DMR.index.names
 # # FrozenList(['Chromosome', 'Start', 'End', 'region'])
@@ -41,6 +42,11 @@ except Exception as e:
  # chr19        | 58228439 | 58228440 | chr19_58228367_58228578 | .                  | .                  | .
  # --> found ranges for cases for which we dont have the
     print(e)
+    print(DF_DMR)
+    # breakpoint()
+    open(pdf_boxplot_out, 'a').close()
+    open(pdf_lineplot_out, 'a').close()
+    os._exit(0)
 DF_to_plot_median = DF_to_plot.groupby( by=['vital_status', 'projects'], axis=1).median().reset_index('Start')
 projects_list = [ i[4] for i in DF_to_plot.columns]
 vital_array = [ i[0] for i in DF_to_plot.columns]
@@ -62,7 +68,7 @@ sns.set(style="ticks", palette=sns.color_palette('coolwarm_r', palette_len))
 plot = sns.boxplot(x='Start', y='beta_value', hue='hue', data=DF_to_plot)
 plt.title(f'Range: {range_title}')
 plot.set_xticklabels(plot.get_xticklabels(), rotation=45)
-plt.legend( title='vital state and projects', bbox_to_anchor=( 1.05, 1), loc=2, borderaxespad=0.)
+plt.legend(title='vital state and projects', bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 plt.tight_layout()
 # pdf_out = met_int_path.replace('.tsv', f'_boxplot_beta_value_{range_}.pdf')
 print(f'saving {pdf_boxplot_out}')
@@ -71,7 +77,7 @@ plt.clf()
 plt.close()
 DF_to_plot = DF_DMR.loc[(slice(None), slice(None), slice(None), range_), :]
 DF_to_plot.columns = new_co_MI
-DF_to_plot.reset_index(level=[0,2,3], drop=True, inplace=True)
+DF_to_plot.reset_index(level=[0, 2, 3], drop=True, inplace=True)
 DF_to_plot = DF_to_plot.T.reset_index()
 DF_to_plot['hue'] = DF_to_plot['vital_status'] + '_' + DF_to_plot['projects']
 DF_to_plot = DF_to_plot.drop(['vital_status', 'projects'], axis=1)
@@ -104,8 +110,7 @@ plot = sns.lineplot(
     data=DF_to_plot,
     x="Start",
     marker='o',
-    y="beta_value_median",
-#         linewidth=3,
+    y="beta_value_median", #  linewidth=3,
     hue="hue")
 plt.title(f'Range: {range_title}')
 plt.setp(plot.get_xticklabels(), rotation=45)

@@ -1,5 +1,6 @@
 import pandas as pd
 from natsort import natsort_keygen
+import sys
 """
 this script is suitable for single and multiprojects
 the invoked data files are always
@@ -8,8 +9,20 @@ the invoked data files are always
 them
 drugs(pharmaceutical_therapy_drug_name), gender(gender)
 """
+
+sys.stderr = sys.stdout = open(snakemake.log[0], "w")
+
+print('# snakemake inputs:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+
+print('# snakemake output:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+
+print('# snakemake wildcards:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+
 out_file = snakemake.output[0]
-# out_file_complement = snakemake.output[1]
+out_file_complement = snakemake.output[1]
 meta_file = snakemake.input[0]
 DF_meta = pd.read_table(meta_file)
 OUTPUT_PATH = snakemake.wildcards[0]
@@ -20,6 +33,11 @@ cutoff = float(snakemake.wildcards[4].split('_')[1])
 
 # DF_meta.set_index(['project_id', 'pharmaceutical_therapy_drug_name',
 # 'gender'])
+
+# choosing this approach over
+# DF_meta_filtered = DF_meta.set_index('gender').loc[genders, :].reset_index()
+# because of:
+# KeyError: "None of [Index(['male'], dtype='object', name='gender')] are in the [index]"
 DF_meta_filtered = pd.DataFrame()
 for gender in genders:
     DF_meta_filtered = pd.concat(
@@ -53,27 +71,20 @@ for drug in drugs:
         [DF_meta_filtered_2,
          DF_meta_filtered[
              DF_meta_filtered['pharmaceutical_therapy_drug_name'] == drug]])
+# DF_meta_filtered_2 = DF_meta_filtered.set_index('pharmaceutical_therapy_drug_name').loc[drugs, :].reset_index()
+
 
 # DF_meta_filtered_2 -> contains the drugs apllied, now drop every item out of
 # DF_meta_filtered which apears in DF_meta_filtered_2, thats the complement
 # table than (DF_meta_filtered)
 
-# DF_meta_filtered.set_index('bcr_patient_uuid', inplace=True)
+DF_meta_filtered.set_index('bcr_patient_uuid', inplace=True)
 DF_meta_filtered_2.set_index('bcr_patient_uuid', inplace=True)
-# DF_complement = DF_meta_filtered.drop(DF_meta_filtered_2.index)
+DF_complement = DF_meta_filtered.drop(DF_meta_filtered_2.index)
 
 
-# # Chromosome  Start
-# # dead;262311a0-7a10-4934-8fba-11ee581ad738;cisplatin;female;TCGA-CESC
-# # chr1    15865   0.937932741729432
-# # the data tables look like this:
-# # Composite Element REF   Beta_value  Chromosome  Start   End  annotations...
-# # cg00000029  0.438094185668971   chr16   53434200    53434201
-# # # where to find the datatables: this summary table is metilene specific, so
-# # that can be set fix
-# # OUTPUT_PATH/project_id/metilene/data_files/jhu-usc.edu_CESC.HumanMethylation450.9.lvl-3.TCGA-DS-A0VM-01A-11D-A10W-05.gdc_hg38.txt
 DF_meta_filtered_2['file_path'] = OUTPUT_PATH + '/' + DF_meta_filtered_2['project_id'] + '/metilene/data_files/' + DF_meta_filtered_2['filename']
-# DF_complement['file_path'] = OUTPUT_PATH + '/' + DF_complement['project_id'] + '/metilene/data_files/' + DF_complement['filename']
+DF_complement['file_path'] = OUTPUT_PATH + '/' + DF_complement['project_id'] + '/metilene/data_files/' + DF_complement['filename']
 def return_data_DF(Series):
     # create the col_name:
     name_list = []
@@ -102,7 +113,7 @@ def write_final_DFs(DF, out_file):
     DF_final.to_csv(out_file, sep='\t')
 
 write_final_DFs(DF_meta_filtered_2, out_file)
-# write_final_DFs(DF_complement, out_file_complement)
+write_final_DFs(DF_complement, out_file_complement)
 
 # # metilene input:
 # # The input consists of a single __SORTED__ (for genomic positions)

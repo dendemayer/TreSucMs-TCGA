@@ -1,3 +1,25 @@
+import snakemake
+import os
+
+"""
+coming from src/shared/modules/main.py
+generating the files requested through the metilene Snakefile in
+src/tcga_deseq/Snakefile
+"""
+
+def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
+              threshold, cores):
+
+    SCRIPT_PATH = os.path.split(__file__)[0]
+
+    PROJECTS = []
+    if len(PROJECT) > 1:
+        PROJECTS.extend(PROJECT)
+        PROJECTS.append('_'.join(sorted([x.upper() for x in PROJECT])))
+
+    shared_workdir = os.path.join(
+        os.path.split(os.path.split(SCRIPT_PATH)[0])[0], 'shared')
+    Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], 'Snakefile')
 
 # #!/usr/bin/env python3.8
 # # ##### DESEQ2 ############

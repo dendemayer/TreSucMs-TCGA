@@ -19,5 +19,4 @@ def create_lifeline_plots(metilene_plots, threshold):
         t = f'threshold_{str(t)}'
         for path in lifeline_plots:
             lifeline_t.append(os.path.join(os.path.split(path)[0], t, os.path.split(path)[1]))
-
     return lifeline_t
