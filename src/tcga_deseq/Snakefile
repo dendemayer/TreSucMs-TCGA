@@ -1,16 +1,41 @@
 #configfile: 'config.yaml'
+import pandas as pd
+import os
 
 include: "../shared/Snakefile"
 
-#rule download_helpfiles:
-#    """
-#    this rule will download the gdc_manifest and the gtf annotation file,
-#    md5checksum checks are performed
-#    """
-#    output:
-#        "{output_path}/metadata/{output_file}"
-#    script:
-#        "scripts/download_help_files.py"
 
+rule create_summary_table:
+    input:
+        meta_table = "{output_path}/{project}/DESeq2/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
+        script_file = "../tcga_deseq/scripts/create_summary_table.py"
+    output:
+        summary_table = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2.tsv",
+        summary_table_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_INFO.tsv",
+        summary_table_complement = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_complement.tsv",
+        summary_table_complement_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_complement_INFO.tsv",
+    conda:
+        "envs/pandas.yaml"
+    threads:  # although no threads are applied, limit the process since the table creations needs a lot of ram
+        5
+    log:
+        "{output_path}/{project}/DESeq2/logs/create_summary_table/{drug_combi}_{gender}_{cutoff}.log",
+    script:
+        "scripts/create_summary_table.py"
 
+rule create_deseq_output:
+    input:
+        summary_table = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2.tsv",
+        summary_table_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_INFO.tsv",
+        R_path = "../tcga_deseq/resources/DESeq2_diffexp_multifactor.R"
+    output:
+        summary_out = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_results_summary.tsv",
+    conda:
+        "envs/DESeq2.yaml"
+    threads:  # although no threads are applied, limit the process since the table creations needs a lot of ram
+        5
+    log:
+        "{output_path}/{project}/DESeq2/logs/create_deseq_output/{drug_combi}_{gender}_{cutoff}.log",
+    script:
+        "scripts/create_deseq_output.py"
 

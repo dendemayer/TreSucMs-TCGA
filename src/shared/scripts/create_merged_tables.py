@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import re
+import sys
 """
 :param: OUTPUT_PATH: path for pipeline outputs
 :type: OUTPUT_PATH: str
@@ -27,36 +28,60 @@ and nationwidechildren are linked through:
     # example:
     $ python main_metilene.py -p TCGA-CESC -d cisplatin -f 3
 """
+###########################
+sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 # 'resources/GCv36_Manifests/TCGA-CESC.tsv':, links the case_id to the datafile
 manifest_file = snakemake.input[0]
-
+print(f'manifest_file = "{manifest_file}"')
 # nationwidechildrens.org_biospecimen_aliquot_cesc.txt:
 aliq_table_path = snakemake.input[1]
+print(f'aliq_table_path = "{aliq_table_path}"')
 
 # nationwidechildrens.org_clinical_drug_cesc.txt:
 drug_table_path = snakemake.input[2]
+print(f'drug_table_path = "{drug_table_path}"')
 
 # nationwidechildrens.org_clinical_patient_cesc.txt:
 patient_table_path = snakemake.input[3]
+print(f'patient_table_path = "{patient_table_path}"')
 
 # nationwidechildrens.org_clinical_follow_up_v4.0_cesc.txt:
 vital_table_path = snakemake.input[4]
-
+print(f'vital_table_path = "{vital_table_path}"')
 # nationwidechildrens.org_biospecimen_sample_cesc.txt
 sample_table_path = snakemake.input[5]
+print(f'sample_table_path = "{sample_table_path}"')
 
 # drug_out_path = snakemake.output[0]
 complete_path = snakemake.output[0]
+print(f'complete_path = "{complete_path}"')
 
 cutoff = snakemake.wildcards.cutoff
 cutoff = float(cutoff.split('_')[1])
-# we filter the output on the pipeline applied on, if Deseq2, than we filter
-# the table on htseq files, if metilene, than we use the HumanMethylation450
+print(f'cutoff = "{cutoff}"')
+
+
+# # we filter the output on the pipeline applied on, if Deseq2, than we filter
+# # the table on htseq files, if metilene, than we use the HumanMethylation450
 PROJECT = [snakemake.wildcards[1]]
+print(f'PROJECT = "{PROJECT}"')
 pipeline = snakemake.wildcards[2]
+print(f'pipeline = "{pipeline}"')
+# ##########################
+
+# manifest_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/resources/GCv36_Manifests/TCGA-CESC.tsv"
+# aliq_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/aux_files/nationwidechildrens.org_biospecimen_aliquot_cesc.txt"
+# drug_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/aux_files/nationwidechildrens.org_clinical_drug_cesc.txt"
+# patient_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/aux_files/nationwidechildrens.org_clinical_patient_cesc.txt"
+# vital_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/aux_files/nationwidechildrens.org_clinical_follow_up_v4.0_cesc.txt"
+# sample_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/aux_files/nationwidechildrens.org_biospecimen_sample_cesc.txt"
+# complete_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+# cutoff = 0.0
+# PROJECT = ['TCGA-CESC']
+# pipeline = "DESeq2"
 
 file_type = ''
-if pipeline == 'Deseq2':
+if pipeline == 'DESeq2':
     file_type = 'htseq'
 elif pipeline == 'metilene':
     file_type = 'HumanMethylation450'
@@ -66,12 +91,11 @@ elif pipeline == 'metilene':
 # combine a filtered TCGA-CESC.tsv on the filetype with the aliq_DF
 aliq_DF = pd.read_table(aliq_table_path).loc[2:, :]
 aliq_DF['bcr_patient_uuid'] = aliq_DF['bcr_patient_uuid'].str.lower()
+aliq_DF['bcr_aliquot_uuid'] = aliq_DF['bcr_aliquot_uuid'].str.lower()
 
 # # ## merge aliquot ids from TCGA-CESC.tsv (mani_DF) with
 # # nationwidechildrens.org_biospecimen_aliquot_cesc
 mani_DF = pd.read_table(manifest_file)  # join on 'aliquot_ids'
-# # this mani_DF can be filtered right away on the workflow_type:
-# workflow_filter = mani_DF['workflow_type'] == workflow_type
 mani_DF = mani_DF[mani_DF['filename'].str.contains(file_type)]
 mani_DF.rename({'aliquot_ids': 'bcr_aliquot_uuid'}, axis=1, inplace=True)
 mani_DF['bcr_aliquot_uuid'] = mani_DF['bcr_aliquot_uuid'].str.lower()
@@ -115,7 +139,11 @@ patient_DF.rename({age_at_dia: 'age_at_diagnosis'}, axis=1, inplace=True)
 
 # # [312 rows x 28 columns]:
 #############################TODO
-aliq_mani_DF = pd.merge(aliq_DF, mani_DF, on='bcr_aliquot_uuid')
+# mani_index = mani_DF.set_index('bcr_aliquot_uuid').index
+# aliq_index =  aliq_DF.set_index('bcr_aliquot_uuid').index
+# aliq_mani_DF = pd.merge(aliq_DF, mani_DF, on='bcr_aliquot_uuid')
+aliq_mani_DF = aliq_DF.merge(mani_DF, on='bcr_aliquot_uuid', suffixes=(None, '_y'))
+# [309 rows x 28 columns]
 ########################################################################
 # # ## END merge aliquot ids from TCGA-CESC.tsv with nation...aliquot..tsv ##
 # # ######################## concat the drugnames in drug_DF:
@@ -296,6 +324,9 @@ else:
     complete_DF = complete_DF.set_index('bcr_patient_uuid')
     complete_DF = complete_DF.reset_index()
 
+# last sanity check
+# in case not value available for survivaltime AND years_to_last_follow_up,
+# drop that case_id, write a new table, cases_incomplete..
 
 complete_DF.to_csv(complete_path, sep='\t', index=False)
 print(f'saved {complete_path}')

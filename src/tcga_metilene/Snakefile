@@ -41,7 +41,7 @@ rule create_summary_table:
     threads:  # although no threads are applied, limit the process since the table creations needs a lot of ram
         5
     log:
-        "{output_path}/logs/create_summary_table/{project}/{drug_combi}_{gender}_{cutoff}.log",
+        "{output_path}/{project}/metilene/logs/create_summary_table/{drug_combi}_{gender}_{cutoff}.log",
     script:
         "scripts/create_summary_table.py"
 
@@ -72,6 +72,8 @@ rule create_metilene_out:
         "envs/metilene.yaml"
     threads:
         10
+    log:
+        "{output_path}/{project}/metilene/logs/create_metilene_out/{drug_combi}_{gender}_{cutoff}.log",
     script:
         "scripts/create_metilene_out.py"
 
@@ -88,6 +90,8 @@ rule metilene_intersect_tables:
         out_file = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv"
     conda:
         "envs/pandas_bedtools.yaml"
+    log:
+        "{output_path}/{project}/metilene/logs/metilene_intersect_tables/{drug_combi}_{gender}_{cutoff}.log",
     script:
         "scripts/bed_intersect_metilene.py"
 
@@ -95,10 +99,12 @@ rule metilene_plot_DMR_regions:
     input:
         metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv"
     output:
-        range_box_plot = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_boxplot_beta_value_{DMR}.pdf",
-        range_line_plot = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_lineplot_median_beta_value_{DMR}.pdf" 
+        pdf_boxplot_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_boxplot_beta_value_{DMR}.pdf",
+        pdf_lineplot_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_lineplot_median_beta_value_{DMR}.pdf" 
     conda:
         "envs/seaborn_plot.yaml"
+    log:
+        "{output_path}/{project}/metilene/logs/metilene_plot_DMR_regions/{drug_combi}_{gender}_{cutoff}_{DMR}.log",
     script:
         "scripts/plot_DMR_regions.py"
 
@@ -114,7 +120,7 @@ rule metilene_DMR_lifeline_plots:
         DMR=".*_.*_\d*"  # to avoid that output files with pattern #metilene_intersect_lifeline_plot_chr19_57351041_57351345_UP_val.pdf match this rule
                         # -> limit the wildcards to chrxy_start_end pattern, otherwise DMR could be interpreted as chr19_57351041_57351345_UP_val
     log:
-        "{output_path}/logs/metilene_DMR_lifeline_plot/{project}/{drug_combi}_{gender}_{cutoff}_{threshold}_{DMR}.log"
+        "{output_path}/{project}/metilene/logs/metilene_DMR_lifeline_plot/{drug_combi}_{gender}_{cutoff}_{threshold}_{DMR}.log"
     conda:
         "envs/lifelines.yaml"
     script:
@@ -160,7 +166,7 @@ rule DMR_plot_validation:
     conda:
         "envs/lifelines.yaml"
     log:
-        "{output_path}/logs/DMR_plot_validation/{project}/{drug_combi}_{gender}_{cutoff}_{threshold}_{DMR}.log"
+        "{output_path}/{project}/metilene/logs/DMR_plot_validation/{drug_combi}_{gender}_{cutoff}_{threshold}_{DMR}.log"
     script:
         "scripts/create_lifeline_plots_validation.py"
 
@@ -221,7 +227,7 @@ rule merge_DMR_plots:
     conda:
         "envs/pypdf.yaml"
     log:
-        "{output_path}/logs/merge_DMR_plots/{project}/{drug_combi}_{gender}_{cutoff}_{threshold}.log"
+        "{output_path}/{project}/metilene/logs/merge_DMR_plots/{drug_combi}_{gender}_{cutoff}_{threshold}.log"
     script:
         "scripts/merge_DMR_region_plots.py"
     #shell:

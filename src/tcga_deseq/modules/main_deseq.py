@@ -1,9 +1,12 @@
 import snakemake
 import os
+from tcga_deseq.modules import create_summary_table
+from tcga_deseq.modules import create_deseq_output
+
 
 """
 coming from src/shared/modules/main.py
-generating the files requested through the metilene Snakefile in
+generating the files requested through the deseq Snakefile in
 src/tcga_deseq/Snakefile
 """
 
@@ -17,9 +20,22 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
         PROJECTS.extend(PROJECT)
         PROJECTS.append('_'.join(sorted([x.upper() for x in PROJECT])))
 
+    DRUG_str = '_'.join(DRUGS)
+
     shared_workdir = os.path.join(
         os.path.split(os.path.split(SCRIPT_PATH)[0])[0], 'shared')
     Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], 'Snakefile')
+
+    summary_tables_list = create_summary_table.create_summary_table(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs)
+    Snakemake_all_files = summary_tables_list
+
+    deseq_output_list = create_deseq_output.create_deseq_output(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs)
+    Snakemake_all_files = Snakemake_all_files + deseq_output_list
+
+
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True)
 
 # #!/usr/bin/env python3.8
 # # ##### DESEQ2 ############

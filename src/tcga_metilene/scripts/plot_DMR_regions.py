@@ -2,18 +2,30 @@ import pandas as pd
 import os
 import seaborn as sns
 from matplotlib import pyplot as plt
-met_int_path = snakemake.input.metilene_intersect
-pdf_boxplot_out = snakemake.output.range_box_plot
-pdf_lineplot_out = snakemake.output.range_line_plot
-range_ = snakemake.wildcards.DMR
-# pdf_out = met_int_path.replace('tsv', 'pdf')
+import sys
+
+sys.stdout = sys.stderr = open(snakemake.log[0], 'w')
+
+print('# snakemake inputs:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+
+print('# snakemake output:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+
+print('# snakemake wildcards:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+
+metilene_intersect = snakemake.input.metilene_intersect
+pdf_boxplot_out = snakemake.output.pdf_boxplot_out
+pdf_lineplot_out = snakemake.output.pdf_lineplot_out
+DMR = snakemake.wildcards.DMR
 
 # make use of MI:
 # # (Pdb) DF_DMR.index.names
 # # FrozenList(['Chromosome', 'Start', 'End', 'region'])
 # # (Pdb) DF_DMR.columns.names
 # # FrozenList(['vital_status', 'case_id', 'drugs', 'gender', 'projects'])
-DF_DMR = pd.read_table(met_int_path, header=[0, 1, 2, 3, 4], index_col=[0, 1, 2, 3], na_values='.')
+DF_DMR = pd.read_table(metilene_intersect, header=[0, 1, 2, 3, 4], index_col=[0, 1, 2, 3], na_values='.')
 # out of the MI index parse the regions:
 # # (Pdb) DF_DMR.index.names
 # # FrozenList(['Chromosome', 'Start', 'End', 'region'])
@@ -32,7 +44,7 @@ palette_len = len(project_list) * 2
 # for range_ in range_list:
 # limit the DF to the recent region:
 try:
-    DF_to_plot = DF_DMR.loc[(slice(None), slice(None), slice(None), range_), :]
+    DF_to_plot = DF_DMR.loc[(slice(None), slice(None), slice(None), DMR), :]
 except Exception as e:
     # KeyError('chr19_58228367_58228578') in meta table TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_paclitaxel/female_male/cutoff_0/metilene_complement_intersect.tsv
  # vital_status |          |          |                         | alive              | dead               | dead
@@ -62,7 +74,7 @@ DF_to_plot = DF_to_plot.melt()
 DF_to_plot.rename({'value': 'beta_value'}, axis=1, inplace=True)
 DF_to_plot['hue'] = hue
 DF_to_plot.sort_values(by=['Start', 'hue'], inplace=True)
-range_title = range_.split('_')
+range_title = DMR.split('_')
 range_title = f'{range_title[0]}: {range_title[1]}-{range_title[2]}'
 sns.set(style="ticks", palette=sns.color_palette('coolwarm_r', palette_len))
 plot = sns.boxplot(x='Start', y='beta_value', hue='hue', data=DF_to_plot)
@@ -70,12 +82,11 @@ plt.title(f'Range: {range_title}')
 plot.set_xticklabels(plot.get_xticklabels(), rotation=45)
 plt.legend(title='vital state and projects', bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 plt.tight_layout()
-# pdf_out = met_int_path.replace('.tsv', f'_boxplot_beta_value_{range_}.pdf')
 print(f'saving {pdf_boxplot_out}')
 plot.figure.savefig(pdf_boxplot_out)
 plt.clf()
 plt.close()
-DF_to_plot = DF_DMR.loc[(slice(None), slice(None), slice(None), range_), :]
+DF_to_plot = DF_DMR.loc[(slice(None), slice(None), slice(None), DMR), :]
 DF_to_plot.columns = new_co_MI
 DF_to_plot.reset_index(level=[0, 2, 3], drop=True, inplace=True)
 DF_to_plot = DF_to_plot.T.reset_index()
@@ -127,7 +138,6 @@ for legobj in legend.legend_handles:
 #     # title='vital state of all projects', bbox_to_anchor=(1,
 #     # 1))
 plt.tight_layout()
-# pdf_out = met_int_path.replace('.tsv', f'_lineplot_median_beta_value_{range_}.pdf')
 print(f'saving {pdf_lineplot_out}')
 plot.figure.savefig(pdf_lineplot_out)
 

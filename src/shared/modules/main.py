@@ -4,12 +4,15 @@ from shared.modules import choose_therapy
 from shared.modules import download_with_api
 from tcga_metilene.modules import main_metilene
 from tcga_deseq.modules import main_deseq
+from tcga_deseq.modules import main_deseq
 import snakemake
+from itertools import compress
 
 SCRIPT_PATH = os.path.split(__file__)[0]
 with open(os.path.join(SCRIPT_PATH, 'version.txt'), 'r') as f:
     version = f.readline().strip()
 
+pipeline_list = ['DESeq2', 'metilene']
 
 def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
@@ -41,7 +44,7 @@ HOME = os.getenv('HOME')
 @click.option('--threshold', '-t', default=[0], multiple=True, show_default=True,
               type=float, help='threshold parameter',
               required=False)
-@click.option('--execute', '-e', default=['Deseq2', 'metilene'], multiple=True,
+@click.option('--execute', '-e', default=pipeline_list, multiple=True,
               show_default=True, help='choose which pipeline shall be\
               executed')
 @click.option('--version', '-v',
@@ -75,7 +78,16 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # SCRIPT_PATH = script_path
     SCRIPT_PATH = os.path.split(__file__)[0]
     print("SCRIPT_PATH:\t\t", SCRIPT_PATH)
-    # check if the main_metilene.py exist in the SCRIPT_PATH:
+    # make sure that the pipelines to execute also exist, every entry must be
+    # present in : ['DESeq2', 'metilene']
+    temp_check = [True if i not in pipeline_list else False for i in execute ]
+    if True in temp_check:
+        print(f'\nyou misspelled a pipeline name, make sure the ', end='')
+        print(f'-e option set is within the set of {pipeline_list}, ', end='')
+        print('wrong pipeline name: ', end='')
+        print(f'{list(compress(execute, temp_check))}, ', end='')
+        print('exiting now')
+        os._exit(0)
     print("PIPELINES executed:\t", execute)
     project = [i.strip() for i in project]
     if len(project) == 0:
@@ -145,7 +157,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # translate here the applied pipeline which shall be executet:
     # Datafiles: OUTPUT_PATH/PROJECT/Diffexpression/PROJECT_data_files/...
     def map_execute(pipeline):
-        if pipeline == 'Deseq2':
+        if pipeline == 'DESeq2':
             return 'htseq'
         elif pipeline == 'metilene':
             return 'HumanMethylation450'
@@ -188,8 +200,12 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # from here the shared modules and Snakemake scripts are getting pipeline
     # specific, hand over all outputfiles requested so far and enter the
     # pipeline specific main files:
-    breakpoint()
-    main_metilene.entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
-                            cutoffs, threshold, cores)
+    if 'metilene' in execute:
+        main_metilene.entry_fct(OUTPUT_PATH, PROJECT, DRUGS,
+                                Snakemake_all_files, cutoffs, threshold, cores)
+    if 'DESeq2' in execute:
+        print('entering deseq entry fct')
+        main_deseq.entry_fct(OUTPUT_PATH, PROJECT, DRUGS,
+                                Snakemake_all_files, cutoffs, threshold, cores)
 
 

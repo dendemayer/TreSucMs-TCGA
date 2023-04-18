@@ -4,9 +4,11 @@ import requests
 import json
 import time
 import subprocess
+import sys
 """
 searching through the manifest file to get the UUID of the requested file:
 """
+sys.stdout = sys.stderr = open(snakemake.log[0], "w")
 
 manifest_file = snakemake.input[0]
 aux_out = snakemake.output[0]

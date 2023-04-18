@@ -2,6 +2,58 @@ configfile: "config.yaml"
 import glob
 import os
 import pandas as pd
+script_path = workflow.basedir
+
+
+rule download_helpfiles:
+    """
+    this rule will download the gdc_manifest and the gtf annotation file,
+    md5checksum checks are performed
+    """
+    output:
+        "{output_path}/metadata/{output_file}"
+    conda:
+        "envs/request.yaml"
+    log:
+        "{output_path}/logs/download_helpfiles/{output_file}.log"
+    script:
+        "scripts/download_help_files.py"
+
+rule download_aux_files:
+    """
+    this rule loads the aux files for both pipelines:
+    those are the 
+    nationwidechildrens.org....
+    files
+    nationwidechildrens.org_auxiliary_cesc.txt
+    # the same scrip like in download_data_files rule can be used, the output
+    # path is different
+    """
+    input:
+        expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file'])
+    output:
+        "{output_path}/{project}/aux_files/{output_file}"
+    conda:
+        "envs/pandas.yaml"
+    log:
+        "{output_path}/{project}/logs/download_aux_files/{output_file}.log"
+    script:
+        "scripts/download_data_files.py"
+
+rule download_data_files:
+    """
+    datafiles loaded via script
+    """
+    input:
+        expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file'])
+    output:
+        "{output_path}/{project}/{pipeline}/data_files/{output_file}"
+    conda:
+        "envs/pandas.yaml"
+    log:
+        "{output_path}/{project}/{pipeline}/logs/download_data_files/{output_file}.log"
+    script:
+        "scripts/download_data_files.py"
 
 def get_aliquot_table(wildcards):
     proj_suffix = wildcards[1].split('-')[1].lower()
@@ -25,6 +77,27 @@ def get_aliquot_table(wildcards):
     final_list = [suppl_2, suppl_3, suppl_4, suppl_5, suppl_6]
     return final_list
 
+rule merge_meta_tables:
+    """
+    merging meta files to connect case id with the datafiles
+    """
+    input:
+        expand("{script_path}/resources/GCv36_Manifests/{{project}}.tsv", script_path=script_path),
+        get_aliquot_table,  # input[1-5]
+        expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file']), # input[0]
+        "scripts/create_merged_tables.py",
+    output:
+        #"{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/merged_meta_tables.tsv",
+        "{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv"
+    conda:
+        "envs/pandas.yaml"
+    wildcard_constraints: # important to just match singleproject patterns
+        project = "[A-Z]*-[A-Z]*"
+    log:
+        "{output_path}/{project}/{pipeline}/logs/merge_meta_tables/{cutoff}.log"
+    script:
+        "scripts/create_merged_tables.py"
+
 def get_multi_proj_drug_merge_tables(wildcards):
     """
     # to create the aggregated meta table over all projects, return the single project meta tables:
@@ -41,74 +114,6 @@ def get_multi_proj_drug_merge_tables(wildcards):
                 os.path.join(wildcards[0], project, wildcards[2], 'merged_meta_files', wildcards[3], 'meta_info_druglist_merged_drugs_combined.tsv')) 
     return final_list
 
-#rule all:
-#    input:
-#        "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv",
-
-
-rule download_helpfiles:
-    """
-    this rule will download the gdc_manifest and the gtf annotation file,
-    md5checksum checks are performed
-    """
-    output:
-        "{output_path}/metadata/{output_file}"
-    conda:
-        "envs/request.yaml"
-    script:
-        "scripts/download_help_files.py"
-
-rule download_aux_files:
-    """
-    this rule loads the aux files for both pipelines:
-    those are the 
-    nationwidechildrens.org....
-    files
-    nationwidechildrens.org_auxiliary_cesc.txt
-    # the same scrip like in download_data_files rule can be used, the output
-    # path is different
-    """
-    input:
-        expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file'])
-    output:
-        "{output_path}/{project}/aux_files/{output_file}"
-    conda:
-        "envs/pandas.yaml"
-    script:
-        "scripts/download_data_files.py"
-
-rule download_data_files:
-    """
-    datafiles loaded via script
-    """
-    input:
-        expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file'])
-    output:
-        "{output_path}/{project}/{pipeline}/data_files/{output_file}"
-    conda:
-        "envs/pandas.yaml"
-    script:
-        "scripts/download_data_files.py"
-
-rule merge_meta_tables:
-    """
-    merging meta files to connect case id with the datafiles
-    """
-    input:
-        "resources/GCv36_Manifests/{project}.tsv",
-        get_aliquot_table,  # input[1-5]
-        expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file']), # input[0]
-        "scripts/create_merged_tables.py",
-    output:
-        #"{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/merged_meta_tables.tsv",
-        "{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv"
-    conda:
-        "envs/pandas.yaml"
-    wildcard_constraints: # important to just match singleproject patterns
-        project = "[A-Z]*-[A-Z]*"
-    script:
-        "scripts/create_merged_tables.py"
-
 rule merge_meta_tables_multiproj:
     """
     take the single project meta_info_druglist_merged_drugs_combined.tsv  and
@@ -122,6 +127,8 @@ rule merge_meta_tables_multiproj:
         projects = "[A-Z]*-[A-Z]*_.*"
     conda:
         "envs/pandas.yaml"
+    log:
+        "{output_path}/{projects}/{pipeline}/logs/merge_meta_tables_multiproj/{cutoff}.log"
     script:
         "scripts/create_merged_tables_multi.py"
     # not possible to invoke the conda env with the run statement

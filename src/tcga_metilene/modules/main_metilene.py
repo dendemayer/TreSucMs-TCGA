@@ -51,9 +51,9 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     ### make sure that this snakemake process is completed before starting
     ### consecutive processes
     # TODO uncomment this !!!
-    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=False, use_conda=True)
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True)
     # TODO uncomment this !!!
 
     merged_plots = bed_intersect_metilene.return_DMR_merge_plots(OUTPUT_PATH, PROJECTS, DRUGS, cutoffs, threshold)

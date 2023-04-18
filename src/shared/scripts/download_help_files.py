@@ -1,10 +1,12 @@
 import requests
 import os
 import subprocess
+import sys
 """
 a different script is needed than for the datafilse, their UUID and md5sums are
 taken out of the manifest file downloaded by this script here
 """
+sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 # get the belonging md5sum out of the config file
 out_file = snakemake.wildcards[1]
 out_dest = snakemake.output[0]

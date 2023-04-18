@@ -108,7 +108,7 @@ def download_data_files(OUTPUT_PATH, PROJECT, config_file_shared, file_type):
 
     # create absolute paths to the filenames where they should be saved to:
     if file_type == 'htseq':
-        exp_type = 'Deseq2'
+        exp_type = 'DESeq2'
     elif file_type == 'HumanMethylation450':
         exp_type = 'metilene'
     gdc_manifest_temp['filepath'] = OUTPUT_PATH + '/' + gdc_manifest_temp['project_id'] + f'/{exp_type}/data_files/' + gdc_manifest_temp['filename']

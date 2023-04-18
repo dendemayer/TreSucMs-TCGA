@@ -1,7 +1,9 @@
 import os
 import pandas as pd
 import subprocess
+import sys
 
+sys.stdout = sys.stderr = open(snakemake.log[0], "w")
 summary_table = snakemake.input[0]
 # check whether we have actually alive and dead groups we can compare
 # check if alive is available in columns (ommit Start and Chromosome col ->

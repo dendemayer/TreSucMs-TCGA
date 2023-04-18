@@ -2,6 +2,7 @@ import pandas as pd
 from pybedtools import BedTool
 import os
 from natsort import natsort_keygen
+import sys
 
 """
 DF_met_out: (in system without header)
@@ -32,6 +33,7 @@ the metilene out result:
 and the metilene input table with which the metilene output was created with:
 '/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-CESC/metilene/metilene_input_table/carboplatin,paclitaxel_cisplatin/male/cutoff_0/summary_for_metilene_complement.tsv'
 """
+sys.stdout = sys.stderr = open(snakemake.log[0], "w")
 
 OUTPUT_PATH = snakemake.wildcards.output_path
 # meta_info = snakemake.input.meta_info
@@ -55,7 +57,7 @@ try:
 except Exception as e:
     print(f'cought exception {e}')
     # print('writing empty files:')
-    breakpoint()
+    # breakpoint()
     # empty_DF = pd.DataFrame()
     os._exit(0)
 
