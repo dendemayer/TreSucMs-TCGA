@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 src/shared/.snakemake/
 src/shared/modules/not_needed/
+src/tcga_deseq/resources/.RData
+src/tcga_deseq/resources/.Rhistory

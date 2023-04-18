@@ -126,7 +126,6 @@ rule metilene_DMR_lifeline_plots:
     script:
         "scripts/create_lifeline_plots.py"
 
-
 rule DMR_plot_validation:
     """
     based on the found DMRs, check those DMRs for the following sets:

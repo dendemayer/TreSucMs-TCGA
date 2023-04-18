@@ -4,7 +4,6 @@ import os
 
 include: "../shared/Snakefile"
 
-
 rule create_summary_table:
     input:
         meta_table = "{output_path}/{project}/DESeq2/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
@@ -39,3 +38,15 @@ rule create_deseq_output:
     script:
         "scripts/create_deseq_output.py"
 
+
+rule create_deseq_lifeline_plots:
+    """
+    the heatmaps are based on the DESeq2 results, which are ordered log2fold
+    wise and filtered for adj_pvalue < 0.05
+    lifelineplots are created for the first 60 (either increasing or
+    decreasing) ENSGs found
+    """
+    input:
+        summary_table = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2.tsv",
+        summary_table_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_INFO.tsv",
+    output:

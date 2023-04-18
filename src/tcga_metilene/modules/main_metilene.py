@@ -69,7 +69,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
         # metilene_intersect_tables)
 
     # Start Snakemake_all_files new over, since the rest must be created at
-    # this point and the DAG resolvement is faster than
+    # this point
     # Snakemake_all_files = metilene_plots
 
     # the lifeline regression is the first step where the threshold is invoked,
@@ -88,10 +88,6 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
 
     # merge the DMR related plots threshold specific lifeline plots and not
     # threshold specific DMR box and lineplots:
-    # merged_plots = [os.path.join(j, 'metilene_merged_lifeline_plot.pdf') for j in list(set([os.path.split(i)[0] for i in lifeline_plots]))]
-    # merged_plots = merged_plots + [os.path.join(j, 'metilene_merged_boxplot_beta_value.pdf') for j in list(set([os.path.split(os.path.split(i)[0])[0] for i in lifeline_plots]))]
-    # merged_plots = merged_plots + [os.path.join(j, 'metilene_merged_lineplot_median_beta_value.pdf') for j in list(set([os.path.split(os.path.split(i)[0])[0] for i in lifeline_plots]))]
-    # merged_plots
 
     Snakemake_all_files = Snakemake_all_files + merged_plots
 
