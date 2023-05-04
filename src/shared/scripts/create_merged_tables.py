@@ -61,13 +61,11 @@ cutoff = float(cutoff.split('_')[1])
 print(f'cutoff = "{cutoff}"')
 
 
-# # we filter the output on the pipeline applied on, if Deseq2, than we filter
-# # the table on htseq files, if metilene, than we use the HumanMethylation450
 PROJECT = [snakemake.wildcards[1]]
 print(f'PROJECT = "{PROJECT}"')
 pipeline = snakemake.wildcards[2]
 print(f'pipeline = "{pipeline}"')
-# ##########################
+# # ##########################
 
 # manifest_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/resources/GCv36_Manifests/TCGA-CESC.tsv"
 # aliq_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/aux_files/nationwidechildrens.org_biospecimen_aliquot_cesc.txt"
@@ -80,6 +78,8 @@ print(f'pipeline = "{pipeline}"')
 # PROJECT = ['TCGA-CESC']
 # pipeline = "DESeq2"
 
+# # we filter the output on the pipeline applied on, if Deseq2, than we filter
+# # the table on htseq files, if metilene, than we use the HumanMethylation450
 file_type = ''
 if pipeline == 'DESeq2':
     file_type = 'htseq'
@@ -300,6 +300,15 @@ complete_DF['survivaltime'] = complete_DF['death_days_to'].apply(
     days_to_years)
 complete_DF['years_to_last_follow_up'] = complete_DF[
     'last_contact_days_to'].apply(days_to_years)
+
+# handle here the issue of potentially missing survivaldata, we nee either
+# survivaltime or years to last followup
+complete_DF['T'] = complete_DF['survivaltime'].combine_first(complete_DF['years_to_last_follow_up'])
+complete_DF = complete_DF.set_index('id')
+complete_DF.drop(complete_DF[complete_DF['T'].isna()].index)
+complete_DF = complete_DF.drop(complete_DF[complete_DF['T'].isna()].index)
+complete_DF = complete_DF.reset_index()
+complete_DF = complete_DF.drop('T', axis=1)
 
 # apply the cutoff parameter:
 

@@ -2,6 +2,7 @@ import snakemake
 import os
 from tcga_deseq.modules import create_summary_table
 from tcga_deseq.modules import create_deseq_output
+from tcga_deseq.modules import create_deseq_lifeline_plots
 
 
 """
@@ -19,6 +20,8 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     if len(PROJECT) > 1:
         PROJECTS.extend(PROJECT)
         PROJECTS.append('_'.join(sorted([x.upper() for x in PROJECT])))
+    else:
+        PROJECTS = PROJECT
 
     DRUG_str = '_'.join(DRUGS)
 
@@ -32,6 +35,22 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     deseq_output_list = create_deseq_output.create_deseq_output(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs)
     Snakemake_all_files = Snakemake_all_files + deseq_output_list
 
+    ###########################################################################
+    # the DESeq2 results are created now, based on them the lifelineplots
+    # created, ENSG is within the filenames
+    ###########################################################################
+    # TODO uncomment this
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True)
+    # TODO uncomment this
+    ###########################################################################
+    # the DESeq2 results are created now, based on them the lifelineplots
+    # created, ENSG is within the filenames
+    ###########################################################################
+
+    deseq_lifeline_list = create_deseq_lifeline_plots.create_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold)
+    Snakemake_all_files = Snakemake_all_files + deseq_lifeline_list
     snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
                         force_incomplete=True, dryrun=False, use_conda=True)

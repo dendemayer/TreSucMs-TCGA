@@ -177,6 +177,15 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     print(f'shared_workdir:\t{shared_workdir}')
     # print(f'Snakemake_all_files:\t{Snakemake_all_files}')
 
+
+    # TODO uncomment this !!!
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True)
+    #########################################################################
+    # TODO uncomment this !!!
+    ########################################################################
+
     # also add the multi proj meta_info_druglist_merged_drugs_combined.tsv
     # which is just the concatenation of the single proj pendants:
     projects = '_'.join(PROJECT)
@@ -190,13 +199,6 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
 
     Snakemake_all_files = Snakemake_all_files + merged_drugs_combined_list
 
-    # TODO uncomment this !!!
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True)
-    #########################################################################
-    # TODO uncomment this !!!
-    #########################################################################
     # from here the shared modules and Snakemake scripts are getting pipeline
     # specific, hand over all outputfiles requested so far and enter the
     # pipeline specific main files:

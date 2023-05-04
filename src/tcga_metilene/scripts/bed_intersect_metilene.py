@@ -29,9 +29,9 @@ those are the beta values, we want to link them for later kaplan meier plots
 3 infos needed, the summary table:
     /scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-CESC/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv
 the metilene out result:
-/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-LIHC/metilene/metilene_output/carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_complement_qval.0.05.out
+/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-LIHC/metilene/metilene_output/carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_qval.0.05.out
 and the metilene input table with which the metilene output was created with:
-'/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-CESC/metilene/metilene_input_table/carboplatin,paclitaxel_cisplatin/male/cutoff_0/summary_for_metilene_complement.tsv'
+'/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-CESC/metilene/metilene_input_table/carboplatin,paclitaxel_cisplatin/male/cutoff_0/summary_for_metilene.tsv'
 """
 sys.stdout = sys.stderr = open(snakemake.log[0], "w")
 

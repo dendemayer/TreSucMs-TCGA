@@ -9,19 +9,19 @@ include: "../shared/Snakefile"
 #    input:
 #        "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-CESC_TCGA-HNSC/metilene/metilene_input_table/carboplatn,paclitaxel_cisplatin/male/cutoff_0/threshold_0/summary_for_metilene.tsv"
 #breakpoint()
-def get_data_files(wildcards):
-    OUTPUT_PATH = wildcards[0]
-    project = wildcards[1].split('_')
-    DF_temp = pd.read_table(os.path.join(OUTPUT_PATH, 'metadata', config['manifest_file'][0]))
-    DF_temp.set_index('project_id').loc[project, 'filename'].str.contains('HumanMethylation450')
-    DF_temp = DF_temp[DF_temp['filename'].str.contains(
-        'HumanMethylation450')].set_index(
-                'project_id').loc[project, 'filename']
-    DF_temp = DF_temp.to_frame()
-    DF_temp.reset_index(inplace=True)
-    DF_temp['filepath'] = OUTPUT_PATH + '/' + DF_temp['project_id'] + '/metilene/'+ 'data_files' + '/' + DF_temp['filename']
-    data_path_list = DF_temp['filepath'].to_list()
-    return data_path_list
+#def get_data_files(wildcards):
+#    OUTPUT_PATH = wildcards[0]
+#    project = wildcards[1].split('_')
+#    DF_temp = pd.read_table(os.path.join(OUTPUT_PATH, 'metadata', config['manifest_file'][0]))
+#    DF_temp.set_index('project_id').loc[project, 'filename'].str.contains('HumanMethylation450')
+#    DF_temp = DF_temp[DF_temp['filename'].str.contains(
+#        'HumanMethylation450')].set_index(
+#                'project_id').loc[project, 'filename']
+#    DF_temp = DF_temp.to_frame()
+#    DF_temp.reset_index(inplace=True)
+#    DF_temp['filepath'] = OUTPUT_PATH + '/' + DF_temp['project_id'] + '/metilene/'+ 'data_files' + '/' + DF_temp['filename']
+#    data_path_list = DF_temp['filepath'].to_list()
+#    return data_path_list
 
 rule create_summary_table:
     """
@@ -31,11 +31,12 @@ rule create_summary_table:
     # the selection of drugs is invoked, but also the complement
     """
     input:
-        "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
-        get_data_files, 
+        meta_file = "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
+        manifest_file = expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file']),
+        #data_files = get_data_files, 
     output:
-        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
-        "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv"
+        out_file = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
+        out_file_complement = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv"
     conda:
         "../shared/envs/pandas_natsort.yaml"
     threads:  # although no threads are applied, limit the process since the table creations needs a lot of ram
@@ -172,10 +173,10 @@ rule DMR_plot_validation:
 #merge  the lifeline pdfs together:
 
 def get_plots_to_aggregate(wildcards):
-    # before this input fct is required, it is already assured, that the
-    # metilene_intersect tables are created and with that, the DMRs on which we
-    # rely are known, 'tell' which DMR plots we expect:
-    # - it's not sufficient to glob the wildcards, since it's not assured that those files are already created!
+    # before this input fct is required, the metilene_intersect tables must be
+    # created and with that, the DMRs on which we rely are known, 'tell' which
+    # DMR plots we expect: - it's not sufficient to glob the wildcards, since
+    # it's not assured that those files are already created!
     path = os.path.join(wildcards[0], wildcards[1], 'metilene/metilene_output', wildcards[2], wildcards[3], wildcards[4], 'metilene_intersect.tsv')
     try:
         DMRs = pd.read_table(path,
@@ -219,8 +220,8 @@ rule merge_DMR_plots:
     # do not use bash tools like qpdf or pdfcombine
     '''
     input:
-        get_plots_to_aggregate, # with this input function, it is secured that the plots are created before merging
         intersect_file = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
+        plots_to_aggregate = get_plots_to_aggregate, # with this input function, it is secured that the plots are created before merging
     output:
         All_plots_merged = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/All_plots_merged.pdf",
     conda:

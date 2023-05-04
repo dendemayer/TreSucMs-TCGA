@@ -15,9 +15,24 @@ rule download_helpfiles:
     conda:
         "envs/request.yaml"
     log:
-        "{output_path}/logs/download_helpfiles/{output_file}.log"
+        "{output_path}/logs/download_helpfiles/{output_file}.gz.log"
     script:
         "scripts/download_help_files.py"
+
+#rule unzip_meta_files:
+#    """
+#    this is just necessary to overcome the problem of DAG resolving..
+#    """
+#    input:
+#        "{output_path}/metadata/{output_file}.gz"
+#    output:
+#        "{output_path}/metadata/{output_file}"
+#    conda:
+#        "envs/gzip.yaml"
+#    log:
+#        "{output_path}/logs/download_helpfiles/{output_file}.log"
+#    shell:
+#        "gzip -dk {input}"
 
 rule download_aux_files:
     """

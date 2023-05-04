@@ -26,9 +26,14 @@ rule create_deseq_output:
     input:
         summary_table = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2.tsv",
         summary_table_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_INFO.tsv",
-        R_path = "../tcga_deseq/resources/DESeq2_diffexp_multifactor.R"
+        R_path = "../tcga_deseq/resources/DESeq2_diffexp_multifactor.R",
+        script_file = "../tcga_deseq/scripts/create_deseq_output.py"
     output:
-        summary_out = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_results_summary.tsv",
+        #summary_out = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_results_summary.tsv",
+        deseq_counts = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.tsv", in_de=['IN', 'DE'], count_type=['nt', 'raw', 'norm', 'vsd']),
+        #deseq_counts_inc = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_heatmap_log2fINCREASE_{count_type}_counts.tsv",
+        #deseq_result_dec = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_heatmap_log2fDECREASE_norm_result.tsv",
+        #deseq_result_inc = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_heatmap_log2fINCREASE_norm_result.tsv",
     conda:
         "envs/DESeq2.yaml"
     threads:  # although no threads are applied, limit the process since the table creations needs a lot of ram
@@ -43,10 +48,26 @@ rule create_deseq_lifeline_plots:
     """
     the heatmaps are based on the DESeq2 results, which are ordered log2fold
     wise and filtered for adj_pvalue < 0.05
-    lifelineplots are created for the first 60 (either increasing or
+    lifelineplots are created for the first (max) 60 (either increasing or
     decreasing) ENSGs found
+    take those ENSGs provided in the tables:
     """
     input:
-        summary_table = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2.tsv",
+        meta_table = "{output_path}/{project}/DESeq2/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
         summary_table_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_INFO.tsv",
+        deseq_counts = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.tsv",
+        #deseq_result_inc = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_heatmap_log2fINCREASE_norm_result.tsv",
+        script_file = "../tcga_deseq/scripts/create_deseq_lifeline_plots.py"
     output:
+        deseq_lifeline_pdf = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline.pdf",
+        deseq_lifeline_tsv = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline.tsv",
+        #deseq_inc_lifeline = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_heatmap_log2fINCREASE_{count_type}_{ENSG}_lifeline.pdf",
+    params:
+        deseq_result = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_heatmap_log2f{in_de}CREASE_norm_result.tsv",
+    conda:
+        "envs/lifelines.yaml"
+    log:
+        "{output_path}/{project}/DESeq2/logs/create_deseq_lifeline_plots/{drug_combi}_{gender}_{cutoff}_{threshold}_{in_de}CREASE_{count_type}_{ENSG}.log",
+    script:
+        "scripts/create_deseq_lifeline_plots.py"
+

@@ -21,27 +21,38 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     if len(PROJECT) > 1:
         PROJECTS.extend(PROJECT)
         PROJECTS.append('_'.join(sorted([x.upper() for x in PROJECT])))
+    else:
+        PROJECTS = PROJECT
 
     shared_workdir = os.path.join(
         os.path.split(os.path.split(SCRIPT_PATH)[0])[0], 'shared')
     Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], 'Snakefile')
 
-    summary_tables = create_summary_table.return_summary_tables(
-        OUTPUT_PATH, PROJECTS, DRUGS, cutoffs)
+    # summary_tables = create_summary_table.return_summary_tables(
+    #     OUTPUT_PATH, PROJECTS, DRUGS, cutoffs)
 
-    Snakemake_all_files = Snakemake_all_files + summary_tables
+    # Snakemake_all_files = Snakemake_all_files + summary_tables
 
-    metilene_out_tables = \
-        create_metilene_out.return_metilene_tables(
-            OUTPUT_PATH, PROJECTS, DRUGS, cutoffs)
+    # metilene_out_tables = \
+    #     create_metilene_out.return_metilene_tables(
+    #         OUTPUT_PATH, PROJECTS, DRUGS, cutoffs)
 
-    Snakemake_all_files = Snakemake_all_files + metilene_out_tables
+    # Snakemake_all_files = Snakemake_all_files + metilene_out_tables
 
     metilene_intersect_tables = \
         bed_intersect_metilene.return_bed_interesect_metilene_files(
             OUTPUT_PATH, PROJECTS, DRUGS, cutoffs)
-
     Snakemake_all_files = Snakemake_all_files + metilene_intersect_tables
+
+    # IMPORTANT the intersect tables define the DMRs which are requested in the
+    # following, tey must be completed here!
+    # TODO uncomment this !!!
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True)
+    # TODO uncomment this !!!
+
+    # Snakemake_all_files = Snakemake_all_files + metilene_intersect_tables
 
     # ## up to this point, every download, preprocessing and metilene analyse
     # steps including intersection of DMR with the original beta_value input
@@ -50,11 +61,6 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # the third snakemake running instance
     ### make sure that this snakemake process is completed before starting
     ### consecutive processes
-    # TODO uncomment this !!!
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True)
-    # TODO uncomment this !!!
 
     merged_plots = bed_intersect_metilene.return_DMR_merge_plots(OUTPUT_PATH, PROJECTS, DRUGS, cutoffs, threshold)
 
@@ -65,8 +71,8 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # /scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-HNSC/metilene/metilene_output/carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv
     # plot for each range found in the intersect.tsv a regions plot
 
-    # metilene_plots = bed_intersect_metilene.return_plot_DMR_regions_plot(
-        # metilene_intersect_tables)
+    metilene_plots = bed_intersect_metilene.return_plot_DMR_regions_plot(
+        metilene_intersect_tables)
 
     # Start Snakemake_all_files new over, since the rest must be created at
     # this point
@@ -76,20 +82,20 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # for every so far created metilene out, create a lifeline for each
     # threshold (the applied metilene_plots list already contains the cutoff
     # permutation...)
-    # lifeline_plots = create_lifeline_plot.create_lifeline_plots(
-        # metilene_plots, threshold)
+    lifeline_plots = create_lifeline_plot.create_lifeline_plots(
+        metilene_plots, threshold)
 
-    # Snakemake_all_files = Snakemake_all_files + lifeline_plots
+    Snakemake_all_files = Snakemake_all_files + lifeline_plots
 
     # validation plots for the found DMRs:
-    # validation_plots = create_lifeline_plots_validation.validation_plots(lifeline_plots)
+    validation_plots = create_lifeline_plots_validation.validation_plots(lifeline_plots)
 
-    # Snakemake_all_files = Snakemake_all_files + validation_plots
+    Snakemake_all_files = Snakemake_all_files + validation_plots
 
     # merge the DMR related plots threshold specific lifeline plots and not
     # threshold specific DMR box and lineplots:
 
-    Snakemake_all_files = Snakemake_all_files + merged_plots
+    Snakemake_all_files = merged_plots
 
     # TODO
     snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,

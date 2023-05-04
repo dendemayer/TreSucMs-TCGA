@@ -18,22 +18,20 @@ for (i in args){
     j <- j + 1
 }
 
+
 ### test files:
 
-#count_inname <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC_TCGA-HNSC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/summary_for_DESeq2.tsv')
-#info_inname  <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC_TCGA-HNSC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/summary_for_DESeq2_INFO.tsv')
-#OUTPUT_PATH  <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC_TCGA-HNSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0')
-#PROJECTS <- 'TCGA-CESC_TCGA-HNSC'
 
-#count_inname <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-HNSC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_2/summary_for_DESeq2.tsv')
-#info_inname  <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-HNSC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_2/summary_for_DESeq2_INFO.tsv')
-#OUTPUT_PATH  <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-HNSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_2')
+
+#count_inname <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-HNSC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_2/summary_for_DESeq2.tsv')
+#info_inname  <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-HNSC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_2/summary_for_DESeq2_INFO.tsv')
+#OUTPUT_PATH  <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-HNSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_2')
 #PROJECTS <- 'TCGA-HNSC'
 
-#count_inname <- file.path('/scr/dings/PEVO/NEW_downloads_3/DEseq_31_10/TCGA-HNSC/carboplatin_carboplatin,paclitaxel_cisplatin/DRUG_combi_male_complement_summary_dead_alive.tsv')
-#info_inname <- file.path('/scr/dings/PEVO/NEW_downloads_3/DEseq_31_10/TCGA-HNSC/carboplatin_carboplatin,paclitaxel_cisplatin/DRUG_combi_male_complement_summary_dead_alive_INFO.tsv')
-#OUTPUT_PATH <- file.path('/scr/dings/PEVO/NEW_downloads_3/DEseq_31_10/TCGA-HNSC/carboplatin_carboplatin,paclitaxel_cisplatin/DESeq2_out_DRUG_combi_male_complement')
-#PROJECTS <- 'TCGA-HNSC'
+#count_inname <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-LUSC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_2/summary_for_DESeq2.tsv')
+#info_inname  <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-LUSC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_2/summary_for_DESeq2_INFO.tsv')
+#OUTPUT_PATH  <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_2')
+#PROJECTS <- 'TCGA-LUSC'
 
 #count_inname <- file.path('/scr/dings/PEVO/NEW_downloads_3/DEseq_env_test/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/carboplatin_carboplatin,paclitaxel_cisplatin/DRUG_combi_summary_dead_alive_short.tsv')
 #info_inname <- file.path('/scr/dings/PEVO/NEW_downloads_3/DEseq_env_test/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/carboplatin_carboplatin,paclitaxel_cisplatin/DRUG_combi_summary_dead_alive_INFO.tsv')
@@ -321,7 +319,11 @@ results_ddsMF <- na.omit(results_ddsMF)
 #results_ddsMF <- lfcShrink(DESeq_ddsMF, coef="vital_state_dead_vs_alive", type="normal")
 
 #head(results_ddsMF)
-results_ddsMF_sort_pv <- results_ddsMF[order(results_ddsMF$pvalue),]
+results_ddsMF_sort_pv <- results_ddsMF[order(results_ddsMF$padj),]
+ ####### writing result table ordered pvalue
+results_outname = file.path(OUTPUT_PATH, paste('DESeq2_results.tsv', sep=''))
+cat('writing DESeq2 MF results in:\t', results_outname, '\n')
+write.table(as.data.frame(results_ddsMF_sort_pv), file = results_outname, quote = FALSE, sep='\t', col.names=NA)
 
  ####### saving the summary of the results:
 results_summary = file.path(OUTPUT_PATH, paste('DESeq2_results_summary.tsv', sep=''))
@@ -329,6 +331,7 @@ cat('writing DESeq2 MF results SUMMARY in:\t', results_summary, '\n')
 sink(file = results_summary)
 summary(results_ddsMF)
 sink(file = NULL)
+
 
 ### START Log fold change shrinkage for visualization and ranking 
 
@@ -359,11 +362,6 @@ ggplot(d, aes(x=vital_state, y=count)) +
 dev.off()
 
 
- ####### writing result table ordered pvalue
-results_outname = file.path(OUTPUT_PATH, paste('DESeq2_results.tsv', sep=''))
-cat('writing DESeq2 MF results in:\t', results_outname, '\n')
-write.table(as.data.frame(results_ddsMF_sort_pv), file = results_outname, quote = FALSE, sep='\t', col.names=NA)
-
 # # ####### writing the results 'dot'plot.pdf
 #### 
 ### this is now the following:
@@ -378,8 +376,9 @@ plotMA(resLFC, ylim=c(-3,3), main=main_tile)
 dev.off()
 
 # ###############writing normalized count table (original count table for DESeq
-# input was the summary_dead_alive_reduced_cisplatin.tsv)
+# input is the input summary)
 table_counts_normalized_MF <- counts(DESeq_ddsMF, normalized=TRUE)
+table_counts_raw_MF <- counts(DESeq_ddsMF)
 #head(table_counts_normalized_MF)
 normalized_outname = file.path(OUTPUT_PATH, paste('DESeq2_normalized_counts.tsv', sep=''))
 cat("writing normalized MF counts in:\t", normalized_outname, "\n")
@@ -399,58 +398,20 @@ write.table(table_counts_norm_transform, file = normalized_outname, quote = FALS
 # #############################################
 #library("pheatmap")
 ntd <- normTransform(DESeq_ddsMF)
+# (to make use in heatmaps use assay(ntd))
 vsd <- vst(DESeq_ddsMF, blind=FALSE) # variance stabilizing transformation
 #rld <- rlog(DESeq_ddsMF, blind=FALSE) # regularized log transformation
-df <- as.data.frame(colData(DESeq_ddsMF)[,col_flags])
+df <- as.data.frame(colData(DESeq_ddsMF)[,col_flags]) # use as annotation col
 #head(df)
 
 # needed s.t. the color scale is not based on negative value, instead starts
 # at zero
 #library(RColorBrewer)
-breaksList <- seq(0, 6, by = 0.05)
-
-
-################################## start HEATMAPS ntd and vsd
-# ###### ntd: 
-#select <- order(rowMeans(counts(DESeq_ddsMF, normalized=TRUE)),decreasing=TRUE)[1:select_size]
-#df <- as.data.frame(colData(DESeq_ddsMF)[,col_flags])
-## adding rownames to the annotationcol, otherwise error:
-## Error in check.length("fill") : 
-##   'gpar' element 'fill' must not be length 0
-## set here new rownames out of the ENSG_symbol.tsv
-##= colnames(assay(ntd)[select,])
-##rownames_temp <-  colnames(ntd)
-##########################
-#rownames(df) <- colnames(assay(ntd)[select,])
-#colnames(df) <- col_flags
-#heatmap_outname_pdf=file.path(OUTPUT_PATH, paste("DESeq2_heatmap_ntd_sorted_rowMeans", select_size, ".pdf", sep=""))
-#cat('writing DESeq2 ntd in:\t', heatmap_outname_pdf, '\n')
-#pdf(heatmap_outname_pdf)
-#pheatmap(assay(ntd)[select,], cluster_rows=TRUE, show_rownames=TRUE, show_colnames=FALSE, cluster_cols=FALSE, annotation_col=df, scale="row", main=PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
-##pheatmap(assay(ntd)[select,], cluster_rows=TRUE, show_rownames=TRUE, show_colnames=FALSE, cluster_cols=FALSE, annotation_col=df, main=PROJECTS)
-#dev.off()
-
-## ####### vsd: # Variance stabilizing transformation
-#heatmap_outname_pdf=file.path(OUTPUT_PATH, paste("DESeq2_heatmap_vsd_sorted_rowMeans", select_size, '.pdf', sep=""))
-#cat('writing DESeq2 vsd in:\t', heatmap_outname_pdf, '\n')
-#pdf(heatmap_outname_pdf)
-#pheatmap(assay(vsd)[select,], cluster_rows=TRUE, show_rownames=TRUE, show_colnames=FALSE, cluster_cols=FALSE, annotation_col=df, scale="row", main=PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
-##pheatmap(assay(vsd)[select,], cluster_rows=TRUE, show_rownames=TRUE, show_colnames=FALSE, cluster_cols=FALSE, annotation_col=df, main=PROJECTS)
-#dev.off()
-# #####################################end of HEATMAPS ntd and vsd
-
- ## ######## rld: Regularized log transformation
- #heatmap_outname_svg=file.path(OUTPUT_PATH, paste("DESeq2_heatmap_rld", select_size , ".svg", sep=""))
- #cat('writing DESeq2 rld in:\t', heatmap_outname_svg, '\n')
- #svg(heatmap_outname_svg)
- #pheatmap(assay(rld)[select,], cluster_rows=TRUE, show_rownames=TRUE, show_colnames=FALSE, cluster_cols=FALSE, annotation_col=df, scale="row")
- #dev.off()
-# 
-#########################################
 
 # ###### sort plot log2fold wise for normalized score:
 
-# ################################# start of INCREASE norm logfch heatmaps:
+# ################################# start of INCREASE norm logfch heatmaps: -> usage of the **table_counts_normalized_MF** counts
+
 select_increase_log2Fold  <- with(results_ddsMF,  order(log2FoldChange))
 results_ddsMF_temp <- results_ddsMF[select_increase_log2Fold,]
 results_ddsMF_temp <- results_ddsMF_temp[results_ddsMF_temp$padj < 0.05,]
@@ -462,7 +423,11 @@ if (dim(results_ddsMF_temp)[1] < 60) {
 
 row_names_inc <- row.names(results_ddsMF_temp[1:select_size,])
     
-
+# the breaksList should be updated for every count matrix
+# limit the range of breaks to the selection of ENSG which shall be plotted:
+#old: [1]       0.0  941414.3 1882828.6 2824243.0 3765657.3 4707071.6 5648485.9 
+breaksList <- seq(min(table_counts_normalized_MF[row_names_inc, ]), max(table_counts_normalized_MF[row_names_inc, ]), by = max(table_counts_normalized_MF[row_names_inc, ]) / 10000)
+# new: [1]      0.0  90464.2 180928.4 271392.6 361856.8 452321.0 542785.2
 # with those rownames, access the count table:
 
 #cat('results_ddsMF[select_increase_log2Fold,] normalized')
@@ -471,14 +436,14 @@ heatmap_outname_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_norm.pd
 cat('writing DESeq2 normTransform in:\t', heatmap_outname_pdf, '\n')
 
 pdf(heatmap_outname_pdf)
-pheatmap(table_counts_normalized_MF[row_names_inc,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, scale = "row", main=PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
+pheatmap(table_counts_normalized_MF[row_names_inc,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, main=paste(PROJECTS, "\nnormalized counts\nincreasing log2foldChange", sep=" ") , color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
 #pheatmap(table_counts_normalized_MF[select_increase_log2Fold,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, annotation_col = df, main=PROJECTS)
 dev.off()
 # #### writing the belonging count table and result table of selected size:
 heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_norm_counts.tsv")
 write.table(as.data.frame(table_counts_normalized_MF[row_names_inc,]), file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
 
-heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_norm_result.tsv")
+heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_log2fINCREASE_result.tsv")
 write.table(as.data.frame(results_ddsMF[row_names_inc,]), file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
 # ########################################### end of INCREASE norm logfch heatmaps
 
@@ -489,71 +454,46 @@ select_decrease_log2Fold  <- with(results_ddsMF,  order(-log2FoldChange))
 results_ddsMF_temp <- results_ddsMF[select_decrease_log2Fold,]
 results_ddsMF_temp <- results_ddsMF_temp[results_ddsMF_temp$padj < 0.05,]
 row_names_dec <- row.names(results_ddsMF_temp[1:select_size,])
+
+breaksList <- seq(min(table_counts_normalized_MF[row_names_dec, ]), max(table_counts_normalized_MF[row_names_dec, ]), by = max(table_counts_normalized_MF[row_names_dec, ]) / 10000)
 #cat('results_ddsMF[select_decrease_log2Fold,] normalized')
 #head(results_ddsMF[select_decrease_log2Fold,])
 heatmap_outname_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_norm.pdf")
 cat('writing DESeq2 normTransform in:\t', heatmap_outname_pdf, '\n')
 pdf(heatmap_outname_pdf)
 # #The assay function is used to extract the matrix of normalized values.
-pheatmap(table_counts_normalized_MF[row_names_dec,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, scale = "row", main=PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
+pheatmap(table_counts_normalized_MF[row_names_dec,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, main=paste(PROJECTS, "\nnormalized counts\ndecreasing log2foldChange", sep=" "), color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
 #pheatmap(table_counts_normalized_MF[row_names_dec,], cluster_rows=TRUE, show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, annotation_col = df, main=PROJECTS, scale="row")
 dev.off()
 # #### writing the belonging count table and result table of selected size:
 heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_norm_counts.tsv")
 write.table(as.data.frame(table_counts_normalized_MF[row_names_dec,]), file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
-heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_norm_result.tsv")
+heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_log2fDECREASE_result.tsv")
 write.table(as.data.frame(results_ddsMF[row_names_dec,]), file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
 # ###########################################end of DECREASE norm
 
 
 ## #############################################start of INCREASE nt:
-## ### sort plot log2fold wise for normTransform:
-#select_increase_log2Fold  <- with(results_ddsMF, order(log2FoldChange, padj, pvalue))[1:select_size]
-#cat('results_ddsMF[select_increase_log2Fold,] nt')
-#head(results_ddsMF[select_increase_log2Fold,])
+
+breaksList <- seq(min(assay(ntd)[row_names_inc,]), max(assay(ntd)[row_names_inc,]), by = max(assay(ntd)[row_names_inc,]) / 10000)
+
+heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_nt_counts.tsv")
+write.table(as.data.frame(assay(ntd)[row_names_inc,]), file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
 
 heatmap_outname_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_nt.pdf")
 cat('writing DESeq2 normTransform Increase in:\t', heatmap_outname_pdf, '\n')
 pdf(heatmap_outname_pdf)
 # #The assay function is used to extract the matrix of normalized values.
-pheatmap(assay(ntd)[row_names_inc,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, scale = "row", main=PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
+pheatmap(assay(ntd)[row_names_inc,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, main=paste(PROJECTS, "\nnormtransformed counts\nincreasing log2foldChange", sep=" "), color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
 dev.off()
 
-# #### writing the belonging count table and result table of selected size:
-
- ######## begin error: avoid this for now, this heatmap is not included into the report anyways:
-# look here:
-#https://www.biostars.org/p/446761/
-#--> Yes, if one column contains only zeros, after scaling the whole column will be set to NaN.
- #TODO with including complements, an error occurs with heatmap creation:
-   #> pheatmap(count_data[select_decrease_log2Fold,], cluster_rows=TRUE, show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=TRUE, annotation_col = df, scale = "row", main=PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList) Fehler in hclust(d, method = method) :
-        #NA/NaN/Inf in externem Funktionsaufruf (arg 10)
-#>begin error:
-
-heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_raw_counts.tsv")
-write.table(as.data.frame(assay(ntd)[row_names_dec,]), file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
-heatmap_raw_counts_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_raw_counts.pdf")
-pdf(heatmap_raw_counts_pdf)
-
-pheatmap(count_data[row_names_dec,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, main=PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
-dev.off()
-#<end error
-#count_data[row_names,]
-# ######## end error:
-
-heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_nt_counts.tsv")
-write.table(as.data.frame(assay(ntd)[row_names_inc,]), file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
-# plot the raw count data sorted by logfold:
-heatmap_raw_counts_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_raw_counts.pdf")
-pdf(heatmap_raw_counts_pdf)
-# the error is provoked by the scale = "row" option:
-#pheatmap(count_data[select_increase_log2Fold,], cluster_rows=TRUE, show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=TRUE, annotation_col = df, scale = "row", main=PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
-pheatmap(count_data[row_names_inc,],  show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, main = PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
-dev.off()
-# ###########################################end of new scale INCREASE nt
+heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_norm_counts.tsv")
+write.table(as.data.frame(table_counts_normalized_MF[row_names_dec,]), file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
+## #############################################end of INCREASE nt:
 
 ## ###########################################start of DECREASE nt
 
+breaksList <- seq(min(assay(ntd)[row_names_dec,]), max(assay(ntd)[row_names_dec,]), by = max(assay(ntd)[row_names_dec,]) / 10000)
 #select_decrease_log2Fold <- with(results_ddsMF, order(-log2FoldChange, padj, pvalue))[1:select_size]
 
 #cat('results_ddsMF[select_decrease_log2Fold,] nt')
@@ -562,19 +502,65 @@ heatmap_outname_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_nt.pdf"
 cat('writing DESeq2 normTransform in:\t', heatmap_outname_pdf, '\n')
 pdf(heatmap_outname_pdf)
 # #The assay function is used to extract the matrix of normalized values.
-pheatmap(assay(ntd)[row_names_dec,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, scale = "row", main=PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
+pheatmap(assay(ntd)[row_names_dec,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, main=paste(PROJECTS, "\nnormtransformed counts\ndecreasing log2foldChange", sep=" "), color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
 dev.off()
 
 heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_nt_counts.tsv")
 write.table(as.data.frame(assay(ntd)[row_names_dec,]), file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
-heatmap_raw_counts_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_raw_counts.pdf")
-pdf(heatmap_raw_counts_pdf)
-# error also here.
-#pheatmap(count_data[row_names_dec,], cluster_rows=TRUE, show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=TRUE, annotation_col = df, scale = "row", main=PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
-pheatmap(count_data[row_names_dec,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, main=PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
-dev.off()
 ## ###########################################end of DECREASE nt
 
+##############################################start of INCREASE raw counts
+
+breaksList <- seq(min(count_data[row_names_inc,]), max(count_data[row_names_inc,]), by = max(count_data[row_names_inc,]) / 10000)
+
+heatmap_raw_counts_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_raw_counts.pdf")
+pdf(heatmap_raw_counts_pdf)
+pheatmap(count_data[row_names_inc,],  show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, main = paste(PROJECTS, "\nraw counts\nincreasing log2foldChange", sep=" "), color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
+dev.off()
+heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_raw_counts.tsv")
+write.table(as.data.frame(count_data[row_names_inc,]), file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
+##################################################end of INCREASE raw counts
+
+##################################################start of DECREASE raw counts
+breaksList <- seq(min(count_data[row_names_dec,]), max(count_data[row_names_dec,]), by = max(count_data[row_names_dec,]) / 10000)
+
+heatmap_raw_counts_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_raw_counts.pdf")
+pdf(heatmap_raw_counts_pdf)
+pheatmap(count_data[row_names_dec,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, main= paste(PROJECTS, "\nraw counts\ndecreasing log2foldChange" , sep=" "), color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
+dev.off()
+
+heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_raw_counts.tsv")
+write.table(count_data[row_names_dec,], file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
+##################################################end of DECREASE raw counts
+
+
+##############################################start of INCREASE vsd counts
+
+breaksList <- seq(min(assay(vsd)[row_names_inc,]), max(assay(vsd)[row_names_inc,]), by = max(assay(vsd)[row_names_inc,]) / 10000)
+
+heatmap_vsd_counts_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_vsd_counts.pdf")
+pdf(heatmap_vsd_counts_pdf)
+pheatmap(assay(vsd)[row_names_inc,],  show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, main = paste(PROJECTS, "\nvsd counts\nincreasing log2foldChange", sep=" "), color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
+dev.off()
+heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_vsd_counts.tsv")
+write.table(assay(vsd)[row_names_inc,], file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
+##################################################end of INCREASE vsd counts
+
+##################################################start of DECREASE vsd counts
+breaksList <- seq(min(assay(vsd)[row_names_dec,]), max(assay(vsd)[row_names_dec,]), by = max(assay(vsd)[row_names_dec,]) / 10000)
+
+heatmap_vsd_counts_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_vsd_counts.pdf")
+pdf(heatmap_vsd_counts_pdf)
+pheatmap(assay(vsd)[row_names_dec,], show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, cluster_rows=FALSE, annotation_col = df, main= paste(PROJECTS, "\nvsd counts\ndecreasing log2foldChange" , sep=" "), color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList)
+dev.off()
+
+heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_vsd_counts.tsv")
+write.table(assay(vsd)[row_names_dec,], file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
+##################################################end of DECREASE vsd counts
+
+
+
+# plot the raw count data sorted by logfold:
 
  #adding PCA (principal component analysis)
 #rlog() may take a long time with 50 or more samples,

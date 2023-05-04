@@ -21,9 +21,9 @@ print('# snakemake output:')
 print('# snakemake wildcards:')
 [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
-out_file = snakemake.output[0]
-out_file_complement = snakemake.output[1]
-meta_file = snakemake.input[0]
+out_file = snakemake.output.out_file
+out_file_complement = snakemake.output.out_file_complement
+meta_file = snakemake.input.meta_file
 DF_meta = pd.read_table(meta_file)
 OUTPUT_PATH = snakemake.wildcards[0]
 projects = snakemake.wildcards[1].split('_')

@@ -49,24 +49,23 @@ print('# snakemake wildcards:')
 
 #####################
 
-# # snakemake inputs:
-# meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-# start_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr5_66828566_66828775.tsv"
-# summary = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/summary_for_metilene.tsv"
-# summary_complement = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/summary_for_metilene_complement.tsv"
+# meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+# start_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27144081_27145663.tsv"
+# summary = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/summary_for_metilene.tsv"
+# summary_complement = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/summary_for_metilene_complement.tsv"
 # # snakemake output:
-# UP_val_plot = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr5_66828566_66828775_UP_val.pdf"
-# UP_val_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr5_66828566_66828775_UP_val.tsv"
-# DOWN_val_plot = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr5_66828566_66828775_DOWN_val.pdf"
-# DOWN_val_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr5_66828566_66828775_DOWN_val.tsv"
+# UP_val_plot = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27144081_27145663_UP_val.pdf"
+# UP_val_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27144081_27145663_UP_val.tsv"
+# DOWN_val_plot = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27144081_27145663_DOWN_val.pdf"
+# DOWN_val_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27144081_27145663_DOWN_val.tsv"
 # # snakemake wildcards:
 # output_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3"
-# project = "TCGA-CESC_TCGA-HNSC"
+# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
 # drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female"
+# gender = "male"
 # cutoff = "cutoff_0"
-# threshold = "threshold_0"
-# DMR = "chr5_66828566_66828775"
+# threshold = "threshold_5"
+# DMR = "chr7_27144081_27145663"
 
 
 def write_empty_files():
@@ -116,15 +115,18 @@ thresh = float(threshold.split('_')[1])
 
 def apply_thresh(row):
     median_temp = row.median()
-    beta_val_max = row.max()
-    limit_val = (thresh/100) * beta_val_max
+    # beta_val_max = row.max()
+    limit_val = (thresh/100) * median_temp
     upper_limit = median_temp + limit_val
     lower_limit = median_temp - limit_val
     row_thresh = row.apply(lambda x: pd.NA if float(x) < upper_limit and float(x) > lower_limit else x)
     return row_thresh
 
 DF_summary = DF_summary.apply(apply_thresh, axis=1)
-DF_summary.dropna(axis=1, inplace=True)
+# TODO check whether the dropna is needed here
+# DF_summary.dropna(axis=1, inplace=True)
+# no, not on the whole DF, when it comes to single plots for every position
+# within the range, check on how lifeline deals with na values
 
 # prepare the DF_meta table, do not limit on case_id but make sure we just
 # include cases in the DF_meta and DF_metilene for which we have the T value

@@ -9,6 +9,7 @@ from decimal import Decimal
 # from lifelines.statistics import logrank_test
 from lifelines.plotting import add_at_risk_counts
 from lifelines import CoxPHFitter
+import numpy as np
 """
 follow lifeline succession from patients with detected DMR
 - needed, metadata:f.e.:
@@ -31,7 +32,7 @@ considered meaningful.
 python /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/
     tcga_metilene/scripts/create_lifeline_plots.py
 """
-#################################################
+# #################################################
 sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 
 meta_table = snakemake.input.meta_table
@@ -52,22 +53,6 @@ print('# snakemake wildcards:')
 #######################################################################
 
 ######################################################################
-
-# # snakemake inputs:
-# metilene_intersect = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_2/metilene_intersect.tsv"
-# meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-HNSC/metilene/merged_meta_files/cutoff_2/meta_info_druglist_merged_drugs_combined.tsv"
-# script_file = "../tcga_metilene/scripts/create_lifeline_plots.py"
-# # snakemake output:
-# lifeline_out_pdf = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_2/threshold_10/metilene_intersect_lifeline_plot_chr1_43146725_43147956.pdf"
-# lifeline_out_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_2/threshold_10/metilene_intersect_lifeline_plot_chr1_43146725_43147956.tsv"
-# # snakemake wildcards:
-# output_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3"
-# project = "TCGA-HNSC"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "male"
-# cutoff = "cutoff_2"
-# threshold = "threshold_10"
-# DMR = "chr1_43146725_43147956"
 
 # # ->>>
 # > /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/.snakemake/scripts/tmppd019qrh.create_lifeline_plots.py(192)<module>()
@@ -98,8 +83,8 @@ thresh = float(threshold.split('_')[1])
 # set every beta value which is to close to the median to pd.NA:
 def apply_thresh(row):
     median = row.median()
-    beta_val_max = row.max()
-    limit_val = (thresh/100) * beta_val_max
+    # beta_val_max = row.max()
+    limit_val = (thresh/100) * median
     upper_limit = median + limit_val
     lower_limit = median - limit_val
     row_thresh = row.apply(lambda x: pd.NA if float(x) < upper_limit and float(x) > lower_limit else x)
@@ -118,7 +103,8 @@ DF_meta = DF_meta.set_index('bcr_patient_uuid').loc[used_cases, :]
 DF_meta['T'] = DF_meta['survivaltime'].combine_first(DF_meta['years_to_last_follow_up'])
 
 T = DF_meta['T']
-DF_meta['E'] = DF_meta['vital_status'] == 'dead'
+# DF_meta['E'] = DF_meta['vital_status'] == 'dead'
+DF_meta['E'] = np.where(DF_meta['vital_status'].values == 'dead', True, False)
 # in case not value available for survivaltime AND years_to_last_follow_up, a
 # NaN is set in T, :
 # '/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_paclitaxel/female_male/cutoff_0/metilene_complement_intersect.tsv'
@@ -150,6 +136,7 @@ DF_meta = DF_meta[T.notna()]
 starts = [i[1] for i in DF_metilene.index]
 p_value = 0
 pvalue_list = []
+
 for start in starts:
     DF_metilene_temp = DF_metilene.loc[
         (slice(None), start, slice(None), slice(None)), :]
@@ -180,8 +167,23 @@ for start in starts:
         # and further reading on: https://discourse.datamethods.org/t/when-is-log-rank-preferred-over-univariable-cox-regression/2344
         cph = CoxPHFitter().fit(DF_temp_2.loc[:, ['UP', 'T', 'E']], 'T', 'E')
     except Exception as e:
-        continue
         print(e)
+        # lifelines.exceptions.ConvergenceError: Convergence halted due to
+        # matrix inversion problems. Suspicion is high collinearity. Please see
+        # the following tips in the lifelines documentation:
+        # https://lifelines.readthedocs.io/en/latest/Examples.html#problems-with-convergence
+        # -in-the-cox-proportional-hazard-modelMatrix is singular.
+        # -- in that case, every start position is problematic, because the
+        # events (E) holds True or False for every position of the case set,
+        # write empty files in that case as well:
+        open(lifeline_out_pdf, 'a').close()
+        pd.DataFrame(
+            columns=['case_id', 'drugs', 'gender', 'projects', 'UP_or_DOWN',
+                    'beta_value', 'vital_status', 'survivaltime',
+                    'years_to_last_follow_up', 'T', 'E', 'median', 'DMR',
+                    'p_value', 'start']).to_csv(lifeline_out_tsv, sep='\t', index=False)
+        os._exit(0)
+
     p_value = cph.summary['p'].values[0]
     # p_value = results.p_value
     pvalue_list.append(p_value)
@@ -261,4 +263,5 @@ else:
     DF['p_value'] = p_value
     DF['start'] = starts[plot_index]
     DF.index.name = 'case_id'
+    print(f'saving: {lifeline_out_tsv}')
     DF.to_csv(lifeline_out_tsv, sep='\t')
