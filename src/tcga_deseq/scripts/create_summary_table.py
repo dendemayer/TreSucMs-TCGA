@@ -91,5 +91,6 @@ DF_summary_complement.to_csv(summary_table_complement, sep='\t')
 # creating the belongin info tables:
 DF_meta.reset_index().loc[:, ['vital_status', 'gender', 'project_id', 'pharmaceutical_therapy_drug_name', 'bcr_patient_uuid']].T.to_csv(summary_table_info, sep='\t')
 DF_meta_complement_T = DF_meta_complement.reset_index().loc[:, ['vital_status', 'gender', 'project_id', 'pharmaceutical_therapy_drug_name', 'bcr_patient_uuid']].T
-DF_meta_complement_T = DF_meta_complement_T.rename({'project_id': 'PROJECT', 'pharmaceutical_therapy_drug_name': 'drugnames', 'bcr_patient_uuid': 'case_id'})
+# why is the renaming step here?
+# DF_meta_complement_T = DF_meta_complement_T.rename({'project_id': 'PROJECT', 'pharmaceutical_therapy_drug_name': 'drugnames', 'bcr_patient_uuid': 'case_id'})
 DF_meta_complement_T.to_csv(summary_table_complement_info, sep='\t')

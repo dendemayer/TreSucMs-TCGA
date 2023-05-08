@@ -236,9 +236,9 @@ colData(ddsMF)
 #design(ddsMF) <- formula(~ cancer + condition)
 
 # Pre-filtering.
-keep = rowSums(counts(ddsMF)) >= 10
+#keep = rowSums(counts(ddsMF)) >= 10
 #ddsMF_bak = ddsMF
-ddsMF <- ddsMF[keep,]
+#ddsMF <- ddsMF[keep,]
 #### -> this step leads to the pheatmap error:
 #> pheatmap(count_data[select_decrease_log2Fold,], cluster_rows=TRUE, show_rownames=TRUE,show_colnames = FALSE, cluster_cols=FALSE, annotation_col = df, scale = "row", main=PROJECTS, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), breaks = breaksList) Fehler in hclust(d, method = method) :
   #NA/NaN/Inf in externem Funktionsaufruf (arg 10)
@@ -311,8 +311,6 @@ results_ddsMF <- na.omit(results_ddsMF)
 # that can be done in the -f 8 and -f10 step:
 # results_DECREASE_10_lgfch_ENSG_and_Gene_info.tsv on that basis the tables and
 # lifeline plots are created
-#TODO: this also triggers the phetamap error...
-#results_ddsMF <- results_ddsMF[results_ddsMF$padj < 0.05, ]
 
 # using the LFC shrinkage as folowing results:
 #results_ddsMF <- lfcShrink(DESeq_ddsMF, coef="vital_state_dead_vs_alive", type="apeglm")

@@ -31,18 +31,14 @@ rule create_deseq_output:
     output:
         #summary_out = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_results_summary.tsv",
         deseq_counts = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.tsv", in_de=['IN', 'DE'], count_type=['nt', 'raw', 'norm', 'vsd']),
-        #deseq_counts_inc = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_heatmap_log2fINCREASE_{count_type}_counts.tsv",
-        #deseq_result_dec = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_heatmap_log2fDECREASE_norm_result.tsv",
-        #deseq_result_inc = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_heatmap_log2fINCREASE_norm_result.tsv",
     conda:
         "envs/DESeq2.yaml"
-    threads:  # although no threads are applied, limit the process since the table creations needs a lot of ram
-        5
+    threads:
+        1
     log:
         "{output_path}/{project}/DESeq2/logs/create_deseq_output/{drug_combi}_{gender}_{cutoff}.log",
     script:
         "scripts/create_deseq_output.py"
-
 
 rule create_deseq_lifeline_plots:
     """
@@ -71,3 +67,108 @@ rule create_deseq_lifeline_plots:
     script:
         "scripts/create_deseq_lifeline_plots.py"
 
+rule merge_summaries:
+    """
+    the lifeline validation should be done on every case available, regardless of the therapy, therefore 
+    concat the deseq2 inputs summary  and summary complements:
+    """
+    input:
+        summary_table = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2.tsv",
+        summary_table_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_INFO.tsv",
+        summary_table_complement = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_complement.tsv",
+        summary_table_complement_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_complement_INFO.tsv",
+        script_file = "../tcga_deseq/scripts/merge_summaries.py"
+    output:
+        summary_table_both = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_counts.tsv",
+        summary_table_both_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_counts_INFO.tsv",
+    conda:
+        "envs/pandas.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/DESeq2/logs/create_counts_all_cases/{drug_combi}_{gender}_{cutoff}.log",
+    script:
+        "scripts/merge_summaries.py"
+
+rule create_counts_all_cases:
+    """
+    similar to the metilene validation, check the influence of the therapy on
+    the whole set of cases, separated by the median in UP and DOWN of the
+    counts, for each found ENSG:
+    - we do not have normalized count data for every case, just the cases we put into the deseq analysis
+    - to achive that, we can use DESeq2 again, without the actual DE analyse:
+    ## Create DESeq2Dataset object
+    dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
+    View(counts(dds))
+    dds <- estimateSizeFactors(dds)
+    sizeFactors(dds)
+    normalized_counts <- counts(dds, normalized=TRUE)
+    write.table(normalized_counts, file="data/normalized_counts.txt", sep="\t", quote=F, col.names=NA)
+    """
+    input:
+        summary_table_both = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_counts.tsv",
+        summary_table_both_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_counts_INFO.tsv",
+        R_path = "../tcga_deseq/resources/DESeq2_create_counts_all_cases.R",
+        script_file = "../tcga_deseq/scripts/create_counts_all_cases.py"
+    output:
+        deseq_counts = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_{count_type}_counts_all_cases.tsv",  count_type=['nt', 'raw', 'norm', 'vsd']),
+    conda:
+        "envs/DESeq2.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/DESeq2/logs/create_counts_all_cases/{drug_combi}_{gender}_{cutoff}.log",
+    script:
+        "scripts/create_counts_all_cases.py"
+
+rule gzip_counts_all_cases:
+    input:
+        "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_{count_type}_counts_all_cases.tsv",  
+    output:
+        "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_{count_type}_counts_all_cases.gz",
+    conda:
+        "envs/gzip.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/DESeq2/logs/gzip_counts_all_cases/{drug_combi}_{gender}_{cutoff}_{count_type}.log",
+    shell:
+        "cat {input} | gzip > {output} && rm {input} 2> {log}"
+
+rule create_deseq_lifeline_validation:
+    """
+                                               |     ENSG      |      
+                                               |---------------|
+                                               |               | 
+                                               |     ja        |
+                                               |   /    \      |
+                                    in therapy?|--        KM   |   
+                                   /           |   \    /      |
+                               hoch  50%       |    nein       |
+                              /      |         |               |
+    - KP including every case:  ---median      |               |
+                              \      |         |               |
+                               tief  50%       |     ja        |
+                                   \           |   /    \      |
+                                    in therapy?|--        KM   |   
+                                               |   \    /      |   
+                                               |    nein       |
+    """
+    input:
+        meta_table = "{output_path}/{project}/DESeq2/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
+        deseq_lifeline_tsv = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline.tsv",
+        counts = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_{count_type}_counts_all_cases.gz",
+    output:
+        deseq_lifeline_tsv_UP = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline_UP_val.tsv",
+        deseq_lifeline_tsv_DOWN = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline_DOWN_val.tsv",
+        deseq_lifeline_pdf_UP = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline_UP_val.pdf",
+        deseq_lifeline_pdf_DOWN = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline_DOWN_val.pdf",
+        dropped_cases = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_dropped_cases.tsv",
+    conda:
+        "envs/lifelines.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/DESeq2/logs/create_deseq_lifeline_validation/{drug_combi}_{gender}_{cutoff}_{threshold}_{in_de}_{count_type}_{ENSG}.log",
+    script:
+        "scripts/create_deseq_lifeline_plots_validation.py"

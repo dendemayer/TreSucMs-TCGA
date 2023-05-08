@@ -157,6 +157,15 @@ def apply_list(value):
     # combined therapies are joined via '_' thats not allowed to be part of the
     # name, replace with '-'
     value = value.replace('_', '-')
+    # spaces are problematic in deseq
+    # DESeq2 Multifactor design with:
+    #         gender, cancer, drugnames, vital_state
+    # Fehler in validObject(.Object) :
+    # ungültiges Objekt der Klasse “DESeqDataSet”: levels of factors in the des
+    # make.names() is applied.
+    # best to only use letters and numbers for levels of factors in the design
+    value = value.replace(' ', '-')
+    value = value.replace('/', ',')
     # correct wrong spellings:
     if re.search("palixtaxel", value):
         return "paclitaxel"
@@ -168,7 +177,7 @@ def apply_list(value):
         re.search("5-fu", value) or re.search("5fu", value) or
         re.search("5 fu", value) or
         re.search("fluorouracil", value) or
-        re.search("fluorouracil", value) or
+        re.search("fluorouracil", value) or re.search("5_fu", value) or
             re.search("fluoruracil", value)):
         return "5-fluorouracil"
     if re.search("cisplatinum", value):

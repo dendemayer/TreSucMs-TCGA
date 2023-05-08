@@ -144,7 +144,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # TODO uncomment this !!!
     snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True)
+                        force_incomplete=True, dryrun=True, use_conda=True)
     # TODO uncomment this !!!
 
     # auxfiles for both pipelines:
@@ -175,19 +175,10 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     print('running snakemake with\n')
     print(f'Snakefile:\t{Snakefile}')
     print(f'shared_workdir:\t{shared_workdir}')
-    # print(f'Snakemake_all_files:\t{Snakemake_all_files}')
-
-
-    # TODO uncomment this !!!
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True)
-    #########################################################################
-    # TODO uncomment this !!!
-    ########################################################################
 
     # also add the multi proj meta_info_druglist_merged_drugs_combined.tsv
     # which is just the concatenation of the single proj pendants:
+    # by that those singl proj meta tables are created aswell
     projects = '_'.join(PROJECT)
     merged_drugs_combined_list = []
     for pipeline in execute:
@@ -198,6 +189,18 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
                 'meta_info_druglist_merged_drugs_combined.tsv'))
 
     Snakemake_all_files = Snakemake_all_files + merged_drugs_combined_list
+
+    # TODO uncomment this !!!
+    # rerun_trggers='mtime' IMPORTANT -> the needed input data is generated via
+    # input function in shared snakefile for rule merge_meta_tables:
+    # without this option this rule would be ran everytime, since everything
+    # following is based on those aux file, every rule would be triggered then
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=True, use_conda=True, rerun_triggers='mtime')
+    #########################################################################
+    # TODO uncomment this !!!
+    ########################################################################
 
     # from here the shared modules and Snakemake scripts are getting pipeline
     # specific, hand over all outputfiles requested so far and enter the

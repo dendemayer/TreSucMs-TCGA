@@ -21,3 +21,6 @@ def create_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold):
                                 lifeline_plots.append(os.path.join(deseq_path, thr, f'DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline.pdf'))
     return lifeline_plots
 
+def create_lifeline_plots_validation(lifeline_plots):
+    return [i.replace('.pdf', '_UP_val.pdf') for i in lifeline_plots]
+

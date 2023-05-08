@@ -155,6 +155,7 @@ final_DF = final_DF.reset_index().rename({'index': 'case_id'}, axis=1)
 # groups, if the value_counts is not 2, write empty files
 if len(final_DF[(chr_, start)].value_counts().index) != 2:
     write_empty_files()
+    os._exit(0)
 
 DOWN_DF = final_DF.set_index((chr_, start)).loc['DOWN', :].reset_index().set_index('case_id')
 # for later summaries, the col names must be identical, add the chr_start as
@@ -172,7 +173,7 @@ def set_if_therapy(drug_invoked):
 
 DOWN_DF['in_therapy'] = DOWN_DF['drugs'].apply(set_if_therapy)
 UP_DF['in_therapy'] = UP_DF['drugs'].apply(set_if_therapy)
-# both in_therapy cols must contain True and False valse, otherwise no
+# both in_therapy cols must contain True and False values, otherwise no
 # comparison in possible:
 if len(UP_DF['in_therapy'].value_counts().index) != 2:
     write_empty_files()
