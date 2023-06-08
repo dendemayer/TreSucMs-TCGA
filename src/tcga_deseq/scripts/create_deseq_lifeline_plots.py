@@ -32,37 +32,42 @@ print('# snakemake output:')
 
 print('# snakemake wildcards:')
 [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
-#######################################################################
-# # snakemake inputs:
-# meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-# summary_table_info = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-LUSC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/summary_for_DESeq2_INFO.tsv"
-# deseq_counts = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/DESeq2_heatmap_log2fINCREASE_nt_counts.tsv"
-# script_file = "../tcga_deseq/scripts/create_deseq_lifeline_plots.py"
-# # snakemake output:
-# deseq_lifeline_pdf = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/DESeq2_log2f_INCREASE_nt_ENSG00000251127_lifeline.pdf"
-# deseq_lifeline_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/DESeq2_log2f_INCREASE_nt_ENSG00000251127_lifeline.tsv"
-# # snakemake wildcards:
-# output_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4"
-# project = "TCGA-LUSC"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "male"
-# cutoff = "cutoff_0"
-# threshold = "threshold_5"
-# in_de = "IN"
-# count_type = "nt"
-# ENSG = "ENSG00000251127"
 
 #######################################################################
+
+# # #######################################################################
+# # snakemake inputs:
+# meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+# summary_table_info = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/summary_for_DESeq2_INFO.tsv"
+# deseq_counts = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/DESeq2_heatmap_log2fDECREASE_norm_counts.tsv"
+# script_file = "../tcga_deseq/scripts/create_deseq_lifeline_plots.py"
+# # snakemake output:
+# deseq_lifeline_pdf = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000081041_lifeline.pdf"
+# deseq_lifeline_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000081041_lifeline.tsv.gz"
+# # snakemake wildcards:
+# output_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4"
+# project = "TCGA-CESC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female"
+# cutoff = "cutoff_0"
+# threshold = "threshold_0"
+# in_de = "DE"
+# count_type = "norm"
+# ENSG = "ENSG00000081041"
+# # #######################################################################
+
 def write_empty_files():
     print(f'writing empty file {deseq_lifeline_pdf}:')
     open(deseq_lifeline_pdf,'a').close()
     print(f'writing empty file {deseq_lifeline_tsv}:')
-    pd.DataFrame(columns=['case_id', 'count', 'UP_or_DOWN', 'project_id',
+    pd.DataFrame(columns=['count', 'UP_or_DOWN', 'project_id',
                           'pharmaceutical_therapy_drug_name', 'gender',
                           'vital_status', 'survivaltime',
-                          'years_to_last_follow_up', 'T', 'E', 'UP_bool',
-                          'DOWN_bool', 'included_in_KM', 'count_type', 'p_value', 'median',
-                          'threshold', 'ENSG']).to_csv(deseq_lifeline_tsv, sep='\t',
+                          'years_to_last_follow_up', 'T', 'E',
+                          'included_in_KM', 'count_type', 'p_value', 'median',
+                          'threshold', 'ENSG', 'plot_type', 'fst_life_mean',
+                          'scnd_life_mean']).to_csv(deseq_lifeline_tsv,
+                                                      sep='\t',
                                                index=False)
 DF_counts = pd.read_table(deseq_counts).loc[ENSG,:]
 
@@ -115,10 +120,15 @@ if len(DF_to_plot['UP_or_DOWN'].value_counts()) != 2:
     os._exit(0)
 kmf_UP = KaplanMeierFitter()
 kmf_UP.fit(T[UP_bool], E[UP_bool], label='UP')
+# UP_life_expectancy_median = kmf_UP._median
+UP_life_expectancy_mean = vars(kmf_UP)['survival_function_'].iloc[:, 0].mean()
 ax = kmf_UP.plot_survival_function(ax=ax)
 
 kmf_DOWN = KaplanMeierFitter()
 kmf_DOWN.fit(T[DOWN_bool], E[DOWN_bool], label='DOWN')
+# DOWN_life_expectancy_median = kmf_DOWN._median
+DOWN_life_expectancy_mean = vars(kmf_DOWN)['survival_function_'].iloc[:, 0].mean()
+
 kmf_DOWN.plot_survival_function(ax=ax)
 
 add_at_risk_counts(kmf_UP, kmf_DOWN, ax=ax)
@@ -157,6 +167,7 @@ print(f'saving: {deseq_lifeline_pdf}')
 plt.savefig(deseq_lifeline_pdf)
 plt.close()
 
+# add the info of the lifeexpany of each group:
 # prepare to store the table:
 print(f'saving {deseq_lifeline_tsv}')
 DF_to_plot['included_in_KM'] = True
@@ -169,4 +180,8 @@ DF_to_plot['p_value'] = p_value
 DF_to_plot['median'] = median
 DF_to_plot['threshold'] = thresh
 DF_to_plot['ENSG'] = ENSG
-DF_to_plot.to_csv(deseq_lifeline_tsv, sep='\t')
+DF_to_plot['plot_type'] = 'base_plot'
+DF_to_plot['fst_life_mean'] = UP_life_expectancy_mean
+DF_to_plot['scnd_life_mean'] = DOWN_life_expectancy_mean
+# DF_to_plot.to_csv(deseq_lifeline_tsv, sep='\t')
+DF_to_plot.drop(['UP_bool', 'DOWN_bool'], axis=1).to_csv(deseq_lifeline_tsv, sep='\t')

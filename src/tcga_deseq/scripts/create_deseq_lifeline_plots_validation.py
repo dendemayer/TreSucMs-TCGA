@@ -37,16 +37,15 @@ print('# snakemake output:')
 print('# snakemake wildcards:')
 [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
-
 def write_empty_files():
     for path in [deseq_lifeline_tsv_UP, deseq_lifeline_tsv_DOWN]:
-        pd.DataFrame(columns= ['case_id', 'count', 'project_id',
-                               'pharmaceutical_therapy_drug_name', 'gender',
-                               'vital_status', 'survivaltime',
-                               'years_to_last_follow_up', 'T', 'E',
-                               'count_type', 'ENSG', 'UP_or_DOWN',
-                               'in_therapy', 'p_value', 'median', 'threshold']).to_csv(
-                                   path, sep='\t', index=False)
+        pd.DataFrame(columns=['count', 'project_id',
+                              'pharmaceutical_therapy_drug_name', 'gender',
+                              'vital_status', 'survivaltime',
+                              'years_to_last_follow_up', 'T', 'E',
+                              'count_type', 'ENSG', 'median', 'threshold',
+                              'UP_or_DOWN', 'in_therapy', 'p_value', 'plot_type', 'fst_life_mean', 'scnd_life_mean']).to_csv(
+                                  path, sep='\t', index=False)
         print(f'writing empty file {path}')
     for path in [deseq_lifeline_pdf_UP, deseq_lifeline_pdf_DOWN]:
         open(path, 'a').close()
@@ -135,15 +134,10 @@ except Exception as e:
     p_value_DOWN = results.p_value
 
 
-UP_DF['p_value'] = p_value_UP
-UP_DF.to_csv(deseq_lifeline_tsv_UP, sep='\t')
-print(f'writing {deseq_lifeline_tsv_UP}')
-
-DOWN_DF['p_value'] = p_value_DOWN
-DOWN_DF.to_csv(deseq_lifeline_tsv_DOWN, sep='\t')
-print(f'writing {deseq_lifeline_tsv_DOWN}')
-
 ### plot up and down
+###############################################################################
+#                                 DOWN_PLOT                                   #
+###############################################################################
 
 T = DOWN_DF['T']
 E = DOWN_DF['E']
@@ -151,10 +145,14 @@ therapy_bool = DOWN_DF['in_therapy']
 fig, ax = plt.subplots(figsize=(8, 6))
 kmf_THERAPY = KaplanMeierFitter()
 kmf_THERAPY.fit(T[therapy_bool], E[therapy_bool], label='in therapy')
+# DOWN_in_therapy_life_median = kmf_THERAPY._median
+DOWN_in_therapy_life_mean = vars(kmf_THERAPY)['survival_function_'].iloc[:, 0].mean()
 ax = kmf_THERAPY.plot_survival_function(ax=ax)
 
 kmf_NO_THERAPY = KaplanMeierFitter()
 kmf_NO_THERAPY.fit(T[~therapy_bool], E[~therapy_bool], label='not in therapy')
+# DOWN_not_in_therapy_life_median = kmf_NO_THERAPY._median
+DOWN_not_in_therapy_life_mean = vars(kmf_NO_THERAPY)['survival_function_'].iloc[:, 0].mean()
 kmf_NO_THERAPY.plot_survival_function(ax=ax)
 
 add_at_risk_counts(kmf_THERAPY, kmf_NO_THERAPY, ax=ax)
@@ -167,6 +165,9 @@ print(f'saving: {deseq_lifeline_pdf_DOWN}')
 plt.savefig(deseq_lifeline_pdf_DOWN)
 plt.close()
 
+###############################################################################
+#                                      UP_plot                                #
+###############################################################################
 
 T = UP_DF['T']
 E = UP_DF['E']
@@ -174,10 +175,14 @@ therapy_bool = UP_DF['in_therapy']
 fig, ax = plt.subplots(figsize=(8, 6))
 kmf_THERAPY = KaplanMeierFitter()
 kmf_THERAPY.fit(T[therapy_bool], E[therapy_bool], label='in therapy')
+# UP_in_therapy_life_median=kmf_THERAPY._median
+UP_in_therapy_life_mean = vars(kmf_THERAPY)['survival_function_'].iloc[:, 0].mean()
 ax = kmf_THERAPY.plot_survival_function(ax=ax)
 
 kmf_NO_THERAPY = KaplanMeierFitter()
 kmf_NO_THERAPY.fit(T[~therapy_bool], E[~therapy_bool], label='not in therapy')
+# UP_not_in_therapy_life_median=kmf_NO_THERAPY._median
+UP_not_in_therapy_life_mean = vars(kmf_NO_THERAPY)['survival_function_'].iloc[:, 0].mean()
 kmf_NO_THERAPY.plot_survival_function(ax=ax)
 
 add_at_risk_counts(kmf_THERAPY, kmf_NO_THERAPY, ax=ax)
@@ -188,3 +193,24 @@ plt.tight_layout()
 print(f'saving: {deseq_lifeline_pdf_UP}')
 plt.savefig(deseq_lifeline_pdf_UP)
 plt.close()
+
+###############################################################################
+#                               writing tables                                #
+###############################################################################
+# 2 kmf medians per table are added, the kmf estimation must be therefore ran
+# already, so we save the tables after plotting the pdfs
+
+
+UP_DF = UP_DF.assign(p_value=np.repeat(p_value_UP,len(UP_DF)))
+UP_DF['plot_type'] = 'UP_validation'
+UP_DF['fst_life_mean'] = UP_in_therapy_life_mean
+UP_DF['scnd_life_mean'] = UP_not_in_therapy_life_mean
+UP_DF.to_csv(deseq_lifeline_tsv_UP, sep='\t')
+print(f'writing {deseq_lifeline_tsv_UP}')
+
+DOWN_DF = DOWN_DF.assign(p_value=np.repeat(p_value_DOWN,len(DOWN_DF)))
+DOWN_DF['plot_type'] = 'DOWN_validation'
+DOWN_DF['fst_life_mean'] = DOWN_in_therapy_life_mean
+DOWN_DF['scnd_life_mean'] = DOWN_not_in_therapy_life_mean
+DOWN_DF.to_csv(deseq_lifeline_tsv_DOWN, sep='\t')
+print(f'writing {deseq_lifeline_tsv_DOWN}')
