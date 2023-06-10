@@ -49,7 +49,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # TODO uncomment this !!!
     snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=True, use_conda=True)
+                        force_incomplete=True, dryrun=False, use_conda=True)
     # TODO uncomment this !!!
 
     # Snakemake_all_files = Snakemake_all_files + metilene_intersect_tables
@@ -100,7 +100,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # TODO
     snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=True, use_conda=True,
+                        force_incomplete=True, dryrun=False, use_conda=True,
                         printshellcmds=True,  rerun_triggers='mtime')
     # TODO
 

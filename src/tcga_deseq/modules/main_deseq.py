@@ -51,9 +51,9 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # created, ENSG is within the filenames
     ###########################################################################
     # TODO uncomment this
-    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=False, use_conda=True, printshellcmds=True, quiet=False)
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True, printshellcmds=True, quiet=False, unlock=False)
     # TODO uncomment this
     ###########################################################################
     ###########################################################################
@@ -78,9 +78,9 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     #     here the lifelineplots are created, both, base and validation plots #
     ###########################################################################
     ### TODO uncomment this !!!!
-    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=False, use_conda=True, rerun_triggers='mtime', printshellcmds=True, quiet=False)
+    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True, rerun_triggers='mtime', printshellcmds=True, quiet=False)
     ### TODO uncomment this !!!!
     ###############################################################################
     ## the previous snakemake runs must be completed before requesting the next

@@ -12,12 +12,16 @@ for (i in args){
     j <- j + 1
 }
 
+#count_inname <-file.path('/scr/palinca/gabor/TCGA-pipeline/TCGA-BRCA/DESeq2/DESeq2_input_table/adriamycin,cytoxan,paclitaxel,tamoxifen_cyclophosphamide,doxorubicin,paclitaxel,tamoxifen_tamoxifen/female/cutoff_10/summary_for_counts.tsv')
+#info_inname <- file.path('/scr/palinca/gabor/TCGA-pipeline/TCGA-BRCA/DESeq2/DESeq2_input_table/adriamycin,cytoxan,paclitaxel,tamoxifen_cyclophosphamide,doxorubicin,paclitaxel,tamoxifen_tamoxifen/female/cutoff_10/summary_for_counts_INFO.tsv') 
+#OUTPUT_PATH <- file.path('/scr/palinca/gabor/TCGA-pipeline/TCGA-BRCA/DESeq2/DESeq2_output/adriamycin,cytoxan,paclitaxel,tamoxifen_cyclophosphamide,doxorubicin,paclitaxel,tamoxifen_tamoxifen/female/cutoff_10')
+#PROJECTS <-   'TCGA-BRCA'
 
 ### test files:
 #count_inname <-file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/summary_for_counts.tsv')
 #info_inname <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/summary_for_counts_INFO.tsv')
 #OUTPUT_PATH <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0')
-#PROJECTS <- 'TCGA-CESC'
+#PROJECTS <-              'TCGA-CESC'
 
 #count_inname <-file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/summary_for_counts.tsv')
 #info_inname <- file.path('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/summary_for_counts_INFO.tsv')
@@ -124,7 +128,11 @@ if (str_contains(col_flags,c("gender", "cancer", "drugnames", "vital_state"), lo
 }
 
 
-ddsMF <- get_ddsMF(col_flags)
+#ddsMF <- get_ddsMF(col_flags)
+
+# since we just need the normalisation of the count data, no fancy design is
+# needed, just take the vital state as design
+ddsMF  <- DESeqDataSetFromMatrix(countData = count_data, colData = vital_cancer, design= ~ vital_state )
 
 colData(ddsMF)
 # Pre-filtering.

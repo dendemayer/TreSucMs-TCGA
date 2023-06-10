@@ -138,9 +138,16 @@ ENSGs_to_delete = []
 # here the filepaths which hold different result files that lead to the same
 # results:
 DF_aggr = DF_aggr.reset_index().drop_duplicates(subset=['ENSG', 'count_type', 'plot_type', 'threshold', 'p_value', 'fst_life_mean', 'scnd_life_mean']).set_index(['ENSG', 'count_type', 'plot_type', 'threshold'])
+ENSGs_to_delete = []
 for count in ['norm_count', 'raw_count', 'nt_count']:
     for thresh in thresholds:
-        [ENSGs_to_delete.append((ensg, count, thresh)) for ensg in ENSGs_list if len(DF_aggr.loc[(ensg,count, slice(None), thresh),:]) != 3]
+        for ensg in ENSGs_list:
+            try:
+                if len(DF_aggr.loc[(ensg,count, slice(None), thresh),:]) != 3:
+                    ENSGs_to_delete.append((ensg, count, thresh))
+            except KeyError:
+                continue
+        # [ENSGs_to_delete.append((ensg, count, thresh)) for ensg in ENSGs_list if len(DF_aggr.loc[(ensg,count, slice(None), thresh),:]) != 3]
 
 # delete the ENSG, count_type and Thresh combinations which do not hold all 3
 # needed plots:
@@ -150,7 +157,10 @@ if len(ENSGs_to_delete) != 0:
 
 DF_aggr['CMP'] = 'CMP'
 for plot_type in ['base_plot', 'UP_validation', 'DOWN_validation']:
-    UP_bool = (DF_aggr.loc[(slice(None), slice(None), plot_type), 'fst_life_mean'] > DF_aggr.loc[(slice(None), slice(None), plot_type), 'scnd_life_mean'])
+    try:
+        UP_bool = (DF_aggr.loc[(slice(None), slice(None), plot_type), 'fst_life_mean'] > DF_aggr.loc[(slice(None), slice(None), plot_type), 'scnd_life_mean'])
+    except KeyError:
+        continue
     UP_bool_index = UP_bool[UP_bool].index
     DOWN_bool_index = UP_bool[~UP_bool].index
     DF_aggr.loc[UP_bool_index,'CMP'] = 'UP'

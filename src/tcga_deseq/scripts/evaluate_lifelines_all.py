@@ -20,28 +20,29 @@ print('# snakemake wildcards:')
 [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
 deseq_lifeline_aggregated = snakemake.input[0]
-deseq_lifeline_eval = snakemake.output[0]
-deseq_lifeline_eval_pdfs = snakemake.output[1]
+deseq_lifeline_eval = snakemake.output[0] # deseq_lifeline_eval
+deseq_lifeline_eval_pdfs = snakemake.output[1] # deseq_lifeline_eval_pdfs
 ###############################################################################
 ###############################################################################
 #                                  test set                                   #
 ###############################################################################
 
-# snakemake inputs:
-deseq_lifeline_aggregated = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5/DESeq2_lifelines_aggregated.tsv.gz"
-# snakemake output:
-deseq_lifeline_eval = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5/DESeq2_lifelines_evaluated.tsv.gz"
-# snakemake wildcards:
-output_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4"
-project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-gender = "female"
-cutoff = "cutoff_0"
-end = "tsv.gz"
+# # snakemake inputs:
+# deseq_lifeline_aggregated = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5/DESeq2_lifelines_aggregated.tsv.gz"
+# # snakemake output:
+# deseq_lifeline_eval = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5/DESeq2_lifelines_evaluated.tsv.gz"
+# # snakemake wildcards:
+# output_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4"
+# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female"
+# cutoff = "cutoff_0"
+# end = "tsv.gz"
 
 DF_eval = pd.read_table(deseq_lifeline_aggregated)
 if DF_eval.empty:
     DF_eval.to_csv(deseq_lifeline_eval)
+    open(deseq_lifeline_eval_pdfs, 'a').close()
     os._exit(0)
 
 # starting point are the scored base_plots, sort them p_sum wise and take 20
@@ -52,6 +53,7 @@ DF_eval = DF_eval.set_index(DF_base_sort_temp.index.names).loc[DF_base_sort_temp
 # for each ENSG take the best result:
 ENSGs = DF_eval.reset_index()['ENSG'].value_counts().index.to_list()
 DF_eval_final = pd.concat([pd.concat([DF_eval.loc[ensg,:].reset_index().iloc[:3,:], pd.DataFrame({'ENSG':[ensg]})], axis=1).fillna(ensg) for ensg in ENSGs]).set_index('ENSG')
+
 DF_eval_final.to_csv(deseq_lifeline_eval, sep='\t')
 
 pdfs_to_merge = [re.sub('tsv.*', 'pdf', i) for i in  DF_eval_final['file_path'].values.tolist()]
