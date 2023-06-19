@@ -48,6 +48,24 @@ print('# snakemake wildcards:')
 [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
 #####################
+# snakemake inputs:
+# meta_table = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_5/meta_info_druglist_merged_drugs_combined.tsv"
+# start_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chrX_49186102_49186568.tsv"
+# summary = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/summary_for_metilene.tsv"
+# summary_complement = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/summary_for_metilene_complement.tsv"
+# snakemake output:
+# UP_val_plot = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chrX_49186102_49186568_UP_val.pdf"
+# UP_val_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chrX_49186102_49186568_UP_val.tsv"
+# DOWN_val_plot = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chrX_49186102_49186568_DOWN_val.pdf"
+# DOWN_val_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chrX_49186102_49186568_DOWN_val.tsv"
+# snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline"
+# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female_male"
+# cutoff = "cutoff_5"
+# threshold = "threshold_5"
+# DMR = "chrX_49186102_49186568"
 
 # meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
 # start_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27144081_27145663.tsv"
@@ -139,8 +157,12 @@ DF_summary.drop(labels=index_to_delete, axis=1, level=1, inplace=True)
 # also the meta is shortened
 DF_meta = DF_meta[T.notna()]
 
-DF_temp = DF_summary.T
+DF_temp = DF_summary.T.dropna()
 median = DF_summary.median(axis=1).values[0]
+# TypeError: float() argument must be a string or a real number, not 'NAType'
+# 1ba4e70c-692c-487a-abc5-36e5f0a03286 carboplatin,docetaxel male TCGA-LUSC <NA>
+# '/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/summary_for_metilene.tsv'
+DF_summary = DF_summary.dropna(axis=1)
 temp_DF = DF_summary.apply(lambda x: 'UP' if float(x) > median else 'DOWN').to_frame()
 temp_DF.columns = DF_summary.index
 final_DF = pd.concat([temp_DF, DF_temp], axis=1)
