@@ -30,7 +30,16 @@ and nationwidechildren are linked through:
 """
 ###########################
 sys.stderr = sys.stdout = open(snakemake.log[0], "w")
-# 'resources/GCv36_Manifests/TCGA-CESC.tsv':, links the case_id to the datafile
+
+print('# snakemake inputs:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+
+print('# snakemake output:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+
+print('# snakemake wildcards:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+
 manifest_file = snakemake.input[0]
 print(f'manifest_file = "{manifest_file}"')
 # nationwidechildrens.org_biospecimen_aliquot_cesc.txt:
@@ -121,8 +130,31 @@ sample_DF = sample_DF[primary_tumor_filter]
 # # proj_low_suf = PROJECT.replace('TCGA-', '').lower()
 vital_base = os.path.basename(vital_table_path)
 print(f'\nusing {vital_base} as clinical followup resource\n')
-vital_DF = pd.read_csv(vital_table_path, sep='\t').loc[2:, :]
+vital_DF = pd.read_csv(vital_table_path, sep='\t', na_values='[Not Available]').loc[2:, :]
 vital_DF['bcr_patient_uuid'] = vital_DF['bcr_patient_uuid'].str.lower()
+vital_DF['vital_status'] = vital_DF['vital_status'].str.lower()
+# it occurs that the value of last_contact_days_to is not set
+# to nan, although the patient is ranked dead, there the follow up value is not
+# updated to nan., set every last_contact_days_to to nan in rows where the
+# vital stat is deadwe have both, ,survivaltime and years_to_last_follow_up
+ # 10b3f56a-e61e-486b-8d3c-176668d5dc34 │ Dead         │ 548                │ 548              ║
+# '/scr/palinca/gabor/TCGA-pipeline/TCGA-HNSC/aux_files/nationwidechildrens.org_clinical_patient_hnsc.txt'
+vital_DF = vital_DF.set_index(['vital_status', 'bcr_patient_uuid']).sort_index(level=['vital_status', 'bcr_patient_uuid'])
+# drop nans in col last_contact_days_to in alive patients (this value needs to
+# be set)
+bcr_to_drop = vital_DF.loc['alive', 'last_contact_days_to'][vital_DF.loc['alive', 'last_contact_days_to'].isna()].index.tolist()
+# drop nans in col death_days_to in dead patients (this value needs to
+# be set)
+bcr_to_drop = bcr_to_drop + vital_DF.loc['dead', 'death_days_to'][vital_DF.loc['dead', 'death_days_to'].isna()].index.to_list()
+#
+vital_DF = vital_DF.reset_index('vital_status').drop(bcr_to_drop).reset_index()
+# vice versa, set every entry to nan where this is expected:
+vital_DF = vital_DF.set_index('vital_status')
+vital_DF.loc['alive', 'death_days_to'] = pd.NA
+vital_DF.loc['dead', 'last_contact_days_to'] = pd.NA
+vital_DF = vital_DF.reset_index()
+# vital_DF = vital_DF.set_index(['vital_status', 'death_days_to'])
+
 
 # # nationwidechildrens.org_clinical_patient_cesc.txt'
 # # patient_DF contains the gender info
@@ -304,7 +336,7 @@ def days_to_years(value):
 
 
 
-# make years out of last_concact_days_to col:
+# make years out of last_contact_days_to col:
 complete_DF['survivaltime'] = complete_DF['death_days_to'].apply(
     days_to_years)
 complete_DF['years_to_last_follow_up'] = complete_DF[
@@ -392,7 +424,7 @@ print(f'saved {complete_path}')
 #         except ValueError:
 #             return np.nan
 
-#     # make years out of last_concact_days_to col:
+#     # make years out of last_contact_days_to col:
 #     complete_DF['survivaltime'] = complete_DF['survivaltime'].apply(
 #         days_to_years)
 #     complete_DF['years_to_last_follow_up'] = complete_DF[

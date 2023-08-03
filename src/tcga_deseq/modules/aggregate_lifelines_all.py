@@ -3,6 +3,10 @@ import os
 
 def aggregate_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs,
                              threshold):
+    """
+    # iterating over all thresholds not necessary, they are summarized into one
+    # dir like: threshold_0_threshold_5_threshold_10
+    """
     threshold_str = '_'.join([f'threshold_{str(i)}' for i in threshold])
     aggregate_lifeline_plots_list = []
     # do not request any aggregation for which the data is missing, f.e. male

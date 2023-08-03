@@ -1,22 +1,25 @@
-Usage: python main_metilene.py [OPTIONS]
+Usage: tcga_main [OPTIONS]
 
-  "metilene_pipeline" a tool to choose, harvest and analyse methylation data of
-  the TCGA-projects with help of the metilene package.
+tcga_main -p TCGA-HNSC -p TCGA-CESC -p TCGA-LUSC -d cisplatin -d carboplatin,paclitaxel -d carboplatin -o /scr/palinca/gabor/TCGA-pipeline -c 40 -e metilene -t 5 -t 10 -C
+ 8 -C 5 -e DESeq2
 
-  build and activate the provided conda env:
+  "tcga_piplines" a tool to choose, harvest and analyse  data of
+  the TCGA-projects with help of the metilene and DESeq2 package to find
+  biomarkers which can have impact on treatment success.
 
-      $ conda env create -f metilene_env.yaml
-
-      $ conda activate metilene_pipeline
+  install the package:
+    $ git clone git@github.com:dendemayer/tcga_piplines.git
+    $ cd tcga_piplines
+    $ pip install .
 
   call the script without any options to enter the interactive mode and set
   each option step by step:
 
-      $ python main_metilene.py
+      $ tcga_main
 
   print help page:
 
-      $ python main_metilene.py --help
+      $ tcga_main --help
 
 Options:  
 

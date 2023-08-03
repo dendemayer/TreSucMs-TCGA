@@ -1,8 +1,10 @@
 manifest_file:
   - gdc_manifest_20211029_data_release_31.0_active.tsv.gz
 
-gtf:
+gtf.gz:
   - gencode.v36.annotation.gtf.gz
+gtf:
+  - gencode.v36.annotation.gtf
 
 gdc_manifest_20211029_data_release_31.0_active.tsv.gz:  # outfilename
   - gdc_manifest_20211029_data_release_31.0_active.tsv.gz # filename on server

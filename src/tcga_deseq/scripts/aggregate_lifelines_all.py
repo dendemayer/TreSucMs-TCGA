@@ -34,11 +34,11 @@ TODO:
 add info which group has the higher life expancy to each of the 3 plot types
 
 
-| plot_type       | fst_life_mean             | scnd_life_mean                | CMP                      |
-| -               | -                         | -                             | -                        |
-| base_plot       | UP_life_expectancy_mean   | DOWN_life_expectancy_mean     | CMP_UP-DOWN              |
-| UP_validation   | UP_in_therapy_life_mean   | UP_not_in_therapy_life_mean   | CMP_in or not in therapy |
-| DOWN_validation | DOWN_in_therapy_life_mean | DOWN_not_in_therapy_life_mean | CMP_in or not in therapy |
+| plot_type         | fst_life_mean               | scnd_life_mean                  | CMP                                      |
+| -                 | -                           | -                               | -                                        |
+| "base_plot"       | UP_life_expectancy_mean     | DOWN_life_expectancy_mean       | CMP_UP-DOWN ("UP" or "DOWN")             |
+| "UP_validation"   | (UP) in therapyx life_mean  | (UP) not in therapy_life_mean   | CMP_in or not in therapy (True or False) |
+| "DOWN_validation" | (DOWN) in therapy_life_mean | (DOWN) not in therapy_life_mean | CMP_in or not in therapy (True or False  |
 
 base_plot: UP is higher -> expectation would be that in UP_validation the UP_in_therapy is also higher
 base_plot: DOWN is higher -> expectation would be that in DOWN_validation the DOWN_in_therapy is also higher
@@ -180,6 +180,9 @@ for plot_type in ['base_plot', 'UP_validation', 'DOWN_validation']:
 DF_aggr = DF_aggr.set_index('CMP', append=True)
 DF_aggr['p_sum'] = 0
 DF_aggr['scored'] = False
+# depending on UP or DOWN in base_plot, we score either UP or DOWN in
+# validation, so out of 3 available plots, we just score 2 of them. the ones
+# scored get the scored col set to True
 
 for ENSG in DF_aggr.reset_index()['ENSG'].value_counts().index.to_list():
     for count_type in ['norm_count', 'nt_count', 'raw_count']:

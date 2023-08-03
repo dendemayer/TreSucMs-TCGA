@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import glob
-#configfile: 'config.yaml'
+configfile: '../shared/config.yaml'
 
 include: "../shared/Snakefile"
 
@@ -9,31 +9,31 @@ include: "../shared/Snakefile"
 #    input:
 #        "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-CESC_TCGA-HNSC/metilene/metilene_input_table/carboplatn,paclitaxel_cisplatin/male/cutoff_0/threshold_0/summary_for_metilene.tsv"
 #breakpoint()
-#def get_data_files(wildcards):
-#    OUTPUT_PATH = wildcards[0]
-#    project = wildcards[1].split('_')
-#    DF_temp = pd.read_table(os.path.join(OUTPUT_PATH, 'metadata', config['manifest_file'][0]))
-#    DF_temp.set_index('project_id').loc[project, 'filename'].str.contains('HumanMethylation450')
-#    DF_temp = DF_temp[DF_temp['filename'].str.contains(
-#        'HumanMethylation450')].set_index(
-#                'project_id').loc[project, 'filename']
-#    DF_temp = DF_temp.to_frame()
-#    DF_temp.reset_index(inplace=True)
-#    DF_temp['filepath'] = OUTPUT_PATH + '/' + DF_temp['project_id'] + '/metilene/'+ 'data_files' + '/' + DF_temp['filename']
-#    data_path_list = DF_temp['filepath'].to_list()
-#    return data_path_list
+def get_data_files(wildcards):
+    OUTPUT_PATH = wildcards[0]
+    project = wildcards[1].split('_')
+    DF_temp = pd.read_table(os.path.join(OUTPUT_PATH, 'metadata', config['manifest_file'][0]))
+    DF_temp.set_index('project_id').loc[project, 'filename'].str.contains('HumanMethylation450')
+    DF_temp = DF_temp[DF_temp['filename'].str.contains(
+        'HumanMethylation450')].set_index(
+                'project_id').loc[project, 'filename']
+    DF_temp = DF_temp.to_frame()
+    DF_temp.reset_index(inplace=True)
+    DF_temp['filepath'] = OUTPUT_PATH + '/' + DF_temp['project_id'] + '/metilene/'+ 'data_files' + '/' + DF_temp['filename']
+    data_path_list = DF_temp['filepath'].to_list()
+    return data_path_list
 
 rule create_summary_table:
     """
     according to the flag composition the (projects, drugs) and the metadata
     given (dead/alive, female/male) create metilene input tables
-    # every data file for the belonging project must be loaded, since not just
-    # the selection of drugs is invoked, but also the complement
+    # every data file for the belonging project must be downloaded, since not
+    # just the selection of drugs is invoked, but also the complement
     """
     input:
         meta_file = "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
         manifest_file = expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file']),
-        #data_files = get_data_files, 
+        data_files = get_data_files, 
     output:
         out_file = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
         out_file_complement = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv"
@@ -75,6 +75,8 @@ rule create_metilene_out:
         10
     log:
         "{output_path}/{project}/metilene/logs/create_metilene_out/{drug_combi}_{gender}_{cutoff}.log",
+    conda:
+        "envs/pandas2.yaml"
     script:
         "scripts/create_metilene_out.py"
 
@@ -110,9 +112,16 @@ rule metilene_plot_DMR_regions:
         "scripts/plot_DMR_regions.py"
 
 rule metilene_DMR_lifeline_plots:
+    """
+    in the validation and evaluation steps, those plots are called "base_plot"
+    # here the ENSGs are also directly added based on chr and start position and the annot file
+    # this is important for the validation steps
+    """
     input:
         metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
         meta_table = "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
+        annot_file = expand("{{output_path}}/metadata_processed/{gtf}_genes_transcripts.gz", gtf=config['gtf']),
+        annot_file_2 = "../shared/resources/annot_from_betafile.tsv.gz",
         script_file = "../tcga_metilene/scripts/create_lifeline_plots.py"
     output:
         lifeline_out_pdf = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{DMR}.pdf",
@@ -129,6 +138,17 @@ rule metilene_DMR_lifeline_plots:
 
 rule DMR_plot_validation:
     """
+    in the validation and evaluation steps, those plots are called "UP_validation" and "DOWN_validation"
+    # here the ENSGs are also directly added based on chr and start position and the annot file
+    # this is important for the validation steps
+    # there are regions which are not annotated within the gtf, but in the datafiles:
+    bedtools intersect -b <(echo "chr11\t115505380\t115505381") -a  /scr/palinca/gabor/TCGA-pipeline/metadata/gencode.v36.annotation.gtf.gz
+    bedtools intersect -b <(echo "chr11\t115505380\t115505381") -a <(awk 'NR>1{print $3"\t"$4"\t"$5"\t"$0}' /scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/data_files/jhu-usc.edu_CESC.HumanMethylation450.1.lvl-3.TCGA-C5-A1BE-01B-11D-A13Z-05.gdc_hg38.txt | grep -v "*")
+    chr11   115505380       115505381       cg01948062      0.0948425263590688      chr11   115505380       115505381       CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1       protein_coding;protein_coding;protein_coding;protein_coding;protein_coding;protein_coding;protein_coding;protein_coding;protein_coding;protein_coding;protein_coding       ENST00000331581.9;ENST00000452722.6;ENST00000536727.4;ENST00000536781.1;ENST00000537058.4;ENST00000537140.4;ENST00000540951.1;ENST00000541434.4;ENST00000542447.5;ENST00000543249.1;ENST00000545380.4      -814;-964;-964;-964;-964;-856;-964;-985;-856;-422;-990  CGI:chr11:115502856-115505163   S_Shore
+    # the ENST and gene symbol can also not be found within the gtf
+    grep CADM1 /scr/palinca/gabor/TCGA-pipeline/metadata/gencode.v36.annotation.gtf.gz
+    grep ENST00000331581 /scr/palinca/gabor/TCGA-pipeline/metadata/gencode.v36.annotation.gtf.gz
+
     based on the found DMRs, check those DMRs for the following sets:
                                                |  initial DMR  |      
                                                |---------------|
@@ -157,7 +177,10 @@ rule DMR_plot_validation:
         start_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{DMR}.tsv",
         # every betavalue available is hold by those two tables, filter on threshold withing validation script:
         summary = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
-        summary_complement = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv"
+        summary_complement = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv",
+        annot_file = expand("{{output_path}}/metadata_processed/{gtf}_genes_transcripts.gz", gtf=config['gtf']),
+        annot_file_2 = "../shared/resources/annot_from_betafile.tsv.gz",
+        script_file = "../tcga_metilene/scripts/create_lifeline_plots_validation.py"
     output:
         UP_val_plot = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{DMR}_UP_val.pdf",
         UP_val_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{DMR}_UP_val.tsv",
@@ -218,6 +241,8 @@ rule merge_DMR_plots:
     [Errno 7] Argument list too long: '/bin/sh'
     # avoid a too long argument list with invokening python pdf funcitonality,
     # do not use bash tools like qpdf or pdfcombine
+    # if the pdf list extends the length of 100, merge them beforehand, and
+    # than merge those merged pdfs, otherwise to many open files error occurs
     '''
     input:
         intersect_file = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
@@ -234,3 +259,73 @@ rule merge_DMR_plots:
         #"qpdf --empty --pages {input} -- {output}"
         #qpdf --empty --pages Linux.pdf ShellIntro.pdf -- new.pdf
         #find . -maxdepth 1 -type f -size +1k -iname '*intersect*pdf'
+
+def get_threshold_list():
+    with open("../tcga_metilene/dynamic/thresholds.txt") as f:
+        return [line.strip() for line in f]
+threshold_list = get_threshold_list()
+threshold_str = "_".join(threshold_list)
+
+def get_lifeline_all(wildcards):
+    """
+    those single tables shall be returned:
+        base_plot:
+        metilene_intersect_lifeline_plot_chr2_176150267_176153069.tsv         
+        metilene_lifeline_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{chr}_{start}_{end}.tsv",
+
+        validation_plots:
+        metilene_intersect_lifeline_plot_chr2_176150267_176153069_DOWN_val.tsv
+        metilene_intersect_lifeline_plot_chr2_176150267_176153069_UP_val.tsv  
+        metilene_lifeline_tsv_UP = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{chr}_{start}_{end}_UP.tsv",
+        metilene_lifeline_tsv_DOWN = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{chr}_{start}_{end}_DOWN.tsv",
+    # the thresholds are merged, explicitly naming them via wildcards is not possible, glob them
+    """
+    output_path = wildcards.output_path
+    project = wildcards.project
+    drug_combi = wildcards.drug_combi
+    gender = wildcards.gender
+    cutoff = wildcards.cutoff
+    # the glob is still necessary but just include applied thresholds within the dynamic/thresholds.txt file.
+    search_result = []
+    for thresh in threshold_list:
+        search_result = search_result + glob.glob(os.path.join(output_path, project, "metilene/metilene_output", drug_combi, gender, cutoff, f'{thresh}/metilene_*lifeline*.tsv' ))
+    return search_result
+
+rule aggregate_lifelines_all:
+    """
+    """
+    input:
+        # not using a input fct, we rather expand here the thresholds which should be aggregated explicitly, with that its still possible to get different aggregated results for different threshold combinations:
+        # so the threshold inclusion depends on the interface threshold input in each single run
+        lifeline_all = get_lifeline_all, # first lifeline plots with therapy set invoked and validation plot for UP and for DOWN regulated expressions
+        # the results are not needed within the aggregate_lifelines_all.py script, but shall be a precondition to run this rule
+        #metilene_results = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/metilene_log2f{in_de}CREASE_result.tsv", in_de=['IN', 'DE']),
+        #metilene_results = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv"
+        script_file = "../tcga_metilene/scripts/aggregate_lifelines_all.py"
+    output:
+        metilene_lifeline_aggregated = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
+        #metilene_lifeline_aggregated = "/scr/metilene_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
+    conda:
+        "envs/pandas2.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/metilene/logs/aggregate_lifelines_all/{drug_combi}_{gender}_{cutoff}.log",
+    script:
+        "scripts/aggregate_lifelines_all.py"
+
+rule evaluate_lifelines_all:
+    input:
+        metilene_lifeline_aggregated = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
+    output:
+        metilene_lifeline_eval = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated.tsv.gz", threshold_str=threshold_str),
+        metilene_lifeline_eval_pdfs = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated.pdf", threshold_str=threshold_str),
+        #metilene_lifeline_aggregated = "/scr/metilene_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
+    conda:
+        "envs/pandas_pypdf.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/metilene/logs/evaluate_lifelines_all/{drug_combi}_{gender}_{cutoff}.log",
+    script:
+        "scripts/evaluate_lifelines_all.py"

@@ -1,5 +1,4 @@
 import sys
-import copy
 import os
 import pandas as pd
 # from methyl import set_logger
@@ -19,14 +18,27 @@ validate found DMRs
     to be found in summary_for_metilene, and the complement
 thats it, consider also here the threshold when dividing in UP and DOWN in the
 merged summary for metilene
+for validation filtering add cols:
+'threshold', 'plot_type', 'fst_life_mean', 'scnd_life_mean'
 """
-#####################
+# #####################
 sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 
-meta_table = snakemake.input.meta_table
-start_tsv = snakemake.input.start_tsv
-summary = snakemake.input.summary
-summary_complement = snakemake.input.summary_complement
+print('# snakemake inputs:')
+[print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+
+print('# snakemake output:')
+[print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+
+print('# snakemake wildcards:')
+[print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+
+meta_table = snakemake.input[0]
+start_tsv = snakemake.input[1]
+summary = snakemake.input[2]
+summary_complement = snakemake.input[3]
+annot_file = snakemake.input[4]
+annot_file_2 = snakemake.input[5]
 
 # # start_tsv is the table which is based on the lifeline_DMR_plot, and holds the
 # # extract start value
@@ -47,50 +59,57 @@ print('# snakemake output:')
 print('# snakemake wildcards:')
 [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
-#####################
-# snakemake inputs:
-# meta_table = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_5/meta_info_druglist_merged_drugs_combined.tsv"
-# start_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chrX_49186102_49186568.tsv"
-# summary = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/summary_for_metilene.tsv"
-# summary_complement = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/summary_for_metilene_complement.tsv"
-# snakemake output:
-# UP_val_plot = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chrX_49186102_49186568_UP_val.pdf"
-# UP_val_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chrX_49186102_49186568_UP_val.tsv"
-# DOWN_val_plot = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chrX_49186102_49186568_DOWN_val.pdf"
-# DOWN_val_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chrX_49186102_49186568_DOWN_val.tsv"
-# snakemake wildcards:
+
+# # snakemake inputs:
+# meta_table = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/merged_meta_files/cutoff_5/meta_info_druglist_merged_drugs_combined.tsv"
+# start_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chr2_38665703_38666377.tsv"
+# summary = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/summary_for_metilene.tsv"
+# summary_complement = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/summary_for_metilene_complement.tsv"
+# annot_file = "/scr/palinca/gabor/TCGA-pipeline/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
+# script_file = "../tcga_metilene/scripts/create_lifeline_plots_validation.py"
+# # snakemake output:
+# UP_val_plot = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chr2_38665703_38666377_UP_val.pdf"
+# UP_val_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chr2_38665703_38666377_UP_val.tsv"
+# DOWN_val_plot = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chr2_38665703_38666377_DOWN_val.pdf"
+# DOWN_val_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chr2_38665703_38666377_DOWN_val.tsv"
+# # snakemake wildcards:
 # output_path = "/scr/palinca/gabor/TCGA-pipeline"
-# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+# project = "TCGA-CESC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female"
+# cutoff = "cutoff_5"
+# threshold = "threshold_5"
+# DMR = "chr2_38665703_38666377"
+
+# # # #####################
+# meta_table = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/merged_meta_files/cutoff_5/meta_info_druglist_merged_drugs_combined.tsv"
+# start_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_0/metilene_intersect_lifeline_plot_chr7_94654961_94657930.tsv"
+# summary = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/summary_for_metilene.tsv"
+# summary_complement = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/summary_for_metilene_complement.tsv"
+# annot_file = "/scr/palinca/gabor/TCGA-pipeline/metadata_processed/gencode.v36.annotation.gtf_genes.gz"
+# script_file = "../tcga_metilene/scripts/create_lifeline_plots_validation.py"
+# # snakemake output:
+# UP_val_plot = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_0/metilene_intersect_lifeline_plot_chr7_94654961_94657930_UP_val.pdf"
+# UP_val_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_0/metilene_intersect_lifeline_plot_chr7_94654961_94657930_UP_val.tsv"
+# DOWN_val_plot = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_0/metilene_intersect_lifeline_plot_chr7_94654961_94657930_DOWN_val.pdf"
+# DOWN_val_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_0/metilene_intersect_lifeline_plot_chr7_94654961_94657930_DOWN_val.tsv"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline"
+# project = "TCGA-CESC"
 # drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
 # gender = "female_male"
 # cutoff = "cutoff_5"
-# threshold = "threshold_5"
-# DMR = "chrX_49186102_49186568"
-
-# meta_table = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-# start_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27144081_27145663.tsv"
-# summary = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/summary_for_metilene.tsv"
-# summary_complement = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/summary_for_metilene_complement.tsv"
-# # snakemake output:
-# UP_val_plot = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27144081_27145663_UP_val.pdf"
-# UP_val_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27144081_27145663_UP_val.tsv"
-# DOWN_val_plot = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27144081_27145663_DOWN_val.pdf"
-# DOWN_val_tsv = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27144081_27145663_DOWN_val.tsv"
-# # snakemake wildcards:
-# output_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_3"
-# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "male"
-# cutoff = "cutoff_0"
-# threshold = "threshold_5"
-# DMR = "chr7_27144081_27145663"
-
+# threshold = "threshold_0"
+# DMR = "chr7_94654961_94657930"
 
 def write_empty_files():
     for path in [UP_val_tsv, DOWN_val_tsv]:
-        pd.DataFrame(columns=['case_id', 'group', 'vital_status', 'drugs',
-                          'gender', 'projects', 'beta_values', 'T', 'E',
-                          'chr_start']).to_csv(path, sep='\t', index=False)
+        pd.DataFrame(columns=['group', 'vital_status', 'drugs', 'gender',
+                              'projects', 'beta_values', 'T', 'E',
+                              'in_therapy', 'p_value', 'start', 'chr',
+                              'threshold', 'fst_life_mean', 'scnd_life_mean',
+                              'plot_type', 'ENSG', 'gene_type', 'gene_status',
+                              'gene_name']).to_csv(path, sep='\t', index=False)
         print(f'writing empty file {path}')
     for path in [UP_val_plot, DOWN_val_plot]:
         open(path, 'a').close()
@@ -237,17 +256,6 @@ except Exception as e:
 # cph_DOWN = CoxPHFitter().fit(DOWN_DF.loc[:, ['in_therapy', 'T', 'E']], 'T', 'E')
 # p_value_DOWN = cph_DOWN.summary['p'].values[0]
 
-
-UP_DF['chr_start'] = chr_ + str(start)
-UP_DF['p_value'] = p_value_UP
-UP_DF.to_csv(UP_val_tsv, sep='\t')
-print(f'writing {UP_val_tsv}')
-
-DOWN_DF['chr_start'] = chr_ + str(start)
-DOWN_DF['p_value'] = p_value_DOWN
-DOWN_DF.to_csv(DOWN_val_tsv, sep='\t')
-print(f'writing {DOWN_val_tsv}')
-
 ### plot up and down
 
 T = DOWN_DF['T']
@@ -256,10 +264,12 @@ therapy_bool = DOWN_DF['in_therapy']
 fig, ax = plt.subplots(figsize=(8, 6))
 kmf_THERAPY = KaplanMeierFitter()
 kmf_THERAPY.fit(T[therapy_bool], E[therapy_bool], label='in therapy')
+DOWN_in_therapy_life_mean = vars(kmf_THERAPY)['survival_function_'].iloc[:, 0].mean()
 ax = kmf_THERAPY.plot_survival_function(ax=ax)
 
 kmf_NO_THERAPY = KaplanMeierFitter()
 kmf_NO_THERAPY.fit(T[~therapy_bool], E[~therapy_bool], label='not in therapy')
+DOWN_not_in_therapy_life_mean = vars(kmf_NO_THERAPY)['survival_function_'].iloc[:, 0].mean()
 kmf_NO_THERAPY.plot_survival_function(ax=ax)
 
 add_at_risk_counts(kmf_THERAPY, kmf_NO_THERAPY, ax=ax)
@@ -279,10 +289,12 @@ therapy_bool = UP_DF['in_therapy']
 fig, ax = plt.subplots(figsize=(8, 6))
 kmf_THERAPY = KaplanMeierFitter()
 kmf_THERAPY.fit(T[therapy_bool], E[therapy_bool], label='in therapy')
+UP_in_therapy_life_mean = vars(kmf_THERAPY)['survival_function_'].iloc[:, 0].mean()
 ax = kmf_THERAPY.plot_survival_function(ax=ax)
 
 kmf_NO_THERAPY = KaplanMeierFitter()
 kmf_NO_THERAPY.fit(T[~therapy_bool], E[~therapy_bool], label='not in therapy')
+UP_not_in_therapy_life_mean = vars(kmf_NO_THERAPY)['survival_function_'].iloc[:, 0].mean()
 kmf_NO_THERAPY.plot_survival_function(ax=ax)
 
 add_at_risk_counts(kmf_THERAPY, kmf_NO_THERAPY, ax=ax)
@@ -293,3 +305,55 @@ plt.tight_layout()
 print(f'saving: {UP_val_plot}')
 plt.savefig(UP_val_plot)
 plt.close()
+
+# write the tables:
+UP_DF['p_value'] = p_value_UP
+UP_DF['start'] = str(start)
+UP_DF['chr'] = chr_
+UP_DF['threshold'] = thresh
+UP_DF['fst_life_mean'] = UP_in_therapy_life_mean
+UP_DF['scnd_life_mean'] = UP_not_in_therapy_life_mean
+UP_DF['plot_type'] = 'UP_validation'
+# # TODO include the ENSGs for the positions found
+DF_annot = pd.read_table(annot_file)
+# # limit the annotatin DF to the right chromosome:
+DF_annot = DF_annot.set_index('chr').loc[chr_,:].reset_index()
+# acces the ENSG:
+DF_annot = DF_annot[(DF_annot['start'] <= start) & (DF_annot['stop'] > start)].loc[:, ["ENSG", "gene_type", "gene_status", "gene_name"]]
+if DF_annot.empty:
+    DF_annot_2 = pd.read_table(annot_file_2).set_index('chr').loc[chr_,:].reset_index()
+    DF_annot_2 = DF_annot_2[(DF_annot_2['start'] <= start) & (DF_annot_2['stop'] > start)].loc[:, ["ENST", "gene_type", "gene_status", "gene_name"]]
+    UP_DF['ENSG'] = DF_annot_2['ENST'].values[0]
+    UP_DF['gene_type'] = DF_annot_2['gene_type'].values[0]
+    UP_DF['gene_status'] = DF_annot_2['gene_status'].values[0]
+    UP_DF['gene_name'] = DF_annot_2['gene_name'].values[0]
+else:
+    UP_DF['ENSG'] = DF_annot['ENSG'].values[0]
+    UP_DF['gene_type'] = DF_annot['gene_type'].values[0]
+    UP_DF['gene_status'] = DF_annot['gene_status'].values[0]
+    UP_DF['gene_name'] = DF_annot['gene_name'].values[0]
+UP_DF.to_csv(UP_val_tsv, sep='\t')
+print(f'writing {UP_val_tsv}')
+
+DOWN_DF['p_value'] = p_value_DOWN
+DOWN_DF['start'] = str(start)
+DOWN_DF['chr'] = chr_
+DOWN_DF['threshold'] = thresh
+DOWN_DF['fst_life_mean'] = DOWN_in_therapy_life_mean
+DOWN_DF['scnd_life_mean'] = DOWN_not_in_therapy_life_mean
+DOWN_DF['plot_type'] = 'DOWN_validation'
+
+if DF_annot.empty:
+    DF_annot_2 = pd.read_table(annot_file_2).set_index('chr').loc[chr_,:].reset_index()
+    DF_annot_2 = DF_annot_2[(DF_annot_2['start'] <= start) & (DF_annot_2['stop'] > start)].loc[:, ["ENST", "gene_type", "gene_status", "gene_name"]]
+    DOWN_DF['ENSG'] = DF_annot_2['ENST'].values[0]
+    DOWN_DF['gene_type'] = DF_annot_2['gene_type'].values[0]
+    DOWN_DF['gene_status'] = DF_annot_2['gene_status'].values[0]
+    DOWN_DF['gene_name'] = DF_annot_2['gene_name'].values[0]
+else:
+    DOWN_DF['ENSG'] = DF_annot['ENSG'].values[0]
+    DOWN_DF['gene_type'] = DF_annot['gene_type'].values[0]
+    DOWN_DF['gene_status'] = DF_annot['gene_status'].values[0]
+    DOWN_DF['gene_name'] = DF_annot['gene_name'].values[0]
+DOWN_DF.to_csv(DOWN_val_tsv, sep='\t')
+print(f'writing {DOWN_val_tsv}')

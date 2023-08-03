@@ -1,0 +1,40 @@
+configfile: "config.yaml"
+
+rule all:
+    input:
+        "/scr/palinca/gabor/TCGA-pipeline/metadata_processed/gencode.v36.annotation.gtf_genes.gz"
+
+rule download_helpfiles:
+    """
+    this rule will download the gdc_manifest and the gtf annotation file,
+    md5checksum checks are performed
+    """
+    output:
+        "{output_path}/metadata/{output_file}",
+    conda:
+        "envs/request.yaml"
+    log:
+        "{output_path}/logs/download_helpfiles/{output_file}.log",
+    script:
+        "scripts/download_help_files.py"
+
+
+rule edit_annotation:
+    """
+    out of the provided annotation gtf, filter out the gene annotations with chr, start, ENSG, gene_type, gene_status, gene_name
+    """
+    input:
+        annot_input=expand("{{output_path}}/metadata/{gtf_gz}", gtf_gz=config["gtf.gz"]),
+    output:
+        annot_output=expand(
+            "{{output_path}}/metadata_processed/{gtf}_genes.gz", gtf=config["gtf"]
+        ),
+    log:
+        expand(
+            "{{output_path}}/logs/edit_annotation/{gtf}_annotated_genes.log",
+            gtf=config["gtf"],
+        ),
+    conda:
+        "envs/pandas2.yaml"
+    script:
+        "scripts/edit_annotation.py"

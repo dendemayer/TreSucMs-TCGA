@@ -4,6 +4,16 @@ import subprocess
 import sys
 
 sys.stdout = sys.stderr = open(snakemake.log[0], "w")
+
+print('# snakemake inputs:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+
+print('# snakemake output:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+
+print('# snakemake wildcards:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+
 summary_table = snakemake.input[0]
 # check whether we have actually alive and dead groups we can compare
 # check if alive is available in columns (ommit Start and Chromosome col ->

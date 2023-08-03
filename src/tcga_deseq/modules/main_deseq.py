@@ -4,7 +4,8 @@ from tcga_deseq.modules import create_summary_table
 from tcga_deseq.modules import create_deseq_output
 from tcga_deseq.modules import create_deseq_lifeline_plots
 from tcga_deseq.modules import gzip_counts_all_cases
-from tcga_deseq.modules import aggregate_lifelines_all
+# from tcga_deseq.modules import aggregate_lifelines_all
+from shared.modules import aggregate_lifelines_all
 
 
 """
@@ -14,7 +15,7 @@ src/tcga_deseq/Snakefile
 """
 
 def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
-              threshold, cores):
+              threshold, cores, pipeline):
 
     SCRIPT_PATH = os.path.split(__file__)[0]
 
@@ -81,7 +82,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
                         force_incomplete=True, dryrun=False, use_conda=True, rerun_triggers='mtime', printshellcmds=True, quiet=False)
-    ### TODO uncomment this !!!!
+    # ### TODO uncomment this !!!!
     ###############################################################################
     ## the previous snakemake runs must be completed before requesting the next
     # aggregated files. all lifeline base and validation plots must be
@@ -89,11 +90,11 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # to one table on which the ranking of potential biomarkers is performed
     #                                                                             #
     ###############################################################################
-    aggregate_lifelines_list = aggregate_lifelines_all.aggregate_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold)
+    aggregate_lifelines_list = aggregate_lifelines_all.aggregate_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold, pipeline)
 
     Snakemake_all_files = aggregate_lifelines_list
 
-    evaluate_lifelines_list  = aggregate_lifelines_all.evaluate_lifelines_all(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold)
+    evaluate_lifelines_list  = aggregate_lifelines_all.evaluate_lifelines_all(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold, pipeline)
 
     Snakemake_all_files = evaluate_lifelines_list
 

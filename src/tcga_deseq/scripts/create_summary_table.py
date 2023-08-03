@@ -22,6 +22,15 @@ case_id e711b88e-fa0e-4781-8549-7a53ed3a13a1
 
 sys.stderr = sys.stdout = open(snakemake.log[0], 'w')
 
+print('# snakemake inputs:')
+[print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+
+print('# snakemake output:')
+[print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+
+print('# snakemake wildcards:')
+[print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+
 meta_table = snakemake.input.meta_table
 gender = snakemake.wildcards.gender
 genders = gender.split('_')

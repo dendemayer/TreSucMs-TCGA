@@ -35,6 +35,15 @@ and the metilene input table with which the metilene output was created with:
 """
 sys.stdout = sys.stderr = open(snakemake.log[0], "w")
 
+print('# snakemake inputs:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+
+print('# snakemake output:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+
+print('# snakemake wildcards:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+
 OUTPUT_PATH = snakemake.wildcards.output_path
 # meta_info = snakemake.input.meta_info
 qval_out = snakemake.input.qval_out

@@ -10,6 +10,7 @@ from decimal import Decimal
 from lifelines.plotting import add_at_risk_counts
 from lifelines import CoxPHFitter
 import numpy as np
+
 """
 follow lifeline succession from patients with detected DMR
 - needed, metadata:f.e.:
@@ -25,35 +26,92 @@ follow lifeline succession from patients with detected DMR
 
 # use the logrank_test at every position within a DMR to select the best
 # resolution between up and down :
+# changing to the cox regression test: -> see lifeine hint on https://lifelines.readthedocs.io/en/latest/lifelines.statistics.html
+# and further reading on: https://discourse.datamethods.org/t/when-is-log-rank-preferred-over-univariable-cox-regression/2344
 If the p-value of the log-rank test is less than a chosen significance level
 (such as 0.05), it suggests that there is a statistically significant
 difference in survival between the groups, and the Kaplan-Meier estimate can be
 considered meaningful.
 python /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/
     tcga_metilene/scripts/create_lifeline_plots.py
+TODO for validatin filtering add col 'threshold', 'fst_life_mean', 'scnd_life_mean'
 """
-# #################################################
+# # # #################################################
 sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 
-meta_table = snakemake.input.meta_table
-metilene_intersect = snakemake.input.metilene_intersect
+metilene_intersect = snakemake.input[0]
+meta_table = snakemake.input[1]
+annot_file = snakemake.input[2]
+annot_file_2 = snakemake.input[3]
 DMR = snakemake.wildcards.DMR
 lifeline_out_pdf = snakemake.output.lifeline_out_pdf
 lifeline_out_tsv = snakemake.output.lifeline_out_tsv
 threshold = snakemake.wildcards.threshold
 
 print('# snakemake inputs:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+[print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
 
 print('# snakemake output:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+[print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
 
 print('# snakemake wildcards:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
-#######################################################################
+[print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+# # #######################################################################
 
 ######################################################################
 
+### triggers:
+    # DF['ENSG'] = DF_annot['ENSG'].values[0]
+                 # ~~~~~~~~~~~~~~~~~~~~~~~^^^
+# IndexError: index 0 is out of bounds for axis 0 with size 0
+# -> do not limit the processed gtf on ENSEMBL:
+# bedtools intersect -b <(echo "chr20\t58856147\t58856148") -a /scr/palinca/gabor/TCGA-pipeline/metadata/gencode.v36.annotation.gtf.gz
+# chr20   HAVANA  gene    58856148        58856148        .       +       .       gene_id "ENSG00000087460.22"; gene_type "protein_coding"; gene_status "KNOWN"; gene_name "GNAS";  level 2; tag "ncRNA_host"; havana_gene "OTTHUMG00000033069.19";
+# grep ENSG00000087460 /scr/palinca/gabor/TCGA-pipeline/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz                                                                                                         ±[●●][main]
+# -> those coordinates can be found in original annotation, but not in the
+# ENSEMBL limited processed one
+
+# :
+# KeyError: 'chr12_132887020_132888306'
+
+# # snakemake inputs:
+# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/metilene_intersect.tsv"
+# meta_table = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+# annot_file = "/scr/palinca/gabor/TCGA-pipeline/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
+# script_file = "../tcga_metilene/scripts/create_lifeline_plots.py"
+# # snakemake output:
+# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr20_58850101_58856248.pdf"
+# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr20_58850101_58856248.tsv"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline"
+# project = "TCGA-CESC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female_male"
+# cutoff = "cutoff_0"
+# threshold = "threshold_0"
+# DMR = "chr20_58850101_58856248"
+
+# (base) [gabor@palinca shared]$ bedtools intersect -b <(echo "chr11\t115505380\t115505381") -a <(awk 'NR>1{print $3"\t"$4"\t"$5"\t"$0}' /scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/data_files/jhu-usc.edu_CESC.HumanMethylation450.1.lvl-3.TCGA-C5-A1BE-01B-11D-A13
+# Z-05.gdc_hg38.txt | grep -v "*")
+# chr11   115505380       115505381       cg01948062      0.0948425263590688      chr11   115505380       115505381       CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1       protein_coding;protein_coding;protein_coding;protein_coding;protein_coding;
+# protein_coding;protein_coding;protein_coding;protein_coding;protein_coding;protein_coding       ENST00000331581.9;ENST00000452722.6;ENST00000536727.4;ENST00000536781.1;ENST00000537058.4;ENST00000537140.4;ENST00000540951.1;ENST00000541434.4;ENST00000542447.5;ENST00000
+# 543249.1;ENST00000545380.4      -814;-964;-964;-964;-964;-856;-964;-985;-856;-422;-990  CGI:chr11:115502856-115505163   S_Shore
+# # snakemake inputs:
+# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/metilene_intersect.tsv"
+# meta_table = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/merged_meta_files/cutoff_5/meta_info_druglist_merged_drugs_combined.tsv"
+# annot_file = "/scr/palinca/gabor/TCGA-pipeline/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
+# script_file = "../tcga_metilene/scripts/create_lifeline_plots.py"
+# # snakemake output:
+# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chr11_115503038_115505464.pdf"
+# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chr11_115503038_115505464.tsv"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline"
+# project = "TCGA-CESC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female_male"
+# cutoff = "cutoff_5"
+# threshold = "threshold_5"
+# DMR = "chr11_115503038_115505464"
 # # ->>>
 # > /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/.snakemake/scripts/tmppd019qrh.create_lifeline_plots.py(192)<module>()
 # -> print(e)
@@ -71,7 +129,7 @@ print('# snakemake wildcards:')
 
 
 DF_meta = pd.read_table(meta_table, usecols=['bcr_patient_uuid', 'survivaltime', 'years_to_last_follow_up', 'vital_status'])
-DF_metilene = pd.read_table(metilene_intersect, header=[0,1,2,3,4], index_col=[0,1,2,3], na_values='.').dropna()
+DF_metilene = pd.read_table(metilene_intersect, header=[0, 1, 2, 3, 4], index_col=[0, 1, 2, 3], na_values='.').dropna()
 # limit the DF_metilene to the recent range:
 DF_metilene = DF_metilene.loc[(slice(None), slice(None), slice(None), DMR), :]
 
@@ -96,9 +154,9 @@ DF_metilene = DF_metilene.apply(apply_thresh, axis=1)
 DF_metilene.dropna(how='all', inplace=True)
 
 #############################################
-#### IMPORTANT T check!!!
+# ### IMPORTANT T check!!!
 # get the used cases out of the meta_table:
-used_cases = [ i[1] for i in DF_metilene.columns]
+used_cases = [i[1] for i in DF_metilene.columns]
 DF_meta = DF_meta.set_index('bcr_patient_uuid').loc[used_cases, :]
 DF_meta['T'] = DF_meta['survivaltime'].combine_first(DF_meta['years_to_last_follow_up'])
 
@@ -147,14 +205,14 @@ for start in starts:
         :, DF_metilene_temp.isna().values[0]].columns]
     DF_metilene_temp = DF_metilene_temp.drop(cases_to_delete, axis=1, level=1)
 
-    ## also T and E must be adjusted here correctly
+    # # also T and E must be adjusted here correctly
     DF_meta_temp = DF_meta[~DF_meta.index.isin(cases_to_delete)]
     T = DF_meta_temp['T']
     E = DF_meta_temp['vital_status'] == 'dead' #  E is a either boolean or binary array
 
     # S_temp is supposed to be a Series, since we access one start postitin
     # within the DMR:
-    S_temp = DF_metilene_temp.loc[ (slice(None), start, slice(None), slice(None)), :].apply( lambda x: 'UP' if float(x) > median else 'DOWN' )
+    S_temp = DF_metilene_temp.loc[(slice(None), start, slice(None), slice(None)), :].apply(lambda x: 'UP' if float(x) > median else 'DOWN')
     # UP_bool = (S_temp == 'UP').values
     # DOWN_bool = (S_temp == 'DOWN').values
     DF_temp_2 = S_temp.to_frame().reset_index()
@@ -177,11 +235,14 @@ for start in starts:
         # events (E) holds True or False for every position of the case set,
         # write empty files in that case as well:
         open(lifeline_out_pdf, 'a').close()
-        pd.DataFrame(
-            columns=['case_id', 'drugs', 'gender', 'projects', 'UP_or_DOWN',
-                    'beta_value', 'vital_status', 'survivaltime',
-                    'years_to_last_follow_up', 'T', 'E', 'median', 'DMR',
-                    'p_value', 'start']).to_csv(lifeline_out_tsv, sep='\t', index=False)
+        pd.DataFrame(columns=['case_id', 'drugs', 'gender', 'projects',
+                              'UP_or_DOWN', 'beta_value', 'vital_status',
+                              'survivaltime', 'years_to_last_follow_up', 'T',
+                              'E', 'median', 'DMR', 'p_value', 'start', 'chr',
+                              'threshold', 'fst_life_mean', 'scnd_life_mean',
+                              'plot_type', 'ENSG', 'gene_type', 'gene_status',
+                              'gene_name']).to_csv(lifeline_out_tsv, sep='\t',
+                                                   index=False)
         os._exit(0)
 
     p_value = cph.summary['p'].values[0]
@@ -220,9 +281,12 @@ if DF_plot.value_counts().index.nunique() != 2:
     open(lifeline_out_pdf, 'a').close()
     pd.DataFrame(
         columns=['case_id', 'drugs', 'gender', 'projects', 'UP_or_DOWN',
-                 'beta_value', 'vital_status', 'survivaltime',
-                 'years_to_last_follow_up', 'T', 'E', 'median', 'DMR',
-                 'p_value', 'start']).to_csv(lifeline_out_tsv, sep='\t', index=False)
+                  'beta_value', 'vital_status', 'survivaltime',
+                  'years_to_last_follow_up', 'T', 'E', 'median', 'DMR',
+                  'p_value', 'start', 'chr', 'threshold', 'fst_life_mean',
+                  'scnd_life_mean', 'plot_type', 'ENSG', 'gene_type',
+                  'gene_status', 'gene_name']).to_csv(lifeline_out_tsv,
+                                                      sep='\t', index=False)
     os._exit(0)
 else:
     cases_to_keep = [i[1] for i in DF_plot.index]
@@ -234,10 +298,12 @@ else:
     fig, ax = plt.subplots(figsize=(8, 6))
     kmf_UP = KaplanMeierFitter()
     kmf_UP.fit(T[UP_bool], E[UP_bool], label='UP')
+    UP_life_expectancy_mean = vars(kmf_UP)['survival_function_'].iloc[:, 0].mean()
     ax = kmf_UP.plot_survival_function(ax=ax)
 
     kmf_DOWN = KaplanMeierFitter()
     kmf_DOWN.fit(T[DOWN_bool], E[DOWN_bool], label='DOWN')
+    DOWN_life_expectancy_mean = vars(kmf_DOWN)['survival_function_'].iloc[:, 0].mean()
     kmf_DOWN.plot_survival_function(ax=ax)
 
     add_at_risk_counts(kmf_UP, kmf_DOWN, ax=ax)
@@ -253,15 +319,68 @@ else:
                    axis=1)
     DF_beta = DF_beta.to_frame()
     DF_beta.columns = ['beta_value']
-    DF_beta = DF_beta.reset_index(level=[0,2,3,4], drop=True)
+    DF_beta = DF_beta.reset_index(level=[0, 2, 3, 4], drop=True)
     DF_plot = DF_plot.to_frame()
     DF_plot.columns = ['UP_or_DOWN']
-    DF_plot = DF_plot.reset_index(level=[0,2,3,4]).drop('vital_status', axis=1)
+    DF_plot = DF_plot.reset_index(level=[0, 2, 3, 4]).drop('vital_status', axis=1)
     DF = pd.concat([DF_plot, DF_beta, DF_meta], axis=1)
     DF['median'] = median
     DF['DMR'] = DMR
     DF['p_value'] = p_value
     DF['start'] = starts[plot_index]
+    start = starts[plot_index]
+    chrom = DMR.split('_')[0]
+    DF['chr'] = chrom
+    DF['threshold'] = thresh
+    DF['fst_life_mean'] = UP_life_expectancy_mean
+    DF['scnd_life_mean'] = DOWN_life_expectancy_mean
+    DF['plot_type'] = 'base_plot'
     DF.index.name = 'case_id'
+    DF = DF.reset_index()
+    #####
+    ### cannot find :
+    # (Pdb) chrom 'chr11' (Pdb) start 115505380 -> DF['ENSG'] = DF_annot['ENSG'].values[0]
+    # this can be found in the betavalue tables and its ENST:
+     # Chromosome Composite Element REF  Beta_value      Start  ...                                      Transcript_ID                                    Position_to_TSS                 CGI_Coordinate Feature_Type
+    # 1614      chr11            cg01948062    0.094843  115505380  ...  ENST00000331581.9;ENST00000452722.6;ENST000005...  -814;-964;-964;-964;-964;-856;-964;-985;-856;-...  CGI:chr11:115502856-115505163      S_Shore
+    # temp_data_file = '/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/data_files/jhu-usc.edu_CESC.HumanMethylation450.1.lvl-3.TCGA-C5-A1BE-01B-11D-A13Z-05.gdc_hg38.txt'
+    # temp_beta_DF = pd.read_table(temp_data_file)
+    # temp_beta_DF = temp_beta_DF.set_index('Chromosome').loc[chrom, :].reset_index()
+    # temp_beta_DF[(temp_beta_DF['Start'] <= start) & (temp_beta_DF['End'] > start)]
+    # chr11| 115169218| 115504957 | ENSG00000182985 | protein_coding     | KNOWN       | CADM1         ║
+    # /scr/palinca/gabor/TCGA-pipeline/metadata_processed/gencode.v36.annotation.gtf_genes.gz
+    # this does not lie withing the range of this gene, but when including the
+    # ENST field (ENST00000331581) and relate back to the belonging ENSG, it
+    # can be found --> ind preprocess, do not filter just on gene, but include
+    # on transcript aswell,
+    # gene level, with it, also the ENSG00000182985 must be present
+    # "transcript" values for:
+    # zgrep ENST00000331581 /scr/palinca/gabor/TCGA-pipeline/metadata/gencode.v36.annotation.gtf.gz:
+    # exon       CDS        UTR        start_codon stop_codon
+    # handle the case if the start lies outside of the ENSG range and report
+    # the transcript value
+    ###### #
+    # # TODO include the ENSGs for the positions found
+    # overkill with bedtool,just one position must be found:
+    # annot_BT = BedTool.from_dataframe(DF_annot)
+    # DF_BT = BedTool.from_dataframe(DF)
+    # ####
+    DF_annot = pd.read_table(annot_file)
+    # # limit the annotatin DF to the right chromosome:
+    DF_annot = DF_annot.set_index('chr').loc[chrom,:].reset_index()
+    # acces the ENSG:
+    DF_annot = DF_annot[(DF_annot['start'] <= start) & (DF_annot['stop'] > start)].loc[:, ["ENSG", "gene_type", "gene_status", "gene_name"]]
+    if DF_annot.empty:
+        DF_annot_2 = pd.read_table(annot_file_2).set_index('chr').loc[chrom,:].reset_index()
+        DF_annot_2 = DF_annot_2[(DF_annot_2['start'] <= start) & (DF_annot_2['stop'] > start)].loc[:, ["ENST", "gene_type", "gene_status", "gene_name"]]
+        DF['ENSG'] = DF_annot_2['ENST'].values[0]
+        DF['gene_type'] = DF_annot_2['gene_type'].values[0]
+        DF['gene_status'] = DF_annot_2['gene_status'].values[0]
+        DF['gene_name'] = DF_annot_2['gene_name'].values[0]
+    else:
+        DF['ENSG'] = DF_annot['ENSG'].values[0]
+        DF['gene_type'] = DF_annot['gene_type'].values[0]
+        DF['gene_status'] = DF_annot['gene_status'].values[0]
+        DF['gene_name'] = DF_annot['gene_name'].values[0]
     print(f'saving: {lifeline_out_tsv}')
     DF.to_csv(lifeline_out_tsv, sep='\t')

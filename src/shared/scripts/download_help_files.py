@@ -3,10 +3,19 @@ import os
 import subprocess
 import sys
 """
-a different script is needed than for the datafilse, their UUID and md5sums are
+a different script is needed than for the datafiles, their UUID and md5sums are
 taken out of the manifest file downloaded by this script here
 """
 sys.stderr = sys.stdout = open(snakemake.log[0], "w")
+
+print('# snakemake inputs:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+
+print('# snakemake output:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+
+print('# snakemake wildcards:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 # get the belonging md5sum out of the config file
 out_file = snakemake.wildcards[1]
 out_dest = snakemake.output[0]

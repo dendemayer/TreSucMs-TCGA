@@ -4,7 +4,6 @@ from shared.modules import choose_therapy
 from shared.modules import download_with_api
 from tcga_metilene.modules import main_metilene
 from tcga_deseq.modules import main_deseq
-from tcga_deseq.modules import main_deseq
 import snakemake
 from itertools import compress
 
@@ -13,6 +12,7 @@ with open(os.path.join(SCRIPT_PATH, 'version.txt'), 'r') as f:
     version = f.readline().strip()
 
 pipeline_list = ['DESeq2', 'metilene']
+
 
 def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
@@ -80,9 +80,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     print("SCRIPT_PATH:\t\t", SCRIPT_PATH)
     # make sure that the pipelines to execute also exist, every entry must be
     # present in : ['DESeq2', 'metilene']
-    temp_check = [True if i not in pipeline_list else False for i in execute ]
+    temp_check = [True if i not in pipeline_list else False for i in execute]
     if True in temp_check:
-        print(f'\nyou misspelled a pipeline name, make sure the ', end='')
+        print('\nyou misspelled a pipeline name, make sure the ', end='')
         print(f'-e option set is within the set of {pipeline_list}, ', end='')
         print('wrong pipeline name: ', end='')
         print(f'{list(compress(execute, temp_check))}, ', end='')
@@ -105,17 +105,17 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     for index, cutoff in enumerate(cutoffs):
         if cutoff % 1 == 0:
             cutoffs[index] = round(cutoff)
-    if not 0 in cutoffs:
+    if 0 not in cutoffs:
         cutoffs.append(0)
-    cutoffs = sorted(cutoffs)
+    cutoffs = sorted(list(set(cutoffs)))
 
     thresholds = list(threshold)
     for index, threshold in enumerate(thresholds):
         if threshold % 1 == 0:
             thresholds[index] = round(threshold)
-    if not 0 in thresholds:
+    if 0 not in thresholds:
         thresholds.append(0)
-    threshold = sorted(thresholds)
+    threshold = sorted(list(set(thresholds)))
 
     # temp=("-p TCGA-CESC" "-p TCGA-HNSC" "-p TCGA-LUSC" "-p TCGA-ESCA" "-p TCGA-BRCA" "-p TCGA-GBM" "-p TCGA-OV" "-p TCGA-LUAD" "-p TCGA-UCEC" "-p TCGA-KIRC" "-p TCGA-LGG" "-p TCGA-THCA" "-p TCGA-PRAD" "-p TCGA-SKCM" "-p TCGA-COAD" "-p TCGA-STAD" "-p TCGA-BLCA" "-p TCGA-LIHC" "-p TCGA-KIRP" "-p TCGA-SARC" "-p TCGA-PAAD" "-p TCGA-PCPG" "-p TCGA-READ" "-p TCGA-TGCT" "-p TCGA-THYM" "-p TCGA-KICH" "-p TCGA-ACC" "-p TCGA-MESO" "-p TCGA-UVM" "-p TCGA-DLBC" "-p TCGA-UCS" "-p TCGA-CHOL")
     # temp=("-p TCGA-CESC" "-p TCGA-HNSC")
@@ -185,7 +185,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
         for cutoff in cutoffs:
             cutoff = 'cutoff_' + str(cutoff)
             merged_drugs_combined_list.append(os.path.join(
-                OUTPUT_PATH, projects, pipeline,'merged_meta_files', cutoff,
+                OUTPUT_PATH, projects, pipeline, 'merged_meta_files', cutoff,
                 'meta_info_druglist_merged_drugs_combined.tsv'))
 
     Snakemake_all_files = Snakemake_all_files + merged_drugs_combined_list
@@ -194,7 +194,8 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # # rerun_trggers='mtime' IMPORTANT -> the needed input data is generated via
     # # input function in shared snakefile for rule merge_meta_tables:
     # # without this option this rule would be ran everytime, since everything
-    # # following is based on those aux file, every rule would be triggered then
+    # # following is based on those aux file, every rule would be triggered
+    # # then again
     snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
                         force_incomplete=True, dryrun=False, use_conda=True, rerun_triggers='mtime')
@@ -202,15 +203,14 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # TODO uncomment this !!!
     ########################################################################
 
+
     # from here the shared modules and Snakemake scripts are getting pipeline
     # specific, hand over all outputfiles requested so far and enter the
     # pipeline specific main files:
     if 'metilene' in execute:
         main_metilene.entry_fct(OUTPUT_PATH, PROJECT, DRUGS,
-                                Snakemake_all_files, cutoffs, threshold, cores)
+                                Snakemake_all_files, cutoffs, threshold, cores, 'metilene')
     if 'DESeq2' in execute:
         print('entering deseq entry fct')
-        main_deseq.entry_fct(OUTPUT_PATH, PROJECT, DRUGS,
-                                Snakemake_all_files, cutoffs, threshold, cores)
-
-
+        main_deseq.entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
+                             cutoffs, threshold, cores, 'DESeq2')

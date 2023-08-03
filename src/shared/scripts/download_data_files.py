@@ -10,6 +10,15 @@ searching through the manifest file to get the UUID of the requested file:
 """
 sys.stdout = sys.stderr = open(snakemake.log[0], "w")
 
+print('# snakemake inputs:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+
+print('# snakemake output:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+
+print('# snakemake wildcards:')
+[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+
 manifest_file = snakemake.input[0]
 aux_out = snakemake.output[0]
 aux_file = os.path.split(aux_out)[1]

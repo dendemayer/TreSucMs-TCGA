@@ -5,9 +5,6 @@ import sys
 import re
 from PyPDF2 import PdfMerger
 
-"""
-important, don't invoke pdf's which are to small:
-"""
 sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 
 print('# snakemake inputs:')
@@ -55,6 +52,9 @@ if len(plots_to_aggregate) == 1:
 # beyond the threshold dir:
 # "_lifeline_plot_"
 
+"""
+important, don't invoke pdf's which are to small:
+"""
 search_path =  os.path.split(os.path.split(All_plots_merged)[0])[0]
 boxplots =  [pdf_file for pdf_file in glob.glob(os.path.join(search_path, '*_boxplot_beta_value*pdf')) if os.lstat(pdf_file)[6] > 0]
 # include DMRs only if also a boxplot is available, meaning, leaving out empty

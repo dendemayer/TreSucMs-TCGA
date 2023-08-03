@@ -18,7 +18,7 @@ def download_help_files(OUTPUT_PATH, config_file_shared):
         df = pd.json_normalize((safe_load(f)))
     mani = df['manifest_file'].tolist()[0][0]
     mani_path = os.path.join(OUTPUT_PATH, 'metadata', mani)
-    gtf = df['gtf'].tolist()[0][0]
+    gtf = df['gtf.gz'].tolist()[0][0]
     gtf_path = os.path.join(OUTPUT_PATH, 'metadata', gtf)
     help_file_list = [gtf_path, mani_path]
     return help_file_list

@@ -1,0 +1,57 @@
+name: pandas_pybedtools
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - bedtools=2.31.0=hf5e1c6e_2
+  - bzip2=1.0.8=h7f98852_4
+  - c-ares=1.19.1=hd590300_0
+  - ca-certificates=2023.5.7=hbcca054_0
+  - keyutils=1.6.1=h166bdaf_0
+  - krb5=1.20.1=h81ceb04_0
+  - ld_impl_linux-64=2.40=h41732ed_0
+  - libblas=3.9.0=17_linux64_openblas
+  - libcblas=3.9.0=17_linux64_openblas
+  - libcurl=8.1.2=h409715c_0
+  - libdeflate=1.18=h0b41bf4_0
+  - libedit=3.1.20191231=he28a2e2_2
+  - libev=4.33=h516909a_1
+  - libffi=3.4.2=h7f98852_5
+  - libgcc-ng=13.1.0=he5830b7_0
+  - libgfortran-ng=13.1.0=h69a702a_0
+  - libgfortran5=13.1.0=h15d22d2_0
+  - libgomp=13.1.0=he5830b7_0
+  - liblapack=3.9.0=17_linux64_openblas
+  - libnghttp2=1.52.0=h61bc06f_0
+  - libnsl=2.0.0=h7f98852_0
+  - libopenblas=0.3.23=pthreads_h80387f5_0
+  - libsqlite=3.42.0=h2797004_0
+  - libssh2=1.11.0=h0841786_0
+  - libstdcxx-ng=13.1.0=hfd8a6a1_0
+  - libuuid=2.38.1=h0b41bf4_0
+  - libzlib=1.2.13=hd590300_5
+  - ncurses=6.4=hcb278e6_0
+  - numpy=1.25.0=py310ha4c1d20_0
+  - openssl=3.1.1=hd590300_1
+  - pandas=2.0.2=py310h7cbd5c2_0
+  - pip=23.1.2=pyhd8ed1ab_0
+  - pybedtools=0.9.0=py310h2b6aa90_2
+  - pysam=0.21.0=py310h41dec4a_1
+  - python=3.10.11=he550d4f_0_cpython
+  - python-dateutil=2.8.2=pyhd8ed1ab_0
+  - python-tzdata=2023.3=pyhd8ed1ab_0
+  - python_abi=3.10=3_cp310
+  - pytz=2023.3=pyhd8ed1ab_0
+  - readline=8.2=h8228510_1
+  - setuptools=67.7.2=pyhd8ed1ab_0
+  - six=1.16.0=pyh6c4a22f_0
+  - tk=8.6.12=h27826a3_0
+  - tzdata=2023c=h71feb2d_0
+  - wheel=0.40.0=pyhd8ed1ab_0
+  - xz=5.2.6=h166bdaf_0
+  - zlib=1.2.13=hd590300_5
+  - zstd=1.5.2=h3eb15da_6
+prefix: /scr/palinca/gabor/miniconda/envs/pandas_pybedtools

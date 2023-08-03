@@ -15,9 +15,25 @@ rule download_helpfiles:
     conda:
         "envs/request.yaml"
     log:
-        "{output_path}/logs/download_helpfiles/{output_file}.gz.log"
+        "{output_path}/logs/download_helpfiles/{output_file}.log"
     script:
         "scripts/download_help_files.py"
+
+rule edit_annotation:
+    """
+    out of the provided annotation gtf, filter out the gene annotations with chr, start, ENSG, gene_type, gene_status, gene_name
+    """
+    input:
+        annot_input = expand("{{output_path}}/metadata/{gtf_gz}", gtf_gz=config['gtf.gz']),
+        script_file = "scripts/edit_annotation.py"
+    output:
+        annot_output = expand("{{output_path}}/metadata_processed/{gtf}_genes_transcripts.gz", gtf=config['gtf'])
+    log:
+        expand("{{output_path}}/logs/edit_annotation/{gtf}_annotated_genes.log", gtf=config['gtf'])
+    conda:
+        "envs/pandas.yaml"
+    script:
+        "scripts/edit_annotation.py"
 
 #rule unzip_meta_files:
 #    """
@@ -95,6 +111,7 @@ def get_aliquot_table(wildcards):
 rule merge_meta_tables:
     """
     merging meta files to connect case id with the datafiles
+    here is also the cutoff applied
     """
     input:
         expand("{script_path}/resources/GCv36_Manifests/{{project}}.tsv", script_path=script_path),
