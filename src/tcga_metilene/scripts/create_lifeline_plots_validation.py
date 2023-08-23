@@ -50,16 +50,6 @@ DOWN_val_tsv =snakemake.output.DOWN_val_tsv
 threshold = snakemake.wildcards.threshold
 drug_combi = snakemake.wildcards.drug_combi
 
-print('# snakemake inputs:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
-
-print('# snakemake output:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
-
-print('# snakemake wildcards:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
-
-
 # # snakemake inputs:
 # meta_table = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/merged_meta_files/cutoff_5/meta_info_druglist_merged_drugs_combined.tsv"
 # start_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chr2_38665703_38666377.tsv"

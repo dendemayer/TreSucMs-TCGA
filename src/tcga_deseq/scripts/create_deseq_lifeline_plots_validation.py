@@ -158,7 +158,7 @@ kmf_NO_THERAPY.plot_survival_function(ax=ax)
 add_at_risk_counts(kmf_THERAPY, kmf_NO_THERAPY, ax=ax)
 p_value_DOWN_str = f'p_value_DOWN = {Decimal(str(p_value_DOWN)):.2e}'
 
-ax.set_title(f'{p_value_DOWN_str}, threshold = {round(thresh)}')
+ax.set_title(f'{p_value_DOWN_str}, threshold = {round(thresh)}\nENSG: {ENSG}')
 
 plt.tight_layout()
 print(f'saving: {deseq_lifeline_pdf_DOWN}')
@@ -187,7 +187,7 @@ kmf_NO_THERAPY.plot_survival_function(ax=ax)
 
 add_at_risk_counts(kmf_THERAPY, kmf_NO_THERAPY, ax=ax)
 p_value_UP_str = f'p_value_UP = {Decimal(str(p_value_UP)):.2e}'
-ax.set_title(f'{p_value_UP_str}, threshold = {round(thresh)}')
+ax.set_title(f'{p_value_UP_str}, threshold = {round(thresh)}\nENSG: {ENSG}')
 
 plt.tight_layout()
 print(f'saving: {deseq_lifeline_pdf_UP}')

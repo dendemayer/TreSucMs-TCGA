@@ -1,8 +1,7 @@
-#configfile: 'config.yaml'
 import glob
 import pandas as pd
 import os
-
+configfile: '../shared/config.yaml'
 include: "../shared/Snakefile"
 
 rule create_summary_table:
@@ -52,6 +51,7 @@ rule create_deseq_lifeline_plots:
     # the ENSGs available are provided through the module
     # create_deseq_lifeline_plots.py, by reading the
     # f'DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.tsv tables
+    in the validation and evaluation steps, those plots are called "base_plot"
     """
     input:
         meta_table = "{output_path}/{project}/DESeq2/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",

@@ -113,4 +113,6 @@ def download_data_files(OUTPUT_PATH, PROJECT, config_file_shared, file_type):
         exp_type = 'metilene'
     gdc_manifest_temp['filepath'] = OUTPUT_PATH + '/' + gdc_manifest_temp['project_id'] + f'/{exp_type}/data_files/' + gdc_manifest_temp['filename']
     aux_file_list = [i for i in gdc_manifest_temp['filepath']]
+    if file_type == 'HumanMethylation450':
+        aux_file_list = [i + '.gz' for i in aux_file_list]
     return aux_file_list

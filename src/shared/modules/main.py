@@ -142,9 +142,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # present on which all the following selections are done on, make sure that
     # here the dryrun flag is not set to False
     # TODO uncomment this !!!
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True)
+    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    #                     workdir=shared_workdir, cores=cores, forceall=False,
+    #                     force_incomplete=True, dryrun=False, use_conda=True)
     # TODO uncomment this !!!
 
     # auxfiles for both pipelines:
@@ -196,10 +196,11 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # # without this option this rule would be ran everytime, since everything
     # # following is based on those aux file, every rule would be triggered
     # # then again
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True, rerun_triggers='mtime')
-    #########################################################################
+    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    #                     workdir=shared_workdir, cores=cores, forceall=False,
+    #                     force_incomplete=True, dryrun=False, use_conda=True,
+    #                     rerun_triggers='mtime')
+    ########################################################################
     # TODO uncomment this !!!
     ########################################################################
 

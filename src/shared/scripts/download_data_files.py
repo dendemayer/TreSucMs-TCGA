@@ -19,10 +19,22 @@ print('# snakemake output:')
 print('# snakemake wildcards:')
 [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
+# [('output_path', '/scr/palinca/gabor/TCGA-pipeline_2'), ('project', 'TCGA-HNSC'), ('pipeline', 'metilene'), ('output_file', 'jhu-u
+# sc.edu_HNSC.HumanMethylation450.6.lvl-3.TCGA-CV-7101-01A-11D-2014-05.gdc_hg38.txt')]
+
 manifest_file = snakemake.input[0]
 aux_out = snakemake.output[0]
-aux_file = os.path.split(aux_out)[1]
+aux_file = os.path.split(aux_out)[1]  # this is the datafile, which will be loaded
 DF_mani = pd.read_table(manifest_file)
+
+# the metilene datafiles are not gzipped, but can be requested that way for
+# download, first they are loaded plain and the md5sum are checked, than the
+# files are compressed:
+pipeline = snakemake.wildcards[2]
+if pipeline == 'metilene':
+    aux_file = aux_file.strip('.gz')
+    aux_out = aux_out.strip('.gz')
+
 # UUID_list = [(DF_mani.set_index('filename').loc[aux_file, 'id'])]
 UUID = DF_mani.set_index('filename').loc[aux_file, 'id']
 if isinstance(UUID, pd.Series):
@@ -83,6 +95,10 @@ for i in range(0, len(UUID_list)):
 
     # aux_out = aux_out + '_' + str(suffix)
     # suffix += 1
+
+# if a methylation data file is loaded, gz it!
+if pipeline == 'metilene':
+    subprocess.call(['gzip', aux_out])
 
 
 # unpack all auxiliary files and put them into PROJECT/aux_files/ dir:

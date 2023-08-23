@@ -42,28 +42,17 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
         os.path.split(os.path.split(SCRIPT_PATH)[0])[0], 'shared')
     Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], 'Snakefile')
 
-    # summary_tables = create_summary_table.return_summary_tables(
-    #     OUTPUT_PATH, PROJECTS, DRUGS, cutoffs)
-
-    # Snakemake_all_files = Snakemake_all_files + summary_tables
-
-    # metilene_out_tables = \
-    #     create_metilene_out.return_metilene_tables(
-    #         OUTPUT_PATH, PROJECTS, DRUGS, cutoffs)
-
-    # Snakemake_all_files = Snakemake_all_files + metilene_out_tables
-
     metilene_intersect_tables = \
         bed_intersect_metilene.return_bed_interesect_metilene_files(
             OUTPUT_PATH, PROJECTS, DRUGS, cutoffs)
     Snakemake_all_files = Snakemake_all_files + metilene_intersect_tables
 
     # IMPORTANT the intersect tables define the DMRs which are requested in the
-    # following, tey must be completed here!
+    # following, they must be completed here!
     # TODO uncomment this !!!
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True)
+    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    #                     workdir=shared_workdir, cores=cores, forceall=False,
+    #                     force_incomplete=True, dryrun=False, use_conda=True)
     # TODO uncomment this !!!
 
     # ## up to this point, every download, preprocessing and metilene analyse
@@ -73,7 +62,6 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # the third snakemake running instance
     # ## make sure that this snakemake process is completed before starting
     # ## consecutive processes
-
 
     # next to do, plot the regions found with its betavalues
     # input is the metilene_intersect.tsv, f.e.:
@@ -88,7 +76,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
 
     # Start Snakemake_all_files new over, since the rest must be created at
     # this point
-    # Snakemake_all_files = metilene_plots
+    Snakemake_all_files = metilene_plots
 
     # the lifeline regression is the first step where the threshold is invoked,
     # for every so far created metilene out, create a lifeline for each
@@ -114,29 +102,34 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
                                                                  cutoffs,
                                                                  threshold)
 
-    # Snakemake_all_files = Snakemake_all_files + merged_plots
-
+    Snakemake_all_files = Snakemake_all_files + merged_plots
     # TODO
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True,
-                        printshellcmds=True,  rerun_triggers='mtime')
+    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    #                     workdir=shared_workdir, cores=cores, forceall=False,
+    #                     force_incomplete=True, dryrun=False, use_conda=True,
+    #                     printshellcmds=True,  rerun_triggers='mtime')
     # TODO
-
     aggregate_lifelines_list = \
         aggregate_lifelines_all.aggregate_lifeline_plots(OUTPUT_PATH, PROJECTS,
                                                          DRUG_str, cutoffs,
                                                          threshold, pipeline)
     Snakemake_all_files = Snakemake_all_files + aggregate_lifelines_list
 
-    evaluate_lifeline_list = \
-        aggregate_lifelines_all.evaluate_lifelines_all(OUTPUT_PATH, PROJECTS,
-                                                       DRUG_str, cutoffs,
-                                                       threshold, pipeline)
-    Snakemake_all_files = Snakemake_all_files + evaluate_lifeline_list
+    evaluate_lifelines_list = [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_lifelines_evaluated.tsv.gz') for i in aggregate_lifelines_list]
+    evaluate_lifelines_list = evaluate_lifelines_list + [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_lifelines_evaluated.pdf') for i in aggregate_lifelines_list]
 
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    Snakemake_all_files = Snakemake_all_files + evaluate_lifelines_list
+
+    plot_diffs_all = [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_plot_diffs.pdf') for i in aggregate_lifelines_list]
+    plot_diffs_all = plot_diffs_all + [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_plot_diffs.tsv.gz') for i in aggregate_lifelines_list]
+
+    Snakemake_all_files = Snakemake_all_files + plot_diffs_all
+
+
+    workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
                         force_incomplete=True, dryrun=False, use_conda=True,
                         printshellcmds=True,  rerun_triggers='mtime')
+    if not workflow:
+        breakpoint()
 # # ##### main_metilene ############

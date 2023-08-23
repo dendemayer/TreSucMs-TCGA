@@ -23,10 +23,21 @@ metilene_lifeline_aggregated = snakemake.input[0]
 metilene_lifeline_eval = snakemake.output[0] # metilene_lifeline_eval
 metilene_lifeline_eval_pdfs = snakemake.output[1] # metilene_lifeline_eval_pdfs
 ###############################################################################
+
+# # snakemake inputs:
+# metilene_lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_aggregated.tsv.gz"
+# # snakemake output:
+# metilene_lifeline_eval = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated.tsv.gz"
+# metilene_lifeline_eval_pdfs = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated.pdf"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_2"
+# project = "TCGA-CESC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female"
+# cutoff = "cutoff_5"
 ###############################################################################
 #                                  test set                                   #
 ###############################################################################
-
 # # snakemake inputs:
 # metilene_lifeline_aggregated = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene2/metilene2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5/metilene2_lifelines_aggregated.tsv.gz"
 # # snakemake output:
@@ -38,6 +49,9 @@ metilene_lifeline_eval_pdfs = snakemake.output[1] # metilene_lifeline_eval_pdfs
 # gender = "female"
 # cutoff = "cutoff_0"
 # end = "tsv.gz"
+###############################################################################
+#                                  test set                                   #
+###############################################################################
 
 DF_eval = pd.read_table(metilene_lifeline_aggregated)
 if DF_eval.empty:
@@ -45,8 +59,8 @@ if DF_eval.empty:
     open(metilene_lifeline_eval_pdfs, 'a').close()
     os._exit(0)
 
-# starting point are the scored base_plots, sort them p_sum wise and take 20
-# best of them
+# starting point are the scored base_plots, sort them p_sum wise [and take 20
+# best of them]
 DF_base_sort_temp = DF_eval.set_index(['plot_type', 'scored']).sort_index().loc[('base_plot', True), :].sort_values('p_sum').reset_index()
 DF_base_sort_temp.set_index(['ENSG', 'threshold'], inplace=True)
 DF_eval = DF_eval.set_index(DF_base_sort_temp.index.names).loc[DF_base_sort_temp.index,:]

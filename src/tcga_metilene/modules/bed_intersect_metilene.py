@@ -34,8 +34,8 @@ def return_plot_DMR_regions_plot(metilene_intersect_tables):
         if not pd.read_table(x).empty:
             DMR_dict.update(
                 {x: pd.read_table(
-                    x, usecols=[3], skiprows=5)['region'].value_counts(
-                    ).index.to_list()})
+                    x, usecols=[3],
+                    skiprows=5)['region'].value_counts().index.to_list()})
     # to each intersect table, we hold the DMR belonging to it, now populate
     # the pdf out filenames:
     metilene_plots = []
