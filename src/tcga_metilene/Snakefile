@@ -84,6 +84,7 @@ rule create_metilene_out:
 rule metilene_intersect_tables:
     """
     intersecting the qval.0.05.out tables (holding DMRs) with the beta value files with which the are created with
+    This intersect file is the base for many following analyses
     """
     input:
         qval_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05.out", 
@@ -175,7 +176,7 @@ rule DMR_plot_validation:
                                                |    nein       |
 
     - the initial DMR KM plot groups beta value UP and DOWN for treated cases
-    - the two validation KM plots groups treated vs untreated 
+    - the two validation KM plots groups treated vs untreated for all cases which are grouped in UP and DOWN by median
 
     """
     input:
@@ -341,6 +342,9 @@ rule evaluate_lifelines_all:
     script:
         "scripts/evaluate_lifelines_all.py"
 
+#TODO this can be merged in the shared Snakefile, the only difference is
+#depending on the pipeline, what to use as xticks, in metilene, tist the chr -
+#start and in deseq the ensg 
 rule plot_diffs:
     """
     for every found ensg, plot the pval or the life mean diff, also together,

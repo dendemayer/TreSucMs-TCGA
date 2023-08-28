@@ -4,8 +4,8 @@ from tcga_deseq.modules import create_summary_table
 from tcga_deseq.modules import create_deseq_output
 from tcga_deseq.modules import create_deseq_lifeline_plots
 from tcga_deseq.modules import gzip_counts_all_cases
-# from tcga_deseq.modules import aggregate_lifelines_all
-from shared.modules import aggregate_lifelines_all
+from tcga_deseq.modules import aggregate_lifelines_all
+# from shared.modules import aggregate_lifelines_all
 
 
 """
@@ -52,9 +52,9 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # created, ENSG is within the filenames
     ###########################################################################
     # TODO uncomment this
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True, printshellcmds=True, quiet=False, unlock=False)
+    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    #                     workdir=shared_workdir, cores=cores, forceall=False,
+    #                     force_incomplete=True, dryrun=False, use_conda=True, printshellcmds=True, quiet=False, unlock=False)
     # TODO uncomment this
     ###########################################################################
     ###########################################################################
@@ -79,9 +79,9 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     #     here the lifelineplots are created, both, base and validation plots #
     ###########################################################################
     ### TODO uncomment this !!!!
-    snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True, rerun_triggers='mtime', printshellcmds=True, quiet=False)
+    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    #                     workdir=shared_workdir, cores=cores, forceall=False,
+    #                     force_incomplete=True, dryrun=False, use_conda=True, rerun_triggers='mtime', printshellcmds=True, quiet=False)
     # ### TODO uncomment this !!!!
     ###############################################################################
     ## the previous snakemake runs must be completed before requesting the next
@@ -90,14 +90,25 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # to one table on which the ranking of potential biomarkers is performed
     #                                                                             #
     ###############################################################################
-    aggregate_lifelines_list = aggregate_lifelines_all.aggregate_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold, pipeline)
+    # DESeq2_lifelines_aggregated.tsv.gz:
+    aggregate_lifelines_list = aggregate_lifelines_all.aggregate_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold)
 
     Snakemake_all_files = aggregate_lifelines_list
 
-    evaluate_lifelines_list  = aggregate_lifelines_all.evaluate_lifelines_all(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold, pipeline)
+    # DESeq2_lifelines_evaluated.pdf:
+    evaluate_lifelines_list = [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_lifelines_evaluated.tsv.gz') for i in aggregate_lifelines_list]
+    evaluate_lifelines_list = evaluate_lifelines_list + [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_lifelines_evaluated.pdf') for i in aggregate_lifelines_list]
 
-    Snakemake_all_files = evaluate_lifelines_list
+    # Snakemake_all_files = Snakemake_all_files + evaluate_lifelines_list
+
+    # DESeq2_plot_diffs.pdf:
+    plot_diffs_all = [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_plot_diffs.pdf') for i in aggregate_lifelines_list]
+    plot_diffs_all = plot_diffs_all + [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_plot_diffs.tsv.gz') for i in aggregate_lifelines_list]
+
+    # Snakemake_all_files = Snakemake_all_files + plot_diffs_all
 
     snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True, rerun_triggers='mtime', printshellcmds=True, quiet=False, verbose=False)
+                        force_incomplete=True, dryrun=False, use_conda=True,
+                        rerun_triggers='mtime', printshellcmds=True,
+                        quiet=False, verbose=False)

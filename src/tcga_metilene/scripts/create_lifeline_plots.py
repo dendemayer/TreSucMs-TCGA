@@ -237,6 +237,9 @@ DF_meta = DF_meta[T.notna()]
 #### IMPORTANT T check!!!
 #################################################################
 
+######################### revision, the start position is not estimated with
+# cox regression for every start ->
+
 # the groups are representing the cases which are either higher or lower
 # methylated than the median of all cases within the DMR, therefore calculate
 # the kmf at every postition and take the one with the highest p_value
@@ -298,8 +301,7 @@ for start in starts:
     # p_value = results.p_value
     pvalue_list.append(p_value)
 
-# take the lowest p_value,
-
+# take the lowest p_value, testet through all postitions:
 plot_index = pvalue_list.index(min(pvalue_list))
 p_value = pvalue_list[plot_index]
 DF_beta = DF_metilene.iloc[
@@ -432,4 +434,4 @@ else:
         DF['gene_status'] = DF_annot['gene_status'].values[0]
         DF['gene_name'] = DF_annot['gene_name'].values[0]
     print(f'saving: {lifeline_out_tsv}')
-    DF.to_csv(lifeline_out_tsv, sep='\t')
+    DF.to_csv(lifeline_out_tsv, sep='\t', index=None)

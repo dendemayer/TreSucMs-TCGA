@@ -128,7 +128,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
 
     workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=False, use_conda=True,
+                        force_incomplete=True, dryrun=True, use_conda=True,
                         printshellcmds=True,  rerun_triggers='mtime')
     if not workflow:
         breakpoint()

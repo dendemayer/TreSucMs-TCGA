@@ -373,10 +373,10 @@ main_tile = paste(PROJECTS, ', LFC shrinkage with apeglm method')
 plotMA(resLFC, ylim=c(-3,3), main=main_tile)
 dev.off()
 
-# ###############writing normalized count table (original count table for DESeq
+# ###############writing normalized count table (normalized input count table for DESeq
 # input is the input summary)
 table_counts_normalized_MF <- counts(DESeq_ddsMF, normalized=TRUE)
-table_counts_raw_MF <- counts(DESeq_ddsMF)
+#table_counts_raw_MF <- counts(DESeq_ddsMF)
 #head(table_counts_normalized_MF)
 normalized_outname = file.path(OUTPUT_PATH, paste('DESeq2_normalized_counts.tsv', sep=''))
 cat("writing normalized MF counts in:\t", normalized_outname, "\n")
@@ -395,7 +395,7 @@ write.table(table_counts_norm_transform, file = normalized_outname, quote = FALS
 # 
 # #############################################
 #library("pheatmap")
-ntd <- normTransform(DESeq_ddsMF)
+ntd <- normTransform(DESeq_ddsMF)  # normtransform
 # (to make use in heatmaps use assay(ntd))
 vsd <- vst(DESeq_ddsMF, blind=FALSE) # variance stabilizing transformation
 #rld <- rlog(DESeq_ddsMF, blind=FALSE) # regularized log transformation

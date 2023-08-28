@@ -250,3 +250,23 @@ rule evaluate_lifelines_all:
         "{output_path}/{project}/DESeq2/logs/evaluate_lifelines_all/{drug_combi}_{gender}_{cutoff}.log",
     script:
         "scripts/evaluate_lifelines_all.py"
+
+rule plot_diffs:
+    """
+    for every found ensg, plot the pval or the life mean diff, also together,
+    if applied, with the different thresholds invoked
+    """
+    input:
+        deseq_lifeline_aggregated = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
+        script_file = "../tcga_DESeq2/scripts/plot_thresh_diff.py"
+    output:
+        plot_diffs = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_plot_diffs.pdf", threshold_str=threshold_str),
+        plot_diffs_table = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_plot_diffs.tsv.gz", threshold_str=threshold_str),
+    conda:
+        "envs/seab_matplot_plotl.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/DESeq2/logs/plot_diffs/{drug_combi}_{gender}_{cutoff}.log",
+    script:
+        "scripts/plot_thresh_diff.py"

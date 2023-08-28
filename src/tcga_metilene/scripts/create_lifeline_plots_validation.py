@@ -50,6 +50,36 @@ DOWN_val_tsv =snakemake.output.DOWN_val_tsv
 threshold = snakemake.wildcards.threshold
 drug_combi = snakemake.wildcards.drug_combi
 
+###############################################################################
+#                                 test input                                  #
+# ###############################################################################
+# # snakemake inputs:
+# meta_table = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+# start_tsv = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr14_85529381_85531409.tsv"
+# summary = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/summary_for_metilene.tsv"
+# summary_complement = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/summary_for_metilene_complement.tsv"
+# annot_file = "/scr/palinca/gabor/TCGA-pipeline_2/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
+# annot_file_2 = "../shared/resources/annot_from_betafile.tsv.gz"
+# script_file = "../tcga_metilene/scripts/create_lifeline_plots_validation.py"
+# # snakemake output:
+# UP_val_plot = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr14_85529381_85531409_UP_val.pdf"
+# UP_val_tsv = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr14_85529381_85531409_UP_val.tsv"
+# DOWN_val_plot = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr14_85529381_85531409_DOWN_val.pdf"
+# DOWN_val_tsv = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr14_85529381_85531409_DOWN_val.tsv"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_2"
+# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female"
+# cutoff = "cutoff_0"
+# threshold = "threshold_5"
+# DMR = "chr14_85529381_85531409"
+
+###############################################################################
+#                                 test input                                  #
+###############################################################################
+
+
 # # snakemake inputs:
 # meta_table = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/merged_meta_files/cutoff_5/meta_info_druglist_merged_drugs_combined.tsv"
 # start_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chr2_38665703_38666377.tsv"
