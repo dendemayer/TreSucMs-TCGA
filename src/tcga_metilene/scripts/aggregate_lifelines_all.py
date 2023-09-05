@@ -1,7 +1,7 @@
 import os
 import pandas as pd
-import re
 import sys
+import re
 
 """
 what would be expect: which group has a longer lifeexpectation in the base lifeline plot:
@@ -196,7 +196,7 @@ if len(ENSGs_to_delete) != 0:
     MI = pd.MultiIndex.from_tuples(ENSGs_to_delete)
     DF_aggr = DF_aggr.reset_index('plot_type').drop(MI).reset_index().set_index(['ENSG', 'plot_type', 'threshold'])
 
-DF_aggr['CMP'] = 'CMP'
+
 """
 plot categorisation is done, for all plottypes, now give a rank fct::
 
@@ -207,16 +207,34 @@ DOWN: baseplot p_val_down  -> UP_val_plot p_val_high   -> DOWN_val_down p_val_do
 -> factors that can be included are:
 p_values of interest, but also the diff of the life_means ? what would be
 interesting is, whether or not an treatment can cause a shorter lifeexpancy
+
+a base plot is labeled an UP plot if the first life mean is higher than the scnd life mean (and vice verca)
+the UP_validation plot is labeled UP if fst_life_mean is higher than the scnd life mean (and vice verca)
+the DOWN_validation plot is labeled DOWN if the fst_life_mean is higher than the scnd life mean (and vice verca)
 """
-for plot_type in ['base_plot', 'UP_validation', 'DOWN_validation']:
+DF_aggr['CMP'] = 'CMP'
+
+for plot_type in ['base_plot', 'UP_validation']:
     try:
-        UP_bool = (DF_aggr.loc[(slice(None),  plot_type), 'fst_life_mean'] > DF_aggr.loc[(slice(None),  plot_type), 'scnd_life_mean'])
+        UP_bool = (DF_aggr.loc[(slice(None), plot_type, slice(None)), 'fst_life_mean'] > DF_aggr.loc[(slice(None), plot_type, slice(None)), 'scnd_life_mean'])
     except KeyError:
         continue
     UP_bool_index = UP_bool[UP_bool].index
     DOWN_bool_index = UP_bool[~UP_bool].index
     DF_aggr.loc[UP_bool_index,'CMP'] = 'UP'
     DF_aggr.loc[DOWN_bool_index,'CMP']= 'DOWN'
+
+
+# the DOWN_validation is handled differently from the both before, if the fst_life_mean is higher, set them to DOWN
+for plot_type in ['DOWN_validation']:
+    try:
+        DOWN_bool = (DF_aggr.loc[(slice(None), plot_type, slice(None)), 'fst_life_mean'] > DF_aggr.loc[(slice(None), plot_type, slice(None)), 'scnd_life_mean'])
+    except KeyError:
+        continue
+    DOWN_bool_index = DOWN_bool[DOWN_bool].index
+    UP_bool_index = DOWN_bool[~DOWN_bool].index
+    DF_aggr.loc[DOWN_bool_index,'CMP'] = 'DOWN'
+    DF_aggr.loc[UP_bool_index,'CMP']= 'UP'
 
 # plot categorisation is done, for all plottypes, now give a rank fct::
 
@@ -272,5 +290,5 @@ DF_aggr['mean_dead'] = DF_aggr['mean_alive'] - DF_aggr['mean_methylation_differe
 DF_aggr['life_mean_diff'] = DF_aggr['fst_life_mean'] - DF_aggr['scnd_life_mean']
 # reaarange the cols:
 DF_aggr = DF_aggr.loc[:, ['ENSG', 'plot_type', 'threshold', 'CMP', 'p_value', 'fst_life_mean', 'scnd_life_mean','life_mean_diff', 'file_path', 'p_sum', 'scored', 'DMR', 'q-value', '#CpGs', 'mean_alive', 'mean_dead', 'mean_methylation_difference']]
-print(f'saving aggregated table in {metilene_lifeline_aggregated}')
+print(f'saving {metilene_lifeline_aggregated}')
 DF_aggr.to_csv(metilene_lifeline_aggregated, sep='\t', index=None)

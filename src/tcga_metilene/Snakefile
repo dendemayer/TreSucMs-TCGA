@@ -4,10 +4,9 @@ import glob
 configfile: '../shared/config.yaml'
 include: "../shared/Snakefile"
 
-#rule all:
-#    input:
-#        "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-CESC_TCGA-HNSC/metilene/metilene_input_table/carboplatn,paclitaxel_cisplatin/male/cutoff_0/threshold_0/summary_for_metilene.tsv"
-#breakpoint()
+threshold_str = config['thresh']
+threshold_list = config['thresh_list']
+
 def get_data_files(wildcards):
     OUTPUT_PATH = wildcards[0]
     project = wildcards[1].split('_')
@@ -91,6 +90,7 @@ rule metilene_intersect_tables:
         #meta_info = "{output_path}/{project}/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv",
         # is this actually needed?
         metilene_input = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
+        script_file = "../tcga_metilene/scripts/bed_intersect_metilene.py"
     output:
         out_file = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv"
     conda:
@@ -116,6 +116,23 @@ rule metilene_plot_DMR_regions:
         "{output_path}/{project}/metilene/logs/metilene_plot_DMR_regions/{drug_combi}_{gender}_{cutoff}_{DMR}.log",
     script:
         "scripts/plot_DMR_regions.py"
+
+rule metilene_plot_DMR_heatmaps:
+    """
+    based on the DMRs within the intersect_tables, heatmaps are plottet
+    """
+    input:
+        metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
+        metilene_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05.out",
+        R_heatmap_script = "../tcga_metilene/scripts/metilene_heatmap.R"
+    output:
+        pdf_heatmap_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_heatmaps_beta_value_{DMR}.pdf",
+    conda:
+        "../shared/envs/pheatmap.yaml"
+    log:
+        "{output_path}/{project}/metilene/logs/metilene_plot_DMR_heatmaps/{drug_combi}_{gender}_{cutoff}_{DMR}.log",
+    script:
+        "scripts/metilene_heatmap.py"
 
 rule create_metilene_lifeline_plots:
     """
@@ -268,13 +285,10 @@ rule merge_DMR_plots:
         #qpdf --empty --pages Linux.pdf ShellIntro.pdf -- new.pdf
         #find . -maxdepth 1 -type f -size +1k -iname '*intersect*pdf'
 
-def get_threshold_list():
-    with open("../tcga_metilene/dynamic/thresholds.txt") as f:
-        return [line.strip() for line in f]
-threshold_list = get_threshold_list()
-# with every call of this script, the threshold_str is created, based on the
-# cli options set
-threshold_str = "_".join(threshold_list)
+#def get_threshold_list():
+#    with open("../tcga_metilene/dynamic/thresholds.txt") as f:
+#        return [line.strip() for line in f]
+#threshold_list = get_threshold_list()
 
 def get_lifeline_all(wildcards):
     """
@@ -345,22 +359,23 @@ rule evaluate_lifelines_all:
 #TODO this can be merged in the shared Snakefile, the only difference is
 #depending on the pipeline, what to use as xticks, in metilene, tist the chr -
 #start and in deseq the ensg 
-rule plot_diffs:
-    """
-    for every found ensg, plot the pval or the life mean diff, also together,
-    if applied, with the different thresholds invoked
-    """
-    input:
-        metilene_lifeline_aggregated = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
-        script_file = "../tcga_metilene/scripts/plot_thresh_diff.py"
-    output:
-        plot_diffs = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_plot_diffs.pdf", threshold_str=threshold_str),
-        plot_diffs_table = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_plot_diffs.tsv.gz", threshold_str=threshold_str),
-    conda:
-        "envs/seab_matplot_plotl.yaml"
-    threads:
-        1
-    log:
-        "{output_path}/{project}/metilene/logs/plot_diffs/{drug_combi}_{gender}_{cutoff}.log",
-    script:
-        "scripts/plot_thresh_diff.py"
+
+#rule plot_diffs:
+#    """
+#    for every found ensg, plot the pval or the life mean diff, also together,
+#    if applied, with the different thresholds invoked
+#    """
+#    input:
+#        metilene_lifeline_aggregated = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
+#        script_file = "../tcga_metilene/scripts/plot_thresh_diff.py"
+#    output:
+#        plot_diffs = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_plot_diffs.pdf", threshold_str=threshold_str),
+#        plot_diffs_table = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_plot_diffs.tsv.gz", threshold_str=threshold_str),
+#    conda:
+#        "envs/seab_matplot_plotl.yaml"
+#    threads:
+#        1
+#    log:
+#        "{output_path}/{project}/metilene/logs/plot_diffs/{drug_combi}_{gender}_{cutoff}.log",
+#    script:
+#        "scripts/plot_thresh_diff.py"

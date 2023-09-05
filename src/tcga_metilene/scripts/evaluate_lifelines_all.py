@@ -24,6 +24,19 @@ metilene_lifeline_eval = snakemake.output[0] # metilene_lifeline_eval
 metilene_lifeline_eval_pdfs = snakemake.output[1] # metilene_lifeline_eval_pdfs
 ###############################################################################
 
+
+# # snakemake inputs:
+# metilene_lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_aggregated.tsv.gz"
+# # snakemake output:
+# metilene_lifeline_eval = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated.tsv.gz"
+# metilene_lifeline_eval_pdfs = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated.pdf"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_2"
+# project = "TCGA-HNSC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female"
+# cutoff = "cutoff_0"
+
 # # snakemake inputs:
 # metilene_lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_aggregated.tsv.gz"
 # # snakemake output:

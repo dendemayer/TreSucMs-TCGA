@@ -1,3 +1,4 @@
+from matplotlib.patches import bbox_artist
 import pandas as pd
 import numpy as np
 import sys
@@ -10,6 +11,7 @@ from decimal import Decimal
 from lifelines.statistics import logrank_test
 from lifelines.plotting import add_at_risk_counts
 from lifelines import CoxPHFitter
+import statistics as st
 # from pandas.core import apply
 
 #######################################################################
@@ -36,6 +38,60 @@ print('# snakemake output:')
 
 print('# snakemake wildcards:')
 [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+#######################################################################
+
+###############################################################################
+#                                 test input                                  #
+###############################################################################
+# # snakemake inputs:
+# meta_table = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+# deseq_lifeline_tsv = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000249235_lifeline.tsv.gz"
+# counts = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/DESeq2_norm_counts_all_cases.gz"
+# script_file = "../tcga_deseq/scripts/create_deseq_lifeline_plots_validation.py"
+# # snakemake output:
+# deseq_lifeline_tsv_UP = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000249235_lifeline_UP_val.tsv.gz"
+# deseq_lifeline_tsv_DOWN = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000249235_lifeline_DOWN_val.tsv.gz"
+# deseq_lifeline_pdf_UP = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000249235_lifeline_UP_val.pdf"
+# deseq_lifeline_pdf_DOWN = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000249235_lifeline_DOWN_val.pdf"
+# dropped_cases = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000249235_dropped_cases.tsv"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_2"
+# project = "TCGA-CESC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female_male"
+# cutoff = "cutoff_0"
+# threshold = "threshold_0"
+# in_de = "DE"
+# count_type = "norm"
+# ENSG = "ENSG00000249235"
+# DRUGS = drug_combi.split('_')
+# # snakemake inputs:
+# meta_table = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+# deseq_lifeline_tsv = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000081041_lifeline.tsv.gz"
+# counts = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/DESeq2_norm_counts_all_cases.gz"
+# script_file = "../tcga_deseq/scripts/create_deseq_lifeline_plots_validation.py"
+# # snakemake output:
+# deseq_lifeline_tsv_UP = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000081041_lifeline_UP_val.tsv.gz"
+# deseq_lifeline_tsv_DOWN = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000081041_lifeline_DOWN_val.tsv.gz"
+# deseq_lifeline_pdf_UP = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000081041_lifeline_UP_val.pdf"
+# deseq_lifeline_pdf_DOWN = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000081041_lifeline_DOWN_val.pdf"
+# dropped_cases = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/DESeq2_log2f_DECREASE_norm_ENSG00000081041_dropped_cases.tsv"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_2"
+# project = "TCGA-CESC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female"
+# cutoff = "cutoff_0"
+# threshold = "threshold_0"
+# in_de = "DE"
+# count_type = "norm"
+# ENSG = "ENSG00000081041"
+# DRUGS = drug_combi.split('_')
+
+###############################################################################
+#                                 test input                                  #
+###############################################################################
+
 
 def write_empty_files():
     for path in [deseq_lifeline_tsv_UP, deseq_lifeline_tsv_DOWN]:
@@ -43,7 +99,7 @@ def write_empty_files():
                               'pharmaceutical_therapy_drug_name', 'gender',
                               'vital_status', 'survivaltime',
                               'years_to_last_follow_up', 'T', 'E',
-                              'count_type', 'ENSG', 'median', 'threshold',
+                              'count_type', 'ENSG', 'mean_median', 'threshold',
                               'UP_or_DOWN', 'in_therapy', 'p_value', 'plot_type', 'fst_life_mean', 'scnd_life_mean']).to_csv(
                                   path, sep='\t', index=False)
         print(f'writing empty file {path}')
@@ -57,12 +113,29 @@ if pd.read_table(counts).empty:
     write_empty_files()
 # limit the counts to the ENSG applied:
 S_counts = pd.read_table(counts, index_col=0).loc[ENSG,:]
-median = S_counts[S_counts > 0].median()
+# median = S_counts[S_counts > 0].median()
 S_counts_temp = S_counts # to access the count values which are excluded after thresh apllication
+S_counts_gt0 = S_counts[S_counts > 0]
+# add the vital state infos to the case ids:
+dead_alive_info = pd.read_table(meta_table, usecols=['bcr_patient_uuid', 'vital_status']).set_index('bcr_patient_uuid').loc[S_counts.index,:].reset_index()
+S_counts_gt0 = S_counts_gt0.to_frame().reset_index().merge(dead_alive_info, how='left').set_index('vital_status')
+# estimate the alive and dead medians:
+try:
+    alive_median = S_counts_gt0.loc['alive', ENSG].median()
+except Exception as e:
+    print(f'{e}\n to many zeros in counts, setting the median manually to 0')
+    alive_median = 0
+try:
+    dead_median = S_counts_gt0.loc['dead', ENSG].median()
+except Exception as e:
+    print(f'{e}\n to many zeros in counts, setting the median manually to 0')
+    dead_median = 0
+mean_median = st.mean([alive_median, dead_median])
+
 thresh = float(threshold.split('_')[1])
-limit_val = (thresh/100) * median
-upper_limit = median + limit_val
-lower_limit = median - limit_val
+limit_val = (thresh/100) * mean_median
+upper_limit = mean_median + limit_val
+lower_limit = mean_median - limit_val
 S_counts = S_counts.apply(lambda x: pd.NA if float(x) < upper_limit and float(x) > lower_limit else x)
 
 cases_dropped = S_counts[S_counts.isna()].index
@@ -88,10 +161,10 @@ DF_to_plot.rename({ENSG: 'count'}, axis=1, inplace=True)
 DF_to_plot['count_type'] = count_type
 DF_to_plot['ENSG'] = ENSG
 DF_to_plot.index.name = 'case_id'
-DF_to_plot['median'] = median
+DF_to_plot['mean_median'] = mean_median
 DF_to_plot['threshold'] = thresh
 
-DF_to_plot['UP_or_DOWN'] = DF_to_plot['count'].apply(lambda x: 'UP' if x > median else 'DOWN')
+DF_to_plot['UP_or_DOWN'] = DF_to_plot['count'].apply(lambda x: 'UP' if x > mean_median else 'DOWN')
 
 def set_if_therapy(drug_invoked):
     temp_val = False
@@ -197,7 +270,7 @@ plt.close()
 ###############################################################################
 #                               writing tables                                #
 ###############################################################################
-# 2 kmf medians per table are added, the kmf estimation must be therefore ran
+# 2 kmf means per table are added, the kmf estimation must be therefore ran
 # already, so we save the tables after plotting the pdfs
 
 

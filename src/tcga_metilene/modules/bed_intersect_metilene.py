@@ -46,6 +46,9 @@ def return_plot_DMR_regions_plot(metilene_intersect_tables):
             metilene_plots.append(
                 filename.replace(
                     '.tsv', f'_lineplot_median_beta_value_{DMR}.pdf'))
+            metilene_plots.append(
+                filename.replace(
+                    '.tsv', f'_heatmaps_beta_value_{DMR}.pdf'))
     return metilene_plots
 
 

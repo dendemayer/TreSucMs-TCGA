@@ -4,6 +4,8 @@ import os
 import pandas as pd
 script_path = workflow.basedir
 
+threshold_str = config['thresh']
+
 
 rule download_helpfiles:
     """
@@ -167,3 +169,24 @@ rule merge_meta_tables_multiproj:
     #run:
     #    import pandas as pd
     #    pd.concat([pd.read_table(i) for i in input]).to_csv(output[0], sep='\t', index=False)
+
+
+rule plot_diffs:
+    """
+    for every found ensg or start of a DMR, plot the pval or the life mean
+    diff, also together, if applied, with the different thresholds invoked
+    """
+    input:
+        lifeline_aggregated = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
+        script_file = "scripts/plot_thresh_diff.py"
+    output:
+        plot_diffs = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_diffs_{{plot_type}}.pdf", threshold_str=threshold_str),
+        plot_diffs_table = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_diffs_{{plot_type}}.tsv.gz", threshold_str=threshold_str),
+    conda:
+        "envs/seab_matplot_plotl.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/{pipeline}/logs/plot_diffs/{drug_combi}_{gender}_{cutoff}_{plot_type}.log",
+    script:
+        "scripts/plot_thresh_diff.py"

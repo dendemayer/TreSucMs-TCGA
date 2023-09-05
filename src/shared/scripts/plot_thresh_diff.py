@@ -15,24 +15,26 @@ print('# snakemake output:')
 print('# snakemake wildcards:')
 [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
-metilene_lifeline_aggregated = snakemake.input[0]
+lifeline_aggregated = snakemake.input[0]
 plot_diffs = snakemake.output.plot_diffs[0]
 plot_diffs_table = snakemake.output.plot_diffs_table[0]
 
 projects = ', '.join(snakemake.wildcards.project.split('_'))
 gender = ', '.join(snakemake.wildcards.gender.split('_'))
 drugs = '; '.join(snakemake.wildcards.drug_combi.split('_'))
+pipeline = snakemake.wildcards.pipeline
+plot_type = snakemake.wildcards.plot_type
 
 """
-visualize the differences of the threshold parameter, based on p_value and the
-life_mean_diff
+visualize the impact of the threshold parameter, based on the variances of
+p_value and the life_mean_diff
 """
 ###############################################################################
 #                                 test input                                  #
 ###############################################################################
 
 # # snakemake inputs:
-# metilene_lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_aggregated.tsv.gz"
+# lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_aggregated.tsv.gz"
 # script_file = "../tcga_metilene/scripts/plot_thresh_diff.py"
 # # snakemake output:
 # plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs.pdf"
@@ -43,6 +45,7 @@ life_mean_diff
 # drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
 # gender = "female"
 # cutoff = "cutoff_0"
+# pipeline = 'metilene'
 
 # projects = project
 # gender = gender
@@ -69,7 +72,7 @@ life_mean_diff
 ###############################################################################
 
 
-DF = pd.read_table(metilene_lifeline_aggregated)
+DF = pd.read_table(lifeline_aggregated)
 if DF.empty:
     open(plot_diffs, 'w').close()
     DF.to_csv(plot_diffs_table)
@@ -77,16 +80,14 @@ if DF.empty:
     os._exit(0)
 DF = DF.set_index('plot_type')
 
-base_DF = DF.loc['base_plot', :]
 
-
-# base_DF = base_DF.dropna(subset='ENSG')
-# [284 rows x 16 columns]
-base_DF['chromosome - start'] = base_DF['DMR'].apply(lambda x: x.split('_')[0] + ' - ' + x.split('_')[1])
-# plt.show()
-# get the thresh length:
-thresh_len = len(base_DF['threshold'].value_counts())
-def plot_dynamical(base_DF, out_file, out_file_table):
+def plot_dynamical_metilene(DF, out_file, out_file_table, plot_type):
+    """
+    using here the chromosome - start as feature for dissemination
+    """
+    thresh_len = len(DF['threshold'].value_counts())
+    base_DF = DF.loc[plot_type, :]
+    base_DF['chromosome - start'] = base_DF['DMR'].apply(lambda x: x.split('_')[0] + ' - ' + x.split('_')[1])
     # p_val_sorted_DMR = base_DF.set_index('threshold').loc[0, :].sort_values(what_to_plot)['DMR'].to_list()
     p_val_sorted_DMR = base_DF.set_index('threshold').loc[0, :].sort_values('p_value')['DMR'].to_list()
     base_DF_pval_sort = base_DF.set_index('DMR').loc[p_val_sorted_DMR, :]
@@ -113,13 +114,39 @@ def plot_dynamical(base_DF, out_file, out_file_table):
     # in addition make a single q-value plot to compare meth diff significance
     # with kaplan meier fct estimation -> not part of snakemake output,
     # additional info...
-    fig, ax = plt.subplots(figsize=figsize)
-    fig.suptitle(f'q-values from metilene for the found DMRs')
-    sns.lineplot(data=base_DF_pval_sort, x='chromosome - start', y='q-value')
+    # fig, ax = plt.subplots(figsize=figsize)
+    # fig.suptitle(f'q-values from metilene for the found DMRs')
+    # sns.lineplot(data=base_DF_pval_sort, x='chromosome - start', y='q-value')
+    # plt.xticks(rotation=90)
+    # plt.subplots_adjust(left=0.06, right=0.98, top=0.86, bottom=0.3)
+    # plt.savefig(out_file.replace('.pdf', '_q_values.pdf'))
+
+def plot_dynamical_deseq(DF, out_file, out_file_table, plot_type):
+    """
+    using here the ENSG as feature for dissemination
+    """
+    thresh_len = len(DF['threshold'].value_counts())
+    # limit the plot to one count type
+    base_DF = DF.loc[plot_type, :]
+    base_DF = base_DF[base_DF['count_type'] == 'nt_count']
+    p_val_sorted_ENSG = base_DF.set_index('threshold').loc[0, :].sort_values('p_value')['ENSG'].to_list()
+    base_DF_pval_sort = base_DF.set_index('ENSG').loc[p_val_sorted_ENSG, :]
+    num_rows, num_cols = base_DF_pval_sort.shape
+    figsize = (num_cols * 0.8, num_rows * 0.02)
+    fig, ax = plt.subplots(2,1,figsize=figsize, sharex=True)
+    fig.suptitle(f'life mean diffs and p-adjusted for all ENSGs\np-value sorted for threshold=0\n{projects}, {gender}, {drugs}')
+    sns.lineplot(ax=ax[0], data=base_DF_pval_sort, x='ENSG', y='p_value', hue='threshold', palette=sns.cubehelix_palette()[:thresh_len][::-1])
+    sns.lineplot(ax=ax[1], data=base_DF_pval_sort, x='ENSG', y='life_mean_diff', hue='threshold', legend=False, palette=sns.cubehelix_palette()[:thresh_len][::-1])
+    ax[1].axhline(y=0)
     plt.xticks(rotation=90)
     plt.subplots_adjust(left=0.06, right=0.98, top=0.86, bottom=0.3)
-    plt.savefig(out_file.replace('.pdf', '_q_values.pdf'))
+    print(f'saving plot {out_file}')
+    plt.savefig(out_file)
+    print(f'saving table {out_file_table}')
+    base_DF_pval_sort.loc[:, ['life_mean_diff', 'p_value']].to_csv(out_file_table, sep='\t')
 
-
-plot_dynamical(base_DF, plot_diffs, plot_diffs_table)
+if pipeline == 'metilene':
+    plot_dynamical_metilene(DF, plot_diffs, plot_diffs_table, plot_type)
+elif pipeline == 'DESeq2':
+    plot_dynamical_deseq(DF, plot_diffs, plot_diffs_table, plot_type)
 # plot_dynamical(base_DF, 'p_value', plot_diffs_p_val , plot_diffs_p_val_table)

@@ -10,14 +10,14 @@ what would be expect:
                 (base_plot)                        |           (validation_plots)
                                                    |  - UP regulated in therapy have a higher expectation
                                                    |   (injects - UP regulated in not in therapy have lower life expectation)
-                                                   |/
+                    "UP-plot"                      |/
             UP regulated - high expection          |
       (injects DOWN regulated - low expectation)   |\
                                                    |  - DOWN regulated in therapy have higher expectation
                                                    |  (injects - DOWN regulated not in therapy have lower expectation)
                                                    |
                                                    |  - UP regulated in therapy have a higher expectation
-                                                   |/ (injects - UP regulated not in therapy have a lower expectation)
+                   "DOWN-plot"                     |/ (injects - UP regulated not in therapy have a lower expectation)
             UP regulated - low expectation         |
 (injects DOWN regulated - higher expectation)      |\
                                                    |  - DOWN regulated in therapy have higher expectation
@@ -54,7 +54,7 @@ TODO:
     ENSG │ count_type │ plot_type │ threshold │ CMP │ p_value │ fst_life_mean │ scnd_life_mean │ file_path │ p_sum │ scored ║
 
 to                                                                                                                              deseq_specific:
-   ENSG │ count_type │ plot_type │ threshold │ CMP │ p_value │ fst_life_mean │ scnd_life_mean │life_mean_diff │ file_path │ p_sum │ scored ║    [[ baseMean │ log2FoldChange │ lfcSE │ stat │ pvalue │ padj │ ║ ]]
+   ENSG │ count_type │ plot_type │ threshold │ CMP │ p_value │ fst_life_mean │ scnd_life_mean │life_mean_diff │ file_path │ p_sum │ scored ║    [[log2FoldChange │ lfcSE │ stat │ pvalue │ padj │ ║ ]]
 
 metilene:                                                                                                                       metilene specific:
  ENSG │ plot_type │ threshold │ CMP │ p_value │ fst_life_mean │ scnd_life_mean │ life_mean_diff │ file_path │ p_sum │ scored    [[│ DMR │ q-value │ #CpGs │ mean_alive │ mean_dead| mean_methylation_difference]]
@@ -143,7 +143,12 @@ if len(ENSGs_to_delete) != 0:
     DF_aggr = DF_aggr.reset_index('plot_type').drop(MI).reset_index().set_index(['ENSG', 'count_type', 'plot_type', 'threshold'])
 
 DF_aggr['CMP'] = 'CMP'
-for plot_type in ['base_plot', 'UP_validation', 'DOWN_validation']:
+"""
+a base plot is labeled an UP plot if the first life mean is higher than the scnd life mean (and vice verca)
+the UP_validation plot is labeled UP if fst_life_mean is higher than the scnd life mean (and vice verca)
+the DOWN_validation plot is labeled DOWN if the fst_life_mean is higher than the scnd life mean (and vice verca)
+"""
+for plot_type in ['base_plot', 'UP_validation']:
     try:
         UP_bool = (DF_aggr.loc[(slice(None), slice(None), plot_type), 'fst_life_mean'] > DF_aggr.loc[(slice(None), slice(None), plot_type), 'scnd_life_mean'])
     except KeyError:
@@ -153,6 +158,17 @@ for plot_type in ['base_plot', 'UP_validation', 'DOWN_validation']:
     DF_aggr.loc[UP_bool_index,'CMP'] = 'UP'
     DF_aggr.loc[DOWN_bool_index,'CMP']= 'DOWN'
 
+
+# the DOWN_validation is handled differently from the both before, if the fst_life_mean is higher, set them to DOWN
+for plot_type in ['DOWN_validation']:
+    try:
+        DOWN_bool = (DF_aggr.loc[(slice(None), slice(None), plot_type), 'fst_life_mean'] > DF_aggr.loc[(slice(None), slice(None), plot_type), 'scnd_life_mean'])
+    except KeyError:
+        continue
+    DOWN_bool_index = DOWN_bool[DOWN_bool].index
+    UP_bool_index = DOWN_bool[~DOWN_bool].index
+    DF_aggr.loc[DOWN_bool_index,'CMP'] = 'DOWN'
+    DF_aggr.loc[UP_bool_index,'CMP']= 'UP'
 # plot categorisation is done, for all plottypes, now give a rank fct::
 
 # UP:   baseplot p_val down  -> UP_val_plot p_val_down   -> DOWN_val_down
@@ -191,7 +207,7 @@ for ENSG in DF_aggr.reset_index()['ENSG'].value_counts().index.to_list():
 # needed, do that filtering in the evaluation step
 
 # add infos from deseq result table:
-# [[ baseMean │ log2FoldChange │ lfcSE │ stat │ pvalue │ padj │ ║ ]]
+# [[ log2FoldChange │ lfcSE │ stat │ pvalue │ padj │ ║ ]]
 print(f'saving aggregated table in {deseq_lifeline_aggregated}')
 DF_deseq_result = pd.concat([pd.read_table(i) for i in deseq_results])
 DF_deseq_result.index.name = 'ENSG'
@@ -199,5 +215,5 @@ DF_deseq_result.reset_index(inplace=True)
 DF_aggr = DF_aggr.reset_index().merge(DF_deseq_result)
 
 DF_aggr['life_mean_diff'] = DF_aggr['fst_life_mean'] - DF_aggr['scnd_life_mean']
-DF_aggr = DF_aggr.loc[:, ['ENSG', 'count_type', 'plot_type', 'threshold', 'CMP', 'p_value', 'fst_life_mean', 'scnd_life_mean', 'life_mean_diff', 'file_path', 'p_sum', 'scored', 'baseMean', 'log2FoldChange', 'lfcSE', 'stat', 'pvalue', 'padj']]
+DF_aggr = DF_aggr.loc[:, ['ENSG', 'count_type', 'plot_type', 'threshold', 'CMP', 'p_value', 'fst_life_mean', 'scnd_life_mean', 'life_mean_diff', 'file_path', 'p_sum', 'scored', 'log2FoldChange', 'lfcSE', 'stat', 'pvalue', 'padj']]
 DF_aggr.to_csv(deseq_lifeline_aggregated, sep='\t', index=None)

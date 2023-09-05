@@ -19,15 +19,18 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
 
     SCRIPT_PATH = os.path.split(__file__)[0]
 
-    # to be able to aggregate over the thresholds, txt file must be written
-    # into file. , this is then read by Snakemake
-    thresh_file = os.path.join(os.path.split(SCRIPT_PATH)[0], 'dynamic',
-                               'thresholds.txt')
+    # an extra parameter can be handed over to the snakefile via the config
+    # method in he snakemake call
+    # # to be able to aggregate over the thresholds, txt file must be written
+    # # into file. , this is then read by Snakemake
+    # thresh_file = os.path.join(os.path.split(SCRIPT_PATH)[0], 'dynamic',
+    #                            'thresholds.txt')
     thresh_list = [f'threshold_{str(i)}' for i in threshold]
 
-    with open(thresh_file, 'w') as w:
-        for i in thresh_list:
-            w.write(f'{i}\n')
+    # with open(thresh_file, 'w') as w:
+    #     for i in thresh_list:
+    #         w.write(f'{i}\n')
+    thresh_str = '_'.join(thresh_list)
 
     PROJECTS = []
     if len(PROJECT) > 1:
@@ -50,9 +53,12 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # IMPORTANT the intersect tables define the DMRs which are requested in the
     # following, they must be completed here!
     # TODO uncomment this !!!
-    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=False, use_conda=True)
+    workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True, config={'thresh': thresh_str, 'thresh_list': thresh_list})
+    if not workflow:
+        print('snakemake execution failed, exiting now')
+        os._exit(0)
     # TODO uncomment this !!!
 
     # ## up to this point, every download, preprocessing and metilene analyse
@@ -104,11 +110,16 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
 
     Snakemake_all_files = Snakemake_all_files + merged_plots
     # TODO
-    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=False, use_conda=True,
-    #                     printshellcmds=True,  rerun_triggers='mtime')
+    workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=shared_workdir, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True,
+                        printshellcmds=True,  rerun_triggers='mtime', config={'thresh': thresh_str, 'thresh_list': thresh_list})
     # TODO
+
+    if not workflow:
+        print('snakemake execution failed, exiting now')
+        os._exit(0)
+
     aggregate_lifelines_list = \
         aggregate_lifelines_all.aggregate_lifeline_plots(OUTPUT_PATH, PROJECTS,
                                                          DRUG_str, cutoffs,
@@ -120,16 +131,25 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
 
     Snakemake_all_files = Snakemake_all_files + evaluate_lifelines_list
 
-    plot_diffs_all = [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_plot_diffs.pdf') for i in aggregate_lifelines_list]
-    plot_diffs_all = plot_diffs_all + [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_plot_diffs.tsv.gz') for i in aggregate_lifelines_list]
+    # plot_diffs_all = [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_plot_diffs_base.pdf') for i in aggregate_lifelines_list]
+    # plot_diffs_all = plot_diffs_all + [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_plot_diffs.tsv.gz') for i in aggregate_lifelines_list]
+
+
+    plot_diffs_all = []
+    plot_types = ['base_plot', 'UP_validation', 'DOWN_validation']
+    for plot_type in plot_types:
+        for i in aggregate_lifelines_list:
+            plot_diffs_all.append(i.replace('lifelines_aggregated.tsv.gz', f'plot_diffs_{plot_type}.pdf'))
 
     Snakemake_all_files = Snakemake_all_files + plot_diffs_all
 
-
+    # TODO
     workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                         workdir=shared_workdir, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=True, use_conda=True,
-                        printshellcmds=True,  rerun_triggers='mtime')
+                        force_incomplete=True, dryrun=False, use_conda=True,
+                                   printshellcmds=True,  rerun_triggers='mtime', config={'thresh': thresh_str, 'thresh_list': thresh_list})
+    # TODO
     if not workflow:
-        breakpoint()
+        print('snakemake execution failed, exiting now')
+        os._exit(0)
 # # ##### main_metilene ############
