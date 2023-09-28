@@ -1,16 +1,17 @@
 import glob
 import pandas as pd
 import os
-configfile: '../shared/config.yaml'
+#configfile: '../shared/config.yaml'
 include: "../shared/Snakefile"
 
 threshold_str = config['thresh']
 threshold_list = config['thresh_list']
+script_path = workflow.basedir
 
 rule create_summary_table:
     input:
         meta_table = "{output_path}/{project}/DESeq2/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
-        script_file = "../tcga_deseq/scripts/create_summary_table.py"
+        script_file = os.path.join(script_path, "scripts/create_summary_table.py")
     output:
         summary_table = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2.tsv",
         summary_table_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_INFO.tsv",
@@ -29,8 +30,8 @@ rule create_deseq_output:
     input:
         summary_table = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2.tsv",
         summary_table_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_INFO.tsv",
-        R_path = "../tcga_deseq/resources/DESeq2_diffexp_multifactor.R",
-        script_file = "../tcga_deseq/scripts/create_deseq_output.py"
+        R_path = os.path.join(script_path, "resources/DESeq2_diffexp_multifactor.R"),
+        script_file = os.path.join(script_path, "scripts/create_deseq_output.py")
     output:
         #summary_out = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_results_summary.tsv",
         deseq_counts = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.tsv", in_de=['IN', 'DE'], count_type=['nt', 'raw', 'norm', 'vsd']),
@@ -61,7 +62,7 @@ rule create_deseq_lifeline_plots:
         summary_table_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_INFO.tsv",
         deseq_counts = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.tsv",
         deseq_result = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_log2f{in_de}CREASE_result.tsv",
-        script_file = "../tcga_deseq/scripts/create_deseq_lifeline_plots.py"
+        script_file = os.path.join(script_path, "scripts/create_deseq_lifeline_plots.py")
     output:
         deseq_lifeline_pdf = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline.pdf",
         deseq_lifeline_tsv = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline.tsv.gz",
@@ -85,7 +86,7 @@ rule merge_summaries:
         summary_table_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_INFO.tsv",
         summary_table_complement = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_complement.tsv",
         summary_table_complement_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_DESeq2_complement_INFO.tsv",
-        script_file = "../tcga_deseq/scripts/merge_summaries.py"
+        script_file = os.path.join(script_path, "scripts/merge_summaries.py")
     output:
         summary_table_both = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_counts.tsv",
         summary_table_both_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_counts_INFO.tsv",
@@ -116,8 +117,8 @@ rule create_counts_all_cases:
     input:
         summary_table_both = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_counts.tsv",
         summary_table_both_info = "{output_path}/{project}/DESeq2/DESeq2_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_counts_INFO.tsv",
-        R_path = "../tcga_deseq/resources/DESeq2_create_counts_all_cases.R",
-        script_file = "../tcga_deseq/scripts/create_counts_all_cases.py"
+        R_path = os.path.join(script_path, "resources/DESeq2_create_counts_all_cases.R"),
+        script_file = os.path.join(script_path, "scripts/create_counts_all_cases.py")
     output:
         deseq_counts = temp(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_{count_type}_counts_all_cases.tsv",  count_type=['nt', 'raw', 'norm', 'vsd'])),
     conda:
@@ -145,28 +146,28 @@ rule gzip_counts_all_cases:
 
 rule create_deseq_lifeline_validation:
     """
-                                               |     ENSG     |      
-                                               |--------------|
-                                               |              | 
-                                               |     ja       |
-                                               |   /    \     |
-                                    in therapy?|--        KM  |   
-                                   /           |   \    /     |
-                               hoch  50%       |    nein      |
-                              /      |         |              |
-    - KP including every case:  ---median      |              |
-                              \      |         |              |
-                               tief  50%       |     ja       |
-                                   \           |   /    \     |
-                                    in therapy?|--        KM  |   
-                                               |   \    /     |   
-                                               |    nein      |
+                                                      |     ENSG     |      
+                                                      |--------------|
+                                                      |              | 
+                                                      |     ja       |
+                                                      |   /    \     |
+                                    in therapy? ----- |--        KM  |   
+                                   /                  |   \    /     |
+                               hoch  ca. 50%          |    nein      |
+                              /      |                |              |
+    - KP including every case:  --- mean of medians   |              |
+                              \      |                |              |
+                               tief  ca. 50%          |     ja       |
+                                   \                  |   /    \     |
+                                    in therapy? ----- |--        KM  |   
+                                                      |   \    /     |   
+                                                      |    nein      |
     """
     input:
         meta_table = "{output_path}/{project}/DESeq2/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
         deseq_lifeline_tsv = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline.tsv.gz",
         counts = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_{count_type}_counts_all_cases.gz",
-        script_file = "../tcga_deseq/scripts/create_deseq_lifeline_plots_validation.py",
+        script_file = os.path.join(script_path, "scripts/create_deseq_lifeline_plots_validation.py"),
     output:
         deseq_lifeline_tsv_UP = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline_UP_val.tsv.gz",
         deseq_lifeline_tsv_DOWN = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline_DOWN_val.tsv.gz",
@@ -211,6 +212,8 @@ rule aggregate_lifelines_all:
     tables which must be available after issuing the first Snakefile
     -> at max those tables have 60 rows each
     # aggregation also over threshold
+    # the count_type is a col within deseq_lifeline_aggregated and can be used
+    # in the following evaluation and diff steps
     """
     input:
         # not using a input fct, we rather expand here the thresholds which should be aggregated explicitly, with that its still possible to get different aggregated results for different threshold combinations:
@@ -218,7 +221,7 @@ rule aggregate_lifelines_all:
         lifeline_all = get_lifeline_all, # first lifeline plots with therapy set invoked and validation plot for UP and for DOWN regulated expressions
         # the results are not needed within the aggregate_lifelines_all.py script, but shall be a precondition to run this rule
         deseq_results = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_log2f{in_de}CREASE_result.tsv", in_de=['IN', 'DE']),
-        script_file = "../tcga_deseq/scripts/aggregate_lifelines_all.py"
+        script_file = os.path.join(script_path, "scripts/aggregate_lifelines_all.py")
     output:
         deseq_lifeline_aggregated = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_aggregated.{{end}}", threshold_str=threshold_str),
         #deseq_lifeline_aggregated = "/scr/DESeq2_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
@@ -232,18 +235,23 @@ rule aggregate_lifelines_all:
         "scripts/aggregate_lifelines_all.py"
 
 rule evaluate_lifelines_all:
+    """
+    the evaluation is done count_type specific and not count_type overlapping
+    the specific count_type is ovarhanded through the given wildcard
+    """
     input:
         deseq_lifeline_aggregated = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
+        script_file = os.path.join(script_path, "scripts/evaluate_lifelines_all.py")
     output:
-        deseq_lifeline_eval = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated.tsv.gz", threshold_str=threshold_str),
-        deseq_lifeline_eval_pdfs = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated.pdf", threshold_str=threshold_str),
+        deseq_lifeline_eval = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.tsv.gz", threshold_str=threshold_str),
+        deseq_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.pdf", threshold_str=threshold_str)),
         #deseq_lifeline_aggregated = "/scr/DESeq2_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
     conda:
         "envs/pandas_pypdf.yaml"
     threads:
         1
     log:
-        "{output_path}/{project}/DESeq2/logs/evaluate_lifelines_all/{drug_combi}_{gender}_{cutoff}.log",
+        "{output_path}/{project}/DESeq2/logs/evaluate_lifelines_all/{drug_combi}_{gender}_{cutoff}_{count_type}.log",
     script:
         "scripts/evaluate_lifelines_all.py"
 

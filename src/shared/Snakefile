@@ -1,10 +1,17 @@
-configfile: "config.yaml"
+#configfile: "config.yaml"
 import glob
 import os
 import pandas as pd
-script_path = workflow.basedir
 
 threshold_str = config['thresh']
+
+script_path = workflow.basedir
+#script_path = snakemake.workflow.script_path
+# the script path will change depending on the main module we have acces from
+# to it, but the scripts invoked here are always withing the shared dir, so go
+# one dir up an reenter into shared (eiterh from shared back into shared or
+# metilene into shrared or deseq into shared:
+script_path = os.path.join(script_path, os.path.pardir, 'shared')
 
 
 rule download_helpfiles:
@@ -27,7 +34,7 @@ rule edit_annotation:
     """
     input:
         annot_input = expand("{{output_path}}/metadata/{gtf_gz}", gtf_gz=config['gtf.gz']),
-        script_file = "scripts/edit_annotation.py"
+        script_file = os.path.join(script_path, "scripts/edit_annotation.py")
     output:
         annot_output = expand("{{output_path}}/metadata_processed/{gtf}_genes_transcripts.gz", gtf=config['gtf'])
     log:
@@ -119,7 +126,7 @@ rule merge_meta_tables:
         expand("{script_path}/resources/GCv36_Manifests/{{project}}.tsv", script_path=script_path),
         get_aliquot_table,  # input[1-5]
         expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file']), # input[0]
-        "scripts/create_merged_tables.py",
+        os.path.join(script_path, "scripts/create_merged_tables.py"),
     output:
         #"{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/merged_meta_tables.tsv",
         "{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv"
@@ -178,15 +185,38 @@ rule plot_diffs:
     """
     input:
         lifeline_aggregated = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
-        script_file = "scripts/plot_thresh_diff.py"
+        script_file = os.path.join(script_path, "scripts/plot_thresh_diff.py")
     output:
-        plot_diffs = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_diffs_{{plot_type}}.pdf", threshold_str=threshold_str),
-        plot_diffs_table = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_diffs_{{plot_type}}.tsv.gz", threshold_str=threshold_str),
+        plot_diffs = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_diffs_{{plot_type}}-{{count_type}}.pdf", threshold_str=threshold_str),
+        plot_diffs_table = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_diffs_{{plot_type}}-{{count_type}}.tsv.gz", threshold_str=threshold_str),
     conda:
         "envs/seab_matplot_plotl.yaml"
     threads:
         1
     log:
-        "{output_path}/{project}/{pipeline}/logs/plot_diffs/{drug_combi}_{gender}_{cutoff}_{plot_type}.log",
+        "{output_path}/{project}/{pipeline}/logs/plot_diffs/{drug_combi}_{gender}_{cutoff}_{plot_type}_{count_type}.log",
+    script:
+        "scripts/plot_thresh_diff.py"
+
+rule plot_diffs_eval:
+    """
+    for every found ensg or start of a DMR, plot the pval or the life mean
+    diff, also together, if applied, with the different thresholds invoked
+    -> just for the evaluated features (scored ones)
+    -> the evaluated tables are also called lifeline_aggregated in the input to
+    keep reusability of the same script
+    """
+    input:
+        lifeline_aggregated = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_lifelines_evaluated-{{count_type}}.tsv.gz", threshold_str=threshold_str),
+        script_file = os.path.join(script_path, "scripts/plot_thresh_diff.py")
+    output:
+        plot_diffs = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_eval_diffs_{{plot_type}}-{{count_type}}.pdf", threshold_str=threshold_str),
+        plot_diffs_table = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_eval_diffs_{{plot_type}}-{{count_type}}.tsv.gz", threshold_str=threshold_str),
+    conda:
+        "envs/seab_matplot_plotl.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/{pipeline}/logs/plot_diffs_eval/{drug_combi}_{gender}_{cutoff}_{plot_type}_{count_type}.log",
     script:
         "scripts/plot_thresh_diff.py"

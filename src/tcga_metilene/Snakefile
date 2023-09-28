@@ -1,12 +1,19 @@
 import os
 import pandas as pd
 import glob
-configfile: '../shared/config.yaml'
+#configfile: '../shared/config.yaml'
 include: "../shared/Snakefile"
 
+#configfile: os.path.join(script_path, os.path.pardir, os.path.pardir, 'shared/config.yaml')
+#include: os.path.join(script_path, os.path.pardir, os.path.pardir, 'shared/Snakefile')
 threshold_str = config['thresh']
 threshold_list = config['thresh_list']
+# for shared resources, the shrarad path is needed
 
+#(Pdb) workflow.basedir
+#'/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene'
+script_path = workflow.basedir
+shared_path = os.path.join(script_path, os.path.pardir, 'shared')
 def get_data_files(wildcards):
     OUTPUT_PATH = wildcards[0]
     project = wildcards[1].split('_')
@@ -33,6 +40,7 @@ rule create_summary_table:
         meta_file = "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
         manifest_file = expand("{{output_path}}/metadata/{manifest}", manifest=config['manifest_file']),
         data_files = get_data_files,
+        script_file = os.path.join(script_path, "scripts/create_summary_table.py")
     output:
         out_file = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
         out_file_complement = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv",
@@ -59,7 +67,7 @@ rule create_metilene_out:
     # filter specific
     -c	minimum (>=) CpGs (default:10)
     we apply first alive, then dead, 
-    a negative mean methylation difference is going to be alive up, a positive means alive down
+    a positive mean methylation difference is going to be alive up, a positive means alive down
 
     """
     input:
@@ -71,8 +79,6 @@ rule create_metilene_out:
         "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05.bedgraph", 
     conda:
         "envs/metilene.yaml"
-    threads:
-        10
     log:
         "{output_path}/{project}/metilene/logs/create_metilene_out/{drug_combi}_{gender}_{cutoff}.log",
     conda:
@@ -90,7 +96,7 @@ rule metilene_intersect_tables:
         #meta_info = "{output_path}/{project}/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv",
         # is this actually needed?
         metilene_input = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
-        script_file = "../tcga_metilene/scripts/bed_intersect_metilene.py"
+        script_file = os.path.join(script_path, "scripts/bed_intersect_metilene.py")
     output:
         out_file = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv"
     conda:
@@ -124,7 +130,8 @@ rule metilene_plot_DMR_heatmaps:
     input:
         metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
         metilene_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05.out",
-        R_heatmap_script = "../tcga_metilene/scripts/metilene_heatmap.R"
+        R_heatmap_script = os.path.join(script_path, "scripts/metilene_heatmap.R"),
+        script_file = os.path.join(script_path, "scripts/metilene_heatmap.py"),
     output:
         pdf_heatmap_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_heatmaps_beta_value_{DMR}.pdf",
     conda:
@@ -146,8 +153,8 @@ rule create_metilene_lifeline_plots:
         metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
         meta_table = "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
         annot_file = expand("{{output_path}}/metadata_processed/{gtf}_genes_transcripts.gz", gtf=config['gtf']),
-        annot_file_2 = "../shared/resources/annot_from_betafile.tsv.gz",
-        script_file = "../tcga_metilene/scripts/create_lifeline_plots.py"
+        annot_file_2 = os.path.join(shared_path, "resources/annot_from_betafile.tsv.gz"),
+        script_file = os.path.join(script_path, "scripts/create_lifeline_plots.py")
     output:
         lifeline_out_pdf = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{DMR}.pdf",
         lifeline_out_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{DMR}.tsv",
@@ -204,8 +211,8 @@ rule DMR_plot_validation:
         summary = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
         summary_complement = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene_complement.tsv",
         annot_file = expand("{{output_path}}/metadata_processed/{gtf}_genes_transcripts.gz", gtf=config['gtf']),
-        annot_file_2 = "../shared/resources/annot_from_betafile.tsv.gz",
-        script_file = "../tcga_metilene/scripts/create_lifeline_plots_validation.py"
+        annot_file_2 = os.path.join(shared_path, "resources/annot_from_betafile.tsv.gz"),
+        script_file = os.path.join(script_path, "scripts/create_lifeline_plots_validation.py")
     output:
         UP_val_plot = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{DMR}_UP_val.pdf",
         UP_val_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{DMR}_UP_val.tsv",
@@ -327,7 +334,7 @@ rule aggregate_lifelines_all:
         # the results are not needed within the aggregate_lifelines_all.py script, but shall be a precondition to run this rule
         #metilene_results = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/metilene_log2f{in_de}CREASE_result.tsv", in_de=['IN', 'DE']),
         #metilene_results = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv"
-        script_file = "../tcga_metilene/scripts/aggregate_lifelines_all.py"
+        script_file = os.path.join(script_path, "scripts/aggregate_lifelines_all.py")
     output:
         metilene_lifeline_aggregated = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
         #metilene_lifeline_aggregated = "/scr/metilene_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
@@ -341,11 +348,16 @@ rule aggregate_lifelines_all:
         "scripts/aggregate_lifelines_all.py"
 
 rule evaluate_lifelines_all:
+    """
+    including here the beta-val "wildcard", s.t. this is set as count-type, in
+    the shared diff plot rule 
+    """
     input:
         metilene_lifeline_aggregated = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
+        evaluate_script = os.path.join(script_path, "scripts/evaluate_lifelines_all.py")
     output:
-        metilene_lifeline_eval = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated.tsv.gz", threshold_str=threshold_str),
-        metilene_lifeline_eval_pdfs = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated.pdf", threshold_str=threshold_str),
+        metilene_lifeline_eval = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.tsv.gz", threshold_str=threshold_str),
+        metilene_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.pdf", threshold_str=threshold_str)),
         #metilene_lifeline_aggregated = "/scr/metilene_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
     conda:
         "envs/pandas_pypdf.yaml"
@@ -356,6 +368,12 @@ rule evaluate_lifelines_all:
     script:
         "scripts/evaluate_lifelines_all.py"
 
+#rule aggregate_evaluated:
+#    """
+#    bring together every outcome associated with the results in the evaluated
+#    table:
+#    """
+#    input:
 #TODO this can be merged in the shared Snakefile, the only difference is
 #depending on the pipeline, what to use as xticks, in metilene, tist the chr -
 #start and in deseq the ensg 

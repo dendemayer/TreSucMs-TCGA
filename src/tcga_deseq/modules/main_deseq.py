@@ -16,7 +16,7 @@ src/tcga_deseq/Snakefile
 
 
 def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
-              threshold, cores, pipeline):
+              threshold, cores, pipeline, config_file_shared):
 
     SCRIPT_PATH = os.path.split(__file__)[0]
 
@@ -30,10 +30,8 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     else:
         PROJECTS = PROJECT
 
-    DRUG_str = '_'.join(DRUGS)
+    DRUG_str = '_'.join(sorted(DRUGS))
 
-    shared_workdir = os.path.join(
-        os.path.split(os.path.split(SCRIPT_PATH)[0])[0], 'shared')
     Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], 'Snakefile')
 
     summary_tables_list = create_summary_table.create_summary_table(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs)
@@ -46,13 +44,22 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # the DESeq2 results are created now, based on them the lifelineplots
     # created, ENSG is within the filenames
     ###########################################################################
+    # # TODO uncomment this
+    workflow = snakemake.snakemake(snakefile=Snakefile,
+                                   targets=Snakemake_all_files,
+                                   workdir=OUTPUT_PATH, cores=cores,
+                                   forceall=False, force_incomplete=True,
+                                   dryrun=False, use_conda=True,
+                                   printshellcmds=True, quiet=False,
+                                   unlock=False, config={'thresh': thresh_str,
+                                                         'thresh_list':
+                                                         thresh_list}, configfiles=[config_file_shared])
+    if not workflow:
+        print('snakemake execution failed, exiting now')
+        os._exit(0)
     # TODO uncomment this
-    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=False, use_conda=True, printshellcmds=True, quiet=False, unlock=False)
-    # TODO uncomment this
-    ###########################################################################
-    ###########################################################################
+    # ###########################################################################
+    # ###########################################################################
 
     deseq_lifeline_list = create_deseq_lifeline_plots.create_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold)
     Snakemake_all_files = Snakemake_all_files + deseq_lifeline_list
@@ -67,22 +74,22 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # plottet:
     # DESeq2_log2f_DECREASE_norm_ENSG00000000005_lifeline.tsv
     # with the both validation outputs:
-        # DESeq2_log2f_DECREASE_norm_ENSG00000000005_lifeline_DOWN_val.tsv
-        # DESeq2_log2f_DECREASE_norm_ENSG00000000005_lifeline_UP_val.tsv
+    # DESeq2_log2f_DECREASE_norm_ENSG00000000005_lifeline_DOWN_val.tsv
+    # DESeq2_log2f_DECREASE_norm_ENSG00000000005_lifeline_UP_val.tsv
 
     ###########################################################################
     #     here the lifelineplots are created, both, base and validation plots #
     ###########################################################################
-    ### TODO uncomment this !!!!
-    # workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=False, use_conda=True,
-    #                     rerun_triggers='mtime', printshellcmds=True,
-    #                     quiet=False, config={'thresh': thresh_str, 'thresh_list': thresh_list})
+    # # ## TODO uncomment this !!!!
+    workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=OUTPUT_PATH, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True,
+                        rerun_triggers='mtime', printshellcmds=True,
+                        quiet=False, config={'thresh': thresh_str, 'thresh_list': thresh_list}, configfiles=[config_file_shared])
     # ### TODO uncomment this !!!!
-    # if not workflow:
-    #     print('snakemake run failed, exiting now')
-    #     os._exit(0)
+    if not workflow:
+        print('snakemake run failed, exiting now')
+        os._exit(0)
     ###############################################################################
     ## the previous snakemake runs must be completed before requesting the next
     # aggregated files. all lifeline base and validation plots must be
@@ -98,8 +105,12 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # DESeq2_lifelines_evaluated.pdf:
     evaluate_lifelines_list = [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_lifelines_evaluated.tsv.gz') for i in aggregate_lifelines_list]
     evaluate_lifelines_list = evaluate_lifelines_list + [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_lifelines_evaluated.pdf') for i in aggregate_lifelines_list]
+    eval_new = []
+    for count_type in ['raw_count', 'norm_count', 'nt_count']:
+        for eval_file in evaluate_lifelines_list:
+            eval_new.append(eval_file.replace('evaluated', f'evaluated-{count_type}'))
 
-    Snakemake_all_files = Snakemake_all_files + evaluate_lifelines_list
+    Snakemake_all_files = Snakemake_all_files + eval_new
 
     # DESeq2_plot_diffs.pdf:
     plot_diffs_all = []
@@ -107,14 +118,22 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     for plot_type in plot_types:
         for i in aggregate_lifelines_list:
             plot_diffs_all.append(i.replace('lifelines_aggregated.tsv.gz', f'plot_diffs_{plot_type}.pdf'))
+    plot_diffs_new = []
+    for plot in plot_diffs_all:
+        for count_type in ['raw_count', 'norm_count', 'nt_count']:
+            plot_diffs_new.append(plot.replace('.pdf', f'-{count_type}.pdf'))
 
-    Snakemake_all_files = Snakemake_all_files + plot_diffs_all
+    Snakemake_all_files = Snakemake_all_files + plot_diffs_new
+    plot_diffs_eval_all = [i.replace('plot_diffs', 'plot_eval_diffs') for i in plot_diffs_new]
+    Snakemake_all_files = Snakemake_all_files + plot_diffs_eval_all
 
+    #report_file = os.path.join(OUTPUT_PATH, PROJECTS[-1], pipeline, f'{pipeline}_output', DRUG_str, 'report.html')
     workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-                        workdir=shared_workdir, cores=cores, forceall=False,
+                        workdir=OUTPUT_PATH, cores=cores, forceall=False,
                         force_incomplete=True, dryrun=False, use_conda=True,
                         rerun_triggers='mtime', printshellcmds=True,
-                        quiet=False, verbose=False, config={'thresh': thresh_str, 'thresh_list': thresh_list})
+                        quiet=False, verbose=False, config={'thresh': thresh_str, 'thresh_list': thresh_list}, configfiles=[config_file_shared])
+                        #quiet=False, verbose=False, config={'thresh': thresh_str, 'thresh_list': thresh_list}, report=report_file)
 
     if not workflow:
         print('snakemake run failed, exiting now')

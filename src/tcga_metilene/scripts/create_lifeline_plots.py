@@ -41,7 +41,7 @@ lifeline_out_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi
 
 include the mean median difference!:
 """
-# # # # #################################################
+# # # # # #################################################
 sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 
 metilene_intersect = snakemake.input[0]
@@ -53,6 +53,10 @@ DMR = snakemake.wildcards.DMR
 lifeline_out_pdf = snakemake.output.lifeline_out_pdf
 lifeline_out_tsv = snakemake.output.lifeline_out_tsv
 threshold = snakemake.wildcards.threshold
+cutoff = snakemake.wildcards.cutoff.split('_')[1]
+drug_combi = snakemake.wildcards.drug_combi.replace('_', ';')
+project = ', '.join(snakemake.wildcards.project.split('_'))
+gender = ', '.join(snakemake.wildcards.gender.split('_'))
 
 print('# snakemake inputs:')
 [print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
@@ -68,6 +72,60 @@ print('# snakemake wildcards:')
 ###############################################################################
 # #                                 test_input                                  #
 # ###############################################################################
+# # snakemake inputs:
+# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/metilene_intersect.tsv"
+# meta_table = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-LUSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+# annot_file = "/scr/palinca/gabor/TCGA-pipeline_3/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
+# annot_file_2 = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/../shared/resources/annot_from_betafile.tsv.gz"
+# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/scripts/create_lifeline_plots.py"
+# # snakemake output:
+# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27141798_27144197.pdf"
+# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27141798_27144197.tsv"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_3"
+# project = "TCGA-LUSC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "male"
+# cutoff = "cutoff_0"
+# threshold = "threshold_5"
+# DMR = "chr7_27141798_27144197"
+
+# # snakemake inputs:
+# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/metilene_intersect.tsv"
+# meta_table = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-HNSC/metilene/merged_meta_files/cutoff_5/meta_info_druglist_merged_drugs_combined.tsv"
+# annot_file = "/scr/palinca/gabor/TCGA-pipeline_3/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
+# annot_file_2 = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/../shared/resources/annot_from_betafile.tsv.gz"
+# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/scripts/create_lifeline_plots.py"
+# # snakemake output:
+# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_20/metilene_intersect_lifeline_plot_chr11_122099576_122101477.pdf"
+# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_20/metilene_intersect_lifeline_plot_chr11_122099576_122101477.tsv"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_3"
+# project = "TCGA-HNSC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female_male"
+# cutoff = "cutoff_5"
+# threshold = "threshold_20"
+# DMR = "chr11_122099576_122101477"
+
+# # snakemake inputs:
+# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv"
+# meta_table = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+# annot_file = "/scr/palinca/gabor/TCGA-pipeline_3/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
+# annot_file_2 = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/../shared/resources/annot_from_betafile.tsv.gz"
+# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/scripts/create_lifeline_plots.py"
+# # snakemake output:
+# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr2_176150267_176153069_temp.pdf"
+# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr2_176150267_176153069_temp.tsv"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_3"
+# project = "TCGA-CESC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female"
+# cutoff = "cutoff_0"
+# threshold = "threshold_5"
+# DMR = "chr2_176150267_176153069"
+
 # snakemake inputs:
 # metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv"
 # meta_table = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
@@ -207,12 +265,16 @@ DF_metilene = DF_metilene.loc[(slice(None), slice(None), slice(None), DMR), :]
 
 # threshold % over or under the median
 thresh = float(threshold.split('_')[1])
-# set every beta value which is to close to the median to pd.NA:
+# add the mean of medians directly into the metielen DF:
+DF_dead_median = DF_metilene.loc[:, ('dead',slice(None),slice(None),slice(None),slice(None))].median(axis=1)
+DF_alive_median = DF_metilene.loc[:, ('alive',slice(None),slice(None),slice(None),slice(None))].median(axis=1)
+DF_mean_of_median = pd.concat([DF_alive_median, DF_dead_median], axis=1).mean(axis=1)
+DF_mean_of_median.name = 'mean_median'
+new_index = DF_metilene.index.to_frame().join(DF_mean_of_median.to_frame()).set_index('mean_median', append=True).index
+DF_metilene.index = new_index
+
 def apply_thresh(row):
-    median_alive = row.loc['alive', slice(None), slice(None), slice(None), slice(None)].median()
-    median_dead = row.loc['dead', slice(None), slice(None), slice(None), slice(None)].median()
-    mean_median = st.mean([median_alive, median_dead])
-    # beta_val_max = row.max()
+    mean_median = row.name[-1]
     limit_val = (thresh/100) * mean_median
     upper_limit = mean_median + limit_val
     lower_limit = mean_median - limit_val
@@ -220,8 +282,9 @@ def apply_thresh(row):
     return row_thresh
 
 DF_metilene = DF_metilene.apply(apply_thresh, axis=1)
-# throw away positions where after thresh appliance the start positions just hold
-# NA
+# # throw away positions where after thresh appliance the start positions just hold
+# # NA
+
 DF_metilene.dropna(how='all', inplace=True)
 
 #############################################
@@ -268,21 +331,21 @@ DF_meta = DF_meta[T.notna()]
 starts = [i[1] for i in DF_metilene.index]
 p_value = 0
 pvalue_list = []
+DF_starts = []
 
 for start in starts:
-    DF_metilene_temp = DF_metilene.loc[
-        (slice(None), start, slice(None), slice(None)), :]
-    # the median is calculated correctly, also with nans present
-    alive_median = DF_metilene_temp.loc[:, ('alive', slice(None), slice(None), slice(None), slice(None))].median(axis=1).values[0]
-    dead_median =  DF_metilene_temp.loc[:, ('dead', slice(None), slice(None), slice(None), slice(None))].median(axis=1).values[0]
-    mean_median = st.mean([alive_median, dead_median])
-    ## thresh depending, some beta values got dropped, consider them correctly:
-    cases_to_delete = [i[1] for i in DF_metilene_temp.loc[
-        :, DF_metilene_temp.isna().values[0]].columns]
-    DF_metilene_temp = DF_metilene_temp.drop(cases_to_delete, axis=1, level=1)
-
-    # # also T and E must be adjusted here correctly
-    DF_meta_temp = DF_meta[~DF_meta.index.isin(cases_to_delete)]
+    # threshold is already apllied for each start position, the UP and DOWN
+    # grouping is performed here
+    # limit DF to the start:
+    DF_metilene_temp = DF_metilene.loc[ (slice(None), start, slice(None), slice(None)), :]
+    # drop beta values which are marked as nans by threshold:
+    DF_metilene_temp = DF_metilene_temp.dropna(axis=1)
+    # get the mean_median, which was set in threshold def apply_thresh(row):
+    mean_median = DF_metilene_temp.index.values[-1][-1]
+    cases_kept = [ i[1] for i in DF_metilene_temp.columns]
+    # limit the DF_mete to the used cases:
+    DF_meta_temp = DF_meta.loc[cases_kept, :]
+    # # also T and E must be adjusted here correctly,
     T = DF_meta_temp['T']
     E = DF_meta_temp['vital_status'] == 'dead' #  E is a either boolean or binary array
 
@@ -291,17 +354,27 @@ for start in starts:
     S_temp = DF_metilene_temp.loc[(slice(None), start, slice(None), slice(None)), :].apply(lambda x: 'UP' if float(x) > mean_median else 'DOWN')
     # UP_bool = (S_temp == 'UP').values
     # DOWN_bool = (S_temp == 'DOWN').values
-    DF_temp_2 = S_temp.to_frame().reset_index()
-    DF_temp_2['T'] = T.values
-    DF_temp_2['E'] = E.values
-    DF_temp_2['UP'] = DF_temp_2[0].apply(lambda x: True if x=='UP' else False)
+    DF_start = S_temp.to_frame().reset_index()
+    DF_start['T'] = T.values
+    DF_start['E'] = E.values
+    DF_start['UP'] = DF_start[0].apply(lambda x: True if x=='UP' else False)
     try:
         # results = logrank_test(T[UP_bool], T[DOWN_bool], E[UP_bool], E[DOWN_bool])
         # changing to the cox regression test: -> see lifeine hint on https://lifelines.readthedocs.io/en/latest/lifelines.statistics.html
         # and further reading on: https://discourse.datamethods.org/t/when-is-log-rank-preferred-over-univariable-cox-regression/2344
-        cph = CoxPHFitter().fit(DF_temp_2.loc[:, ['UP', 'T', 'E']], 'T', 'E')
+        cph = CoxPHFitter().fit(DF_start.loc[:, ['UP', 'T', 'E']], 'T', 'E')
+        p_value = cph.summary['p'].values[0]
+        # p_value = results.p_value
+        pvalue_list.append(p_value)
+        DF_start['start'] = start
+        DF_start['p_value'] = p_value
+        DF_start['mean_median'] = mean_median
+        DF_starts.append(DF_start)
     except Exception as e:
         print(e)
+        # if thats not feasable we set an p_value of 1:
+        pvalue_list.append(1)
+        DF_starts.append(pd.DataFrame())
         # lifelines.exceptions.ConvergenceError: Convergence halted due to
         # matrix inversion problems. Suspicion is high collinearity. Please see
         # the following tips in the lifelines documentation:
@@ -310,35 +383,46 @@ for start in starts:
         # -- in that case, every start position is problematic, because the
         # events (E) holds True or False for every position of the case set,
         # write empty files in that case as well:
-        open(lifeline_out_pdf, 'a').close()
-        pd.DataFrame(columns=['case_id', 'drugs', 'gender', 'projects',
-                              'UP_or_DOWN', 'beta_value', 'vital_status',
-                              'survivaltime', 'years_to_last_follow_up', 'T',
-                              'E', 'mean_median', 'DMR', 'p_value', 'start', 'chr',
-                              'threshold', 'fst_life_mean', 'scnd_life_mean',
-                              'plot_type', 'ENSG', 'gene_type', 'gene_status',
-                              'gene_name']).to_csv(lifeline_out_tsv, sep='\t',
-                                                   index=False)
-        os._exit(0)
+        # open(lifeline_out_pdf, 'a').close()
+        # pd.DataFrame(columns=['case_id', 'drugs', 'gender', 'projects',
+        #                       'UP_or_DOWN', 'beta_value', 'vital_status',
+        #                       'survivaltime', 'years_to_last_follow_up', 'T',
+        #                       'E', 'mean_median', 'DMR', 'p_value', 'start', 'chr',
+        #                       'threshold', 'fst_life_mean', 'scnd_life_mean',
+        #                       'plot_type', 'ENSG', 'gene_type', 'gene_status',
+        #                       'gene_name']).to_csv(lifeline_out_tsv, sep='\t',
+        #                                            index=False)
+        # os._exit(0)
 
-    p_value = cph.summary['p'].values[0]
-    # p_value = results.p_value
-    pvalue_list.append(p_value)
 
 # take the lowest p_value, testet through all postitions:
+if min(pvalue_list) == 1:
+    open(lifeline_out_pdf, 'a').close()
+    pd.DataFrame(
+        columns=['case_id', 'drugs', 'gender', 'projects', 'UP_or_DOWN',
+                  'beta_value', 'vital_status', 'survivaltime',
+                  'years_to_last_follow_up', 'T', 'E', 'mean_median', 'DMR',
+                  'p_value', 'start', 'chr', 'threshold', 'fst_life_mean',
+                  'scnd_life_mean', 'plot_type', 'ENSG', 'gene_type',
+                  'gene_status', 'gene_name']).to_csv(lifeline_out_tsv,
+                                                      sep='\t', index=False)
+    os._exit(0)
 plot_index = pvalue_list.index(min(pvalue_list))
-p_value = pvalue_list[plot_index]
-DF_beta = DF_metilene.iloc[
-    plot_index, :][DF_metilene.iloc[plot_index, :].notna().values]
-alive_median = DF_beta.loc[('alive', slice(None), slice(None), slice(None), slice(None))].median()
-dead_median = DF_beta.loc[('dead', slice(None), slice(None), slice(None), slice(None))].median()
-mean_median = st.mean([alive_median, dead_median])
-DF_plot = DF_beta.apply(lambda x: 'UP' if float(x) > mean_median else 'DOWN')
+# get the best start DF through the minimum pvalue :
+DF_start = DF_starts[plot_index]
+DF_start.rename({0: 'UP_or_DOWN'}, axis=1, inplace=True)
+# p_value = pvalue_list[plot_index]
+# DF_beta = DF_metilene.iloc[ plot_index, :].dropna()
+# alive_median = DF_beta.loc[('alive', slice(None), slice(None), slice(None), slice(None))].median()
+# dead_median = DF_beta.loc[('dead', slice(None), slice(None), slice(None), slice(None))].median()
+# mean_median = st.mean([alive_median, dead_median])
+# DF_plot = DF_beta.apply(lambda x: 'UP' if float(x) > mean_median else 'DOWN')
 
+p_value = DF_start['p_value'].values[0]
 p_value_str = f'p_value = {Decimal(str(min(pvalue_list))):.2e}'
 # again, consider the threshold dependend betavalue which are maybe set to NA:
-cases_to_delete = [i[1] for i in DF_metilene.loc[
-    :, DF_metilene.isna().values[0]].columns]
+# cases_to_delete = [i[1] for i in DF_metilene.loc[
+    # :, DF_metilene.isna().values[0]].columns]
 
 
 # kmf.fit(T, event_observed=E)  # or, more succinctly, kmf.fit(T, E)
@@ -354,7 +438,7 @@ cases_to_delete = [i[1] for i in DF_metilene.loc[
 # 0.0445787454608645
 # just write 2 emtpy files:
 
-if DF_plot.value_counts().index.nunique() != 2:
+if DF_start['UP_or_DOWN'].value_counts().index.nunique() != 2:
     open(lifeline_out_pdf, 'a').close()
     pd.DataFrame(
         columns=['case_id', 'drugs', 'gender', 'projects', 'UP_or_DOWN',
@@ -366,12 +450,12 @@ if DF_plot.value_counts().index.nunique() != 2:
                                                       sep='\t', index=False)
     os._exit(0)
 else:
-    cases_to_keep = [i[1] for i in DF_plot.index]
-    DF_meta = DF_meta.loc[cases_to_keep]
-    T = DF_meta['T']
-    E = DF_meta['E']
-    UP_bool = (DF_plot == 'UP').values
-    DOWN_bool = (DF_plot == 'DOWN').values
+    # cases_to_keep = [i[1] for i in DF_plot.index]
+    # DF_meta = DF_meta.loc[cases_to_keep]
+    T = DF_start['T']
+    E = DF_start['E']
+    UP_bool = (DF_start['UP_or_DOWN'] == 'UP').values
+    DOWN_bool = (DF_start['UP_or_DOWN'] == 'DOWN').values
     fig, ax = plt.subplots(figsize=(8, 6))
     kmf_UP = KaplanMeierFitter()
     kmf_UP.fit(T[UP_bool], E[UP_bool], label='UP')
@@ -385,35 +469,37 @@ else:
 
     add_at_risk_counts(kmf_UP, kmf_DOWN, ax=ax)
     ax.set_title(
-        f'{p_value_str}, threshold = {threshold.split("_")[1]} \nDMR: {": ".join(DMR.split("_")[:2]) + "-" + DMR.split("_")[2]}\nStart: {str(starts[plot_index])}')
+        f'{p_value_str}, threshold = {threshold.split("_")[1]} \nDMR: {": ".join(DMR.split("_")[:2]) + "-" + DMR.split("_")[2]}, Start: {str(starts[plot_index])}\n{project}, {drug_combi}, {gender}, cutoff={cutoff}')
 
     plt.tight_layout()
     print(f'saving: {lifeline_out_pdf}')
     plt.savefig(lifeline_out_pdf)
     plt.close()
 
-    DF = pd.concat([kmf_UP.survival_function_, kmf_DOWN.survival_function_],
-                   axis=1)
-    DF_beta = DF_beta.to_frame()
-    DF_beta.columns = ['beta_value']
-    DF_beta = DF_beta.reset_index(level=[0, 2, 3, 4], drop=True)
-    DF_plot = DF_plot.to_frame()
-    DF_plot.columns = ['UP_or_DOWN']
-    DF_plot = DF_plot.reset_index(level=[0, 2, 3, 4]).drop('vital_status', axis=1)
-    DF = pd.concat([DF_plot, DF_beta, DF_meta], axis=1)
-    DF['mean_median'] = mean_median
-    DF['DMR'] = DMR
-    DF['p_value'] = p_value
-    DF['start'] = starts[plot_index]
+    # DF = pd.concat([kmf_UP.survival_function_, kmf_DOWN.survival_function_], axis=1)
+    # DF_beta = DF_beta.to_frame()
+    # DF_beta.columns = ['beta_value']
+    # DF_beta = DF_beta.reset_index(level=[0, 2, 3, 4], drop=True)
+    # DF_plot = DF_plot.to_frame()
+    # DF_plot.columns = ['UP_or_DOWN']
+    # DF_plot = DF_plot.reset_index(level=[0, 2, 3, 4]).drop('vital_status', axis=1)
+    # DF = pd.concat([DF_plot, DF_beta, DF_meta], axis=1)
+
+    DF_meta.index.name='case_id'
+    # add survivaltime and years_to_last_follow_up to the start DF
+    DF_start = DF_start.set_index('case_id').join(DF_meta.loc[:, ['survivaltime', 'years_to_last_follow_up']])
     start = starts[plot_index]
+    DF_beta = DF_metilene.loc[(slice(None), start, slice(None), slice(None)),:].reset_index(drop=True).T.reset_index().loc[:, ['case_id', 0]].set_index('case_id')
+    DF_beta.columns = ['beta_value']
+    DF_start = DF_start.join(DF_beta)
+    DF_start['DMR'] = DMR
     chrom = DMR.split('_')[0]
-    DF['chr'] = chrom
-    DF['threshold'] = thresh
-    DF['fst_life_mean'] = UP_life_expectancy_mean
-    DF['scnd_life_mean'] = DOWN_life_expectancy_mean
-    DF['plot_type'] = 'base_plot'
-    DF.index.name = 'case_id'
-    DF = DF.reset_index()
+    DF_start['chr'] = chrom
+    DF_start['threshold'] = thresh
+    DF_start['fst_life_mean'] = UP_life_expectancy_mean
+    DF_start['scnd_life_mean'] = DOWN_life_expectancy_mean
+    DF_start['plot_type'] = 'base_plot'
+    DF_start = DF_start.reset_index()
     #####
     ### cannot find :
     # (Pdb) chrom 'chr11' (Pdb) start 115505380 -> DF['ENSG'] = DF_annot['ENSG'].values[0]
@@ -450,14 +536,16 @@ else:
     if DF_annot.empty:
         DF_annot_2 = pd.read_table(annot_file_2).set_index('chr').loc[chrom,:].reset_index()
         DF_annot_2 = DF_annot_2[(DF_annot_2['start'] <= start) & (DF_annot_2['stop'] > start)].loc[:, ["ENST", "gene_type", "gene_status", "gene_name"]]
-        DF['ENSG'] = DF_annot_2['ENST'].values[0]
-        DF['gene_type'] = DF_annot_2['gene_type'].values[0]
-        DF['gene_status'] = DF_annot_2['gene_status'].values[0]
-        DF['gene_name'] = DF_annot_2['gene_name'].values[0]
+        DF_start['ENSG'] = DF_annot_2['ENST'].values[0]
+        DF_start['gene_type'] = DF_annot_2['gene_type'].values[0]
+        DF_start['gene_status'] = DF_annot_2['gene_status'].values[0]
+        DF_start['gene_name'] = DF_annot_2['gene_name'].values[0]
     else:
-        DF['ENSG'] = DF_annot['ENSG'].values[0]
-        DF['gene_type'] = DF_annot['gene_type'].values[0]
-        DF['gene_status'] = DF_annot['gene_status'].values[0]
-        DF['gene_name'] = DF_annot['gene_name'].values[0]
+        DF_start['ENSG'] = DF_annot['ENSG'].values[0]
+        DF_start['gene_type'] = DF_annot['gene_type'].values[0]
+        DF_start['gene_status'] = DF_annot['gene_status'].values[0]
+        DF_start['gene_name'] = DF_annot['gene_name'].values[0]
     print(f'saving: {lifeline_out_tsv}')
-    DF.to_csv(lifeline_out_tsv, sep='\t', index=None)
+    DF_start = DF_start.loc[:,['case_id', 'drugs', 'gender', 'projects', 'UP_or_DOWN', 'beta_value', 'vital_status', 'survivaltime', 'years_to_last_follow_up', 'T', 'E', 'mean_median', 'DMR', 'p_value', 'start', 'chr', 'threshold', 'fst_life_mean', 'scnd_life_mean', 'plot_type', 'ENSG', 'gene_type', 'gene_status', 'gene_name']]
+    DF_start.to_csv(lifeline_out_tsv, sep='\t', index=None)
+

@@ -39,6 +39,19 @@ drug_combi = snakemake.wildcards.drug_combi
 #                                  test set                                   #
 ###############################################################################
 
+# # snakemake inputs:
+# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_4/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv"
+# metilene_out = "/scr/palinca/gabor/TCGA-pipeline_4/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_qval.0.05.out"
+# R_heatmap_script = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/scripts/metilene_heatmap.R"
+# # snakemake output:
+# pdf_heatmap_out = "/scr/palinca/gabor/TCGA-pipeline_4/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect_heatmaps_beta_value_chr7_27163810_27167288.pdf"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_4"
+# project = "TCGA-CESC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female"
+# cutoff = "cutoff_0"
+# DMR = "chr7_27163810_27167288"
 
 # import countmatrix as:
 #                 │ 0       │ 1     │ 2
@@ -70,7 +83,7 @@ drug_combi = snakemake.wildcards.drug_combi
 
 cutoff = cutoff.split('_')[1]
 
-met_int_DF = pd.read_table(metilene_intersect, index_col=[0, 1, 2, 3], header=[0, 1, 2, 3, 4])
+met_int_DF = pd.read_table(metilene_intersect, index_col=[0, 1, 2, 3], header=[0, 1, 2, 3, 4], na_values="-").dropna(how='all')
 # limit the beta_val to plot right away to the recent DMR
 met_int_DF = met_int_DF.loc[(slice(None), slice(None), slice(None), DMR ), :]
 # selecting increasing and decreasing methylations
@@ -97,7 +110,12 @@ cols.to_csv(header_temp, sep='\t')
 met_int_DF.columns = range(0, met_int_DF.shape[1])
 beta_val_temp = pdf_heatmap_out.replace('.pdf', '_input_temp.tsv')
 print(f'saving temp file for metilene_heatmap.R {beta_val_temp}')
-met_int_DF.to_csv(beta_val_temp, sep='\t')
+# breakpoint() # metilene needs empty values to be written as '-', but thats
+# problematic in R pheatmap, change them to "" or delete the entyre row of all
+# are NaNs
+# this frame is handed over to R, in case there are values missing for some
+# patients, the still would be NAs, write 0, s.t. they can be plottet correctly
+met_int_DF.to_csv(beta_val_temp, sep='\t', na_rep="0")
 
 
 ###

@@ -76,7 +76,7 @@ project = snakemake.wildcards.project
 try:
     # DF_summary = pd.read_table(meta_info)
     DF_met_out = pd.read_table(qval_out, header=None)
-    DF_met_input = pd.read_table(metilene_input, na_values='.').dropna(how='any')
+    DF_met_input = pd.read_table(metilene_input, na_values='-').dropna(how='any')
     # if the DF_met_out DF is empty, nothing can be intersected, independent of
     # the content of the metilene input (metilene_input) table, at this point, an
     # empty DF out can be written as result of this step
@@ -131,7 +131,7 @@ DF_met_inp_out = DF_met_inp_out.set_index('region', append=True)
 # DF_met_inp_out.loc[(slice(None), slice(None), slice(None), range_), :]
 # problem solved with dropping not present betavalues whilst reading in the
 # input for metilene:
-# DF_met_input = pd.read_table(metilene_input, na_values='.').dropna(how='all')
+# DF_met_input = pd.read_table(metilene_input, na_values='-').dropna(how='all')
 # if intersected_out=='/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_paclitaxel/female_male/cutoff_0/metilene_complement_intersect.tsv':
     # breakpoint()
 print(f'saving {out_file}')

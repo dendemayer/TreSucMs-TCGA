@@ -30,6 +30,11 @@ ENSG = snakemake.wildcards.ENSG
 count_type = snakemake.wildcards.count_type + '_count'
 DRUGS = snakemake.wildcards.drug_combi.split('_')
 
+drug_combi = snakemake.wildcards.drug_combi.replace('_', ';')
+cutoff = snakemake.wildcards.cutoff.split('_')[1]
+project = ', '.join(snakemake.wildcards.project.split('_'))
+gender = ', '.join(snakemake.wildcards.gender.split('_'))
+
 print('# snakemake inputs:')
 [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
 
@@ -231,7 +236,7 @@ kmf_NO_THERAPY.plot_survival_function(ax=ax)
 add_at_risk_counts(kmf_THERAPY, kmf_NO_THERAPY, ax=ax)
 p_value_DOWN_str = f'p_value_DOWN = {Decimal(str(p_value_DOWN)):.2e}'
 
-ax.set_title(f'{p_value_DOWN_str}, threshold = {round(thresh)}\nENSG: {ENSG}')
+ax.set_title(f'{p_value_DOWN_str}, threshold = {round(thresh)}\nENSG: {ENSG}\n{project}, {drug_combi}\n{project}, {drug_combi}, {gender}, cutoff={cutoff}')
 
 plt.tight_layout()
 print(f'saving: {deseq_lifeline_pdf_DOWN}')
@@ -260,7 +265,7 @@ kmf_NO_THERAPY.plot_survival_function(ax=ax)
 
 add_at_risk_counts(kmf_THERAPY, kmf_NO_THERAPY, ax=ax)
 p_value_UP_str = f'p_value_UP = {Decimal(str(p_value_UP)):.2e}'
-ax.set_title(f'{p_value_UP_str}, threshold = {round(thresh)}\nENSG: {ENSG}')
+ax.set_title(f'{p_value_UP_str}, threshold = {round(thresh)}\nENSG: {ENSG}\n{project}, {drug_combi}, {gender}, cutoff={cutoff}')
 
 plt.tight_layout()
 print(f'saving: {deseq_lifeline_pdf_UP}')

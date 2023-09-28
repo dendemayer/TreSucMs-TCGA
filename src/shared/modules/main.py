@@ -117,6 +117,10 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
         thresholds.append(0)
     threshold = sorted(list(set(thresholds)))
 
+    thresh_list = [f'threshold_{str(i)}' for i in threshold]
+    thresh_str = '_'.join(thresh_list)
+
+
     # temp=("-p TCGA-CESC" "-p TCGA-HNSC" "-p TCGA-LUSC" "-p TCGA-ESCA" "-p TCGA-BRCA" "-p TCGA-GBM" "-p TCGA-OV" "-p TCGA-LUAD" "-p TCGA-UCEC" "-p TCGA-KIRC" "-p TCGA-LGG" "-p TCGA-THCA" "-p TCGA-PRAD" "-p TCGA-SKCM" "-p TCGA-COAD" "-p TCGA-STAD" "-p TCGA-BLCA" "-p TCGA-LIHC" "-p TCGA-KIRP" "-p TCGA-SARC" "-p TCGA-PAAD" "-p TCGA-PCPG" "-p TCGA-READ" "-p TCGA-TGCT" "-p TCGA-THYM" "-p TCGA-KICH" "-p TCGA-ACC" "-p TCGA-MESO" "-p TCGA-UVM" "-p TCGA-DLBC" "-p TCGA-UCS" "-p TCGA-CHOL")
     # temp=("-p TCGA-CESC" "-p TCGA-HNSC")
     print('PROJECT:\t\t', PROJECT)
@@ -125,12 +129,13 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     print(f'cutoff:\t\t\t{cutoffs}')
     print(f'threshold:\t\t{threshold}')
 
-    shared_workdir = os.path.join(
+    shared_scriptdir = os.path.join(
         os.path.split(os.path.split(SCRIPT_PATH)[0])[0], 'shared')
+
     Snakemake_all_files = []
 
     Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], 'Snakefile')
-    config_file_shared = os.path.join(shared_workdir, 'config.yaml')
+    config_file_shared = os.path.join(shared_scriptdir, 'config.yaml')
 
     # help files for both pipelines, like:
     # OUTPUT_PATH/metadata/gdc_manifest_20211029_data_release_31...,
@@ -140,11 +145,14 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     Snakemake_all_files = Snakemake_all_files + help_file_list
     # once we have to call snakemake in prior, s.t. the manifest file is
     # present on which all the following selections are done on, make sure that
-    # here the dryrun flag is not set to False
+    # here the dryrun flag is not set to True
     # TODO uncomment this !!!
-    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=False, use_conda=True)
+    workflow =  snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                         workdir=OUTPUT_PATH, cores=cores, forceall=False,
+                         force_incomplete=True, dryrun=False, use_conda=True, config={'thresh': thresh_str, 'thresh_list': thresh_list}, configfiles=[config_file_shared])
+    if not workflow:
+        print('snakemake execution failed, exiting now')
+        os._exit(0)
     # TODO uncomment this !!!
 
     # auxfiles for both pipelines:
@@ -174,7 +182,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
 
     print('running snakemake with\n')
     print(f'Snakefile:\t{Snakefile}')
-    print(f'shared_workdir:\t{shared_workdir}')
+    print(f'shared_scriptdir:\t{shared_scriptdir}')
 
     # also add the multi proj meta_info_druglist_merged_drugs_combined.tsv
     # which is just the concatenation of the single proj pendants:
@@ -190,16 +198,21 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
 
     Snakemake_all_files = Snakemake_all_files + merged_drugs_combined_list
 
+    ########################################################################
     # TODO uncomment this !!!
+    ########################################################################
     # # rerun_trggers='mtime' IMPORTANT -> the needed input data is generated via
     # # input function in shared snakefile for rule merge_meta_tables:
     # # without this option this rule would be ran everytime, since everything
     # # following is based on those aux file, every rule would be triggered
     # # then again
-    # snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=shared_workdir, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=False, use_conda=True,
-    #                     rerun_triggers='mtime')
+    workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=OUTPUT_PATH, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=False, use_conda=True,
+                        rerun_triggers='mtime', config={'thresh': thresh_str, 'thresh_list': thresh_list}, configfiles=[config_file_shared])
+    if not workflow:
+        print('snakemake execution failed, exiting now')
+        os._exit(0)
     ########################################################################
     # TODO uncomment this !!!
     ########################################################################
@@ -210,8 +223,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # pipeline specific main files:
     if 'metilene' in execute:
         main_metilene.entry_fct(OUTPUT_PATH, PROJECT, DRUGS,
-                                Snakemake_all_files, cutoffs, threshold, cores, 'metilene')
+                                Snakemake_all_files, cutoffs, threshold,
+                                cores, 'metilene', config_file_shared)
     if 'DESeq2' in execute:
         print('entering deseq entry fct')
         main_deseq.entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
-                             cutoffs, threshold, cores, 'DESeq2')
+                             cutoffs, threshold, cores, 'DESeq2', config_file_shared)

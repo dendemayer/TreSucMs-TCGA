@@ -33,6 +33,10 @@ deseq_lifeline_pdf = snakemake.output.deseq_lifeline_pdf
 deseq_lifeline_tsv = snakemake.output.deseq_lifeline_tsv
 ENSG = snakemake.wildcards.ENSG
 count_type = snakemake.wildcards.count_type + '_count'
+cutoff = snakemake.wildcards.cutoff.split('_')[1]
+drug_combi = snakemake.wildcards.drug_combi.replace('_', ';')
+project = ', '.join(snakemake.wildcards.project.split('_'))
+gender = ', '.join(snakemake.wildcards.gender.split('_'))
 
 print('# snakemake inputs:')
 [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
@@ -252,7 +256,7 @@ except Exception as e:
 p_value = cph.summary['p'].values[0]
 p_value_str = f'p_value = {Decimal(str(p_value)):.2e}'
 
-ax.set_title(f'{p_value_str}, threshold = {threshold.split("_")[1]}\nENSG: {ENSG}')
+ax.set_title(f'{p_value_str}, threshold = {threshold.split("_")[1]}\nENSG: {ENSG}\n{project}, {drug_combi}\n{gender}, cutoff={cutoff}')
 
 plt.tight_layout()
 print(f'saving: {deseq_lifeline_pdf}')
