@@ -44,7 +44,7 @@ count_type = snakemake.wildcards.count_type
 
 DF_eval = pd.read_table(deseq_lifeline_aggregated)
 if DF_eval.empty:
-    DF_eval.to_csv(deseq_lifeline_eval)
+    DF_eval.to_csv(deseq_lifeline_eval, sep='\t')
     open(deseq_lifeline_eval_pdfs, 'a').close()
     os._exit(0)
 

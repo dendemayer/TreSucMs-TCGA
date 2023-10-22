@@ -430,7 +430,7 @@ breaksList <- seq(min(table_counts_normalized_MF[row_names_inc, ]), max(table_co
 
 #cat('results_ddsMF[select_increase_log2Fold,] normalized')
 #head(results_ddsMF[select_increase_log2Fold,])
-heatmap_outname_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_norm.pdf")
+heatmap_outname_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_norm_counts.pdf")
 cat('writing DESeq2 normTransform in:\t', heatmap_outname_pdf, '\n')
 
 pdf(heatmap_outname_pdf)
@@ -456,7 +456,7 @@ row_names_dec <- row.names(results_ddsMF_temp[1:select_size,])
 breaksList <- seq(min(table_counts_normalized_MF[row_names_dec, ]), max(table_counts_normalized_MF[row_names_dec, ]), by = max(table_counts_normalized_MF[row_names_dec, ]) / 10000)
 #cat('results_ddsMF[select_decrease_log2Fold,] normalized')
 #head(results_ddsMF[select_decrease_log2Fold,])
-heatmap_outname_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_norm.pdf")
+heatmap_outname_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_norm_counts.pdf")
 cat('writing DESeq2 normTransform in:\t', heatmap_outname_pdf, '\n')
 pdf(heatmap_outname_pdf)
 # #The assay function is used to extract the matrix of normalized values.
@@ -478,7 +478,7 @@ breaksList <- seq(min(assay(ntd)[row_names_inc,]), max(assay(ntd)[row_names_inc,
 heatmap_outname_tsv=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_nt_counts.tsv")
 write.table(as.data.frame(assay(ntd)[row_names_inc,]), file = heatmap_outname_tsv, quote = FALSE, sep = "\t", col.names=TRUE)
 
-heatmap_outname_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_nt.pdf")
+heatmap_outname_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fINCREASE_nt_counts.pdf")
 cat('writing DESeq2 normTransform Increase in:\t', heatmap_outname_pdf, '\n')
 pdf(heatmap_outname_pdf)
 # #The assay function is used to extract the matrix of normalized values.
@@ -496,7 +496,7 @@ breaksList <- seq(min(assay(ntd)[row_names_dec,]), max(assay(ntd)[row_names_dec,
 
 #cat('results_ddsMF[select_decrease_log2Fold,] nt')
 #head(results_ddsMF[select_decrease_log2Fold,])
-heatmap_outname_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_nt.pdf")
+heatmap_outname_pdf=file.path(OUTPUT_PATH, "DESeq2_heatmap_log2fDECREASE_nt_counts.pdf")
 cat('writing DESeq2 normTransform in:\t', heatmap_outname_pdf, '\n')
 pdf(heatmap_outname_pdf)
 # #The assay function is used to extract the matrix of normalized values.

@@ -132,3 +132,5 @@ src/shared/modules/not_needed/
 src/tcga_deseq/resources/.RData
 src/tcga_deseq/resources/.Rhistory
 src/tcga_deseq/.snakemake/
+src/shared/dag.pdf
+src/tcga_deseq/scripts/create_deseq_output_temp.py

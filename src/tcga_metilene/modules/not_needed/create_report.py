@@ -418,7 +418,7 @@ def create_report_pdf(OUTPUT_PATH, DRUGS, SCRIPT_PATH, PROJECT_DRUG_UUID,
             log_file = pdf_file.replace(OUTPUT_PATH + os.path.sep, '')
             logger.info('REPORT_17:\t{}'.format(log_file))
         except subprocess.CalledProcessError:
-            breakpoint()
+            # breakpoint()
             print('\nfailed to create the report pdf, ')
             print('do you have installed latex?\n')
             return

@@ -49,6 +49,11 @@ for base_plot that would be comparison between UP and DOWN lifeexpancy,
 for UP_validation, that would be comparison between IN therapy or NOT IN therapy
 for DOWN_validation, that would be comparison between IN therapy or NOT IN therapy
 
+
+a base plot is labeled an UP plot if the first life mean is higher than the scnd life mean (and vice verca) (fst is UP)
+the UP_validation plot is labeled UP if fst_life_mean is higher than the scnd life mean (and vice verca)  (fst is in therapy)
+the DOWN_validation plot is labeled DOWN if the fst_life_mean is higher than the scnd life mean (and vice verca) (fst is in therapy)
+
 also include the threshold info.
 """
 
@@ -207,9 +212,9 @@ DOWN: baseplot p_val_down  -> UP_val_plot p_val_high   -> DOWN_val_down p_val_do
 p_values of interest, but also the diff of the life_means ? what would be
 interesting is, whether or not an treatment can cause a shorter lifeexpancy
 
-a base plot is labeled an UP plot if the first life mean is higher than the scnd life mean (and vice verca)
-the UP_validation plot is labeled UP if fst_life_mean is higher than the scnd life mean (and vice verca)
-the DOWN_validation plot is labeled DOWN if the fst_life_mean is higher than the scnd life mean (and vice verca)
+a base plot is labeled an UP plot if the first life mean is higher than the scnd life mean (and vice verca) (fst is UP)
+the UP_validation plot is labeled UP if fst_life_mean is higher than the scnd life mean (and vice verca)  (fst is in therapy)
+the DOWN_validation plot is labeled DOWN if the fst_life_mean is higher than the scnd life mean (and vice verca) (fst is in therapy)
 """
 DF_aggr['CMP'] = 'CMP'
 

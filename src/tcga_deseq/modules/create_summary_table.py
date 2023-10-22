@@ -6,7 +6,6 @@ def create_summary_table(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs):
     for project in PROJECTS:
         for gender in ['female', 'male', 'female_male']:
             for cutoff in cutoffs:
-                cutoff = f'cutoff_{str(cutoff)}'
                 summary_tables.append(
                     os.path.join(
                         OUTPUT_PATH, project,

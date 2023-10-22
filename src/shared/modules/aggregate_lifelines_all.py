@@ -14,7 +14,6 @@ def aggregate_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs,
     for project in PROJECTS:
         for gender in ['female', 'female_male', 'male']:
             for cutoff in cutoffs:
-                cutoff = f'cutoff_{str(cutoff)}'
                 metilene_path = os.path.join(
                     OUTPUT_PATH, project, f'{pipeline}/{pipeline}_output',
                     DRUG_str, gender, cutoff)

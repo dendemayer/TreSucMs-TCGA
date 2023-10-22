@@ -55,7 +55,7 @@ def Choose_project():
     while True:
         inp = input(
             'enter your choices one by one,' +
-            ' if you are finnished, just type "Enter": ')
+            ' when you are done, simply press "Enter": ')
         if inp == "":
             break
         else:
@@ -144,7 +144,7 @@ def Choose_drugs(SCRIPT_PATH, PROJECTS):
     while True:
         inp = input(
             'enter your choices one by one,' +
-            ' if you are finnished, just type "Enter": ')
+            ' when you are done, simply press "Enter": ')
         if inp == "":
             break
         else:

@@ -35,6 +35,7 @@ rule create_summary_table:
     given (dead/alive, female/male) create metilene input tables
     # every data file for the belonging project must be downloaded, since not
     # just the selection of drugs is invoked, but also the complement
+    - empty values are represented as "-" for metilene compatibility 
     """
     input:
         meta_file = "{output_path}/{project}/metilene/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
@@ -47,7 +48,7 @@ rule create_summary_table:
     conda:
         "../shared/envs/pandas_natsort.yaml"
     threads:  # although no threads are applied, limit the process since the table creations needs a lot of ram
-        5
+        10
     log:
         "{output_path}/{project}/metilene/logs/create_summary_table/{drug_combi}_{gender}_{cutoff}.log",
     script:
@@ -112,7 +113,8 @@ rule metilene_plot_DMR_regions:
     as box and lineplots:
     """
     input:
-        metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv"
+        metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
+        script_file = os.path.join(script_path, "scripts/plot_DMR_regions.py"),
     output:
         pdf_boxplot_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_boxplot_beta_value_{DMR}.pdf",
         pdf_lineplot_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_lineplot_median_beta_value_{DMR}.pdf" 
@@ -133,7 +135,7 @@ rule metilene_plot_DMR_heatmaps:
         R_heatmap_script = os.path.join(script_path, "scripts/metilene_heatmap.R"),
         script_file = os.path.join(script_path, "scripts/metilene_heatmap.py"),
     output:
-        pdf_heatmap_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_heatmaps_beta_value_{DMR}.pdf",
+        pdf_heatmap_out = report("{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_heatmaps_beta_value_{DMR}.pdf", category="metilene", subcategory = "{project}-{gender}-heatmaps"),
     conda:
         "../shared/envs/pheatmap.yaml"
     log:
@@ -357,7 +359,7 @@ rule evaluate_lifelines_all:
         evaluate_script = os.path.join(script_path, "scripts/evaluate_lifelines_all.py")
     output:
         metilene_lifeline_eval = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.tsv.gz", threshold_str=threshold_str),
-        metilene_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.pdf", threshold_str=threshold_str)),
+        metilene_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.pdf", threshold_str=threshold_str), category="metilene", subcategory = "{project}-{gender}-evaluated-survivalplots"),
         #metilene_lifeline_aggregated = "/scr/metilene_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
     conda:
         "envs/pandas_pypdf.yaml"

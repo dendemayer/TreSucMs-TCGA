@@ -11,7 +11,6 @@ def return_bed_interesect_metilene_files(OUTPUT_PATH, PROJECTS, DRUGS,
     for project in PROJECTS:
         for gender in ['female', 'male', 'female_male']:
             for cutoff in cutoffs:
-                cutoff = f'cutoff_{str(cutoff)}'
                 file_list.append(
                     os.path.join(
                         OUTPUT_PATH, project,
@@ -58,7 +57,6 @@ def return_DMR_merge_plots(OUTPUT_PATH, PROJECTS, DRUGS, cutoffs, threshold):
     # if len(PROJECT) > 1:
     #     PROJECT.append('_'.join(sorted([x.upper() for x in PROJECT])))
     thresholds = [f'threshold_{str(i)}' for i in threshold]
-    cutoffs = [f'cutoff_{str(i)}' for i in cutoffs]
     for project in PROJECTS:
         for gender in ['female', 'male', 'female_male']:
             for cutoff in cutoffs:

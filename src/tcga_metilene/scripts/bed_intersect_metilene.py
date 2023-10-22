@@ -55,6 +55,18 @@ project = snakemake.wildcards.project
 #                                  test set:                                  #
 ###############################################################################
 
+# # snakemake inputs:
+# qval_out = "/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/metilene_qval.0.05.out"
+# metilene_input = "/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_input_table/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/summary_for_metilene.tsv"
+# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/scripts/bed_intersect_metilene.py"
+# # snakemake output:
+# out_file = "/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/metilene_intersect.tsv"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_5"
+# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female"
+# cutoff = "cutoff_5"
 # # -rw-r--r-- 1 gabor studentslegacy 8K  6. Jul 21:30 /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/scripts/bed_intersect_metilene.py
 # # snakemake inputs:
 # qval_out = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/metilene_qval.0.05.out"
@@ -76,7 +88,7 @@ project = snakemake.wildcards.project
 try:
     # DF_summary = pd.read_table(meta_info)
     DF_met_out = pd.read_table(qval_out, header=None)
-    DF_met_input = pd.read_table(metilene_input, na_values='-').dropna(how='any')
+    DF_met_input = pd.read_table(metilene_input, na_values='-')
     # if the DF_met_out DF is empty, nothing can be intersected, independent of
     # the content of the metilene input (metilene_input) table, at this point, an
     # empty DF out can be written as result of this step
@@ -94,6 +106,8 @@ except Exception as e:
 
 DF_met_input['End'] = DF_met_input['Start']
 DF_met_input = pd.concat([DF_met_input.loc[:, ['Chromosome', 'Start', 'End']], DF_met_input.drop(['Chromosome', 'Start', 'End'], axis=1)], axis=1).sort_values(['Chromosome', 'Start'], key=natsort_keygen())
+# the dropna(how='all') is only now usable, otherwise the index was not index
+# and interpreted as values
 
 
 #######
@@ -135,7 +149,10 @@ DF_met_inp_out = DF_met_inp_out.set_index('region', append=True)
 # if intersected_out=='/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_paclitaxel/female_male/cutoff_0/metilene_complement_intersect.tsv':
     # breakpoint()
 print(f'saving {out_file}')
-DF_met_inp_out.to_csv(out_file, sep='\t')
+# DONE single empty values are just set as dot from bedtools, turn them into
+# nans, and on writing into '-' !
+DF_met_inp_out.replace('.', pd.NA, inplace=True)
+DF_met_inp_out.to_csv(out_file, sep='\t', na_rep=0)
 
 # to read it correctly with the MI use header and index_col:
 # pd.read_table('/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines/TCGA-CESC/metilene/metilene_output/carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv', header=[0,1,2,3,4], index_col=[0,1,2])

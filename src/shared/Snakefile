@@ -3,13 +3,22 @@ import glob
 import os
 import pandas as pd
 
-threshold_str = config['thresh']
+include: "../tcga_deseq/Snakefile"
+include: "../tcga_metilene/Snakefile"
 
-script_path = workflow.basedir
-#script_path = snakemake.workflow.script_path
+threshold_str = config['thresh']   # 'threshold_0_threshold_5_threshold_10_threshold_20'
+OUTPUT_PATH = config['OUTPUT_PATH']
+projects_str = config['projects_str']  # 'TCGA-CESC_TCGA-HNSC'
+PROJECTS = projects_str.split('_')  # ['TCGA-CESC', 'TCGA-HNSC']
+if len(PROJECTS) != 1:
+    PROJECTS.append(projects_str)
+pipelines = config['pipelines']  # ['DESeq2', 'metilene']
+pipeline_str = '_'.join(pipelines)
+drug_str = config['drug_str']
+script_path = workflow.basedir  #  '/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared'
 # the script path will change depending on the main module we have acces from
 # to it, but the scripts invoked here are always withing the shared dir, so go
-# one dir up an reenter into shared (eiterh from shared back into shared or
+# one dir up an reenter into shared (either from shared back into shared or
 # metilene into shrared or deseq into shared:
 script_path = os.path.join(script_path, os.path.pardir, 'shared')
 
@@ -177,6 +186,34 @@ rule merge_meta_tables_multiproj:
     #    import pandas as pd
     #    pd.concat([pd.read_table(i) for i in input]).to_csv(output[0], sep='\t', index=False)
 
+rule create_patient_plots:
+    """
+    based on the meta table (single project with rule merge_meta_tables and
+    multi proj with rule merge_meta_tables_multiproj) make plots of the
+    patients invoked, their survivaldata an age:
+    /scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/metilene/merged_meta_files/cutoff_0/
+    """
+    input:
+        meta_table = "{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
+        script_file = os.path.join(script_path, "scripts/create_patient_plots.py")
+    output:
+        final_pdf = report("{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_final.pdf", category="{pipeline}", subcategory="{project}-patient_overview"),
+        plot_file_age = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_age.pdf',
+        plot_file_age_in_therapy = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_age_in_therapy.pdf',
+        plot_file_age_not_in_therapy = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_age_not_in_therapy.pdf',
+        plot_file_survival = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_survival.pdf',
+        plot_file_survival_in_therapy = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_survival_in_therapy.pdf',
+        plot_file_survival_not_in_therapy = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_survival_not_in_therapy.pdf',
+        out_md_vital = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_vital.md',
+        out_pdf_vital = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_vital.pdf',
+    conda:
+        "envs/pandas_pypdf_seaborn.yaml"
+    log:
+        "{output_path}/{project}/{pipeline}/logs/create_patient_overview/{cutoff}.log"
+    params:
+        drug_str = drug_str,
+    script:
+        "scripts/create_patient_plots.py"
 
 rule plot_diffs:
     """
@@ -187,7 +224,7 @@ rule plot_diffs:
         lifeline_aggregated = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
         script_file = os.path.join(script_path, "scripts/plot_thresh_diff.py")
     output:
-        plot_diffs = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_diffs_{{plot_type}}-{{count_type}}.pdf", threshold_str=threshold_str),
+        plot_diffs = report(expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_diffs_{{plot_type}}-{{count_type}}.pdf", threshold_str=threshold_str), category="{pipeline}", subcategory = "{project}-{gender}-lifeline_differences"),
         plot_diffs_table = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_diffs_{{plot_type}}-{{count_type}}.tsv.gz", threshold_str=threshold_str),
     conda:
         "envs/seab_matplot_plotl.yaml"
@@ -210,7 +247,7 @@ rule plot_diffs_eval:
         lifeline_aggregated = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_lifelines_evaluated-{{count_type}}.tsv.gz", threshold_str=threshold_str),
         script_file = os.path.join(script_path, "scripts/plot_thresh_diff.py")
     output:
-        plot_diffs = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_eval_diffs_{{plot_type}}-{{count_type}}.pdf", threshold_str=threshold_str),
+        plot_diffs = report(expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_eval_diffs_{{plot_type}}-{{count_type}}.pdf", threshold_str=threshold_str), category="{pipeline}", subcategory= "{project}-{gender}-lifeline_differences_evaluated"),
         plot_diffs_table = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_eval_diffs_{{plot_type}}-{{count_type}}.tsv.gz", threshold_str=threshold_str),
     conda:
         "envs/seab_matplot_plotl.yaml"
@@ -220,3 +257,74 @@ rule plot_diffs_eval:
         "{output_path}/{project}/{pipeline}/logs/plot_diffs_eval/{drug_combi}_{gender}_{cutoff}_{plot_type}_{count_type}.log",
     script:
         "scripts/plot_thresh_diff.py"
+
+def get_eval_input(wildcards):
+    """
+    returning all input files needed to create f.e.: 
+    /scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/DESeq2_metilene/carboplatin_carboplatin,paclitaxel_cisplatin/final_majority_vote.tsv
+    """
+    #(Pdb) [ i for i in wildcards.items()]
+    #[('output_path', '/scr/palinca/gabor/TCGA-pipeline_5'), ('project', 'TCGA-CESC_TCGA-HNSC'), ('pipeline_str', 'DESeq2_metilene'), ('drug_str', 'carboplatin_carboplatin,paclitaxel_cisplatin')]
+    output_path = wildcards.output_path
+    projects_str = wildcards.project
+    pipeline_str = wildcards.pipeline_str
+    drug_str = wildcards.drug_str
+    cutoffs = config['cutoffs']  # [0, 5, 8]
+    cutoff_strs = ['cutoff_' + str(i) for i in cutoffs]  # ['cutoff_0', 'cutoff_5', 'cutoff_8']
+    types = config['types']  # ['norm_counts', 'beta_vals']
+    # requesting.
+    #/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/DESeq2_metilene/carboplatin_carboplatin,paclitaxel_cisplatin/final_majority_vote.tsv
+    # invoking f.e.:
+    #/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.tsv.gz
+    #/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/DESeq2/DESeq2_output/carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_evaluated-norm_count.tsv.gz
+    evaluated_tables = []
+    for pipeline, type_  in zip(pipelines, types):
+        for project in PROJECTS:
+            for gender in ['female', 'male', 'female_male']:
+                for cutoff in cutoff_strs:
+                    evaluated_tables.append(os.path.join(output_path, project, pipeline, f'{pipeline}_output', drug_str, gender, cutoff, threshold_str, f'{pipeline}_lifelines_evaluated-{type_}.tsv.gz' ))
+    return evaluated_tables
+
+rule majority_vote_all:
+    """
+    over the applied pipelines, aggregate every found outcome, make a majority
+    vote which genesymbols are found the most over the configuration of the
+    pipeline call
+    for every deseq ensg we have the genesymbol available, not necessarily
+    for every ENSG/ENST the genesymbol for metilene output -> fallback
+    solution: use the DMR where the respective start is from, different
+    starts of the same DMR are then aggregated (evantually a intersection is
+    then needed)
+    -
+    to be able to aggregate over both, or one of both tables, the input
+    function is not devided into the pipelines, the separation is then
+    performed within the script if needed
+    """
+    input:
+        evaluated_tables = get_eval_input,
+        annot = expand("{{output_path}}/metadata_processed/{gtf}_genes_transcripts.gz", gtf=config['gtf']),
+        HM450_annot = os.path.join(script_path, os.path.pardir,'tcga_metilene', 'resources', 'HM450.hg38.manifest.gencode.v36.tsv.gz'),
+        script_file = os.path.join(script_path, "scripts/majority_vote_all.py")
+    output:
+        major_table =  '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote.tsv.gz',
+        venn_project = '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_venn_projects.pdf',
+        venn_pipeline = '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_venn_pipeline.pdf',
+        md_aggr =  '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project.md',
+        pdf_aggr =  '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project.pdf',
+        pdf_final =  report('{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project_final.pdf', category="{pipeline_str}", subcategory="final_majority_vote"),
+        #major_table =  expand('{{output_path}}/{{project}}/{{pipeline_str}}/{{drug_str}}/final_majority_vote.tsv.gz', output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str),
+        #venn_project = expand('{{output_path}}/{{project}}/{{pipeline_str}}/{{drug_str}}/final_majority_vote_venn_projects.pdf', output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str),
+        #venn_pipeline = expand('{{output_path}}/{{project}}/{{pipeline_str}}/{{drug_str}}/final_majority_vote_venn_pipeline.pdf', output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str),
+        #md_aggr =  expand('{{output_path}}/{{project}}/{{pipeline_str}}/{{drug_str}}/final_majority_vote_pipeline_project.md', output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str),
+        #pdf_aggr =  expand('{{output_path}}/{{project}}/{{pipeline_str}}/{{drug_str}}/final_majority_vote_pipeline_project.pdf', output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str),
+        #pdf_final =  report(expand('{{output_path}}/{{project}}/{{pipeline_str}}/{{drug_str}}/final_majority_vote_pipeline_project_final.pdf', output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str), category="pipeline_str", subcategory="" ),
+    conda:
+        "envs/pybedtools_matpl_seaborn.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/{pipeline_str}/logs/majority_vote_all/{drug_str}.log",
+        #expand("{{output_path}}/{{project}}/{{pipeline_str}}/logs/majority_vote_all/{{drug_str}}.log",output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str)
+    script:
+        "scripts/majority_vote_all.py"
+

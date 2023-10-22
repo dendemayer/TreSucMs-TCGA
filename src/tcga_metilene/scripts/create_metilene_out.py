@@ -16,6 +16,7 @@ print('# snakemake wildcards:')
 
 summary_table = snakemake.input[0]
 met_prefix = snakemake.output[1]
+gender = snakemake.wildcards.gender
 # check whether we have actually alive and dead groups we can compare
 # check if alive is available in columns (ommit Start and Chromosome col ->
 # iloc[2:,0]), the value count of it must be 2, than
@@ -25,7 +26,13 @@ if len(pd.read_table(summary_table, nrows=1).T.reset_index().iloc[2:,0].str.cont
     temp_DF = pd.DataFrame()
     for i in snakemake.output:
         temp_DF.to_csv(i)
+# if input table is empty, dont start at all:
 elif pd.read_table(summary_table).empty:
+    temp_DF = pd.DataFrame()
+    for i in snakemake.output:
+        temp_DF.to_csv(i)
+# in case female_male gender, but there is just one available, stop
+elif pd.read_table(summary_table, nrows=1).T.reset_index().iloc[2:,0].apply(lambda x: x.split(';')[3]).nunique() == 1 and len(gender.split('_')) == 2:
     temp_DF = pd.DataFrame()
     for i in snakemake.output:
         temp_DF.to_csv(i)

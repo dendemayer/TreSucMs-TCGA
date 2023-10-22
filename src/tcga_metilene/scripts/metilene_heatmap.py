@@ -39,6 +39,23 @@ drug_combi = snakemake.wildcards.drug_combi
 #                                  test set                                   #
 ###############################################################################
 
+# # snakemake inputs: # the CpG with the start chr16 51151149 is not plottet,
+# # because of one missing value, the missing value should be actually be
+# # represented as 0:
+# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/metilene_intersect.tsv"
+# metilene_out = "/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/metilene_qval.0.05.out"
+# R_heatmap_script = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/scripts/metilene_heatmap.R"
+# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/scripts/metilene_heatmap.py"
+# # snakemake output:
+# pdf_heatmap_out = "/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/metilene_intersect_heatmaps_beta_value_chr16_51150443_51153014.pdf"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_5"
+# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female"
+# cutoff = "cutoff_5"
+# DMR = "chr16_51150443_51153014"
+
 # # snakemake inputs:
 # metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_4/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv"
 # metilene_out = "/scr/palinca/gabor/TCGA-pipeline_4/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_qval.0.05.out"

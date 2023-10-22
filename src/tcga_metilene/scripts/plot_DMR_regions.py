@@ -25,18 +25,44 @@ DMR = snakemake.wildcards.DMR
 #                                   test set                                  #
 ###############################################################################
 
+# (Pdb) num_cols
+# 3
 # # snakemake inputs:
-# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/metilene_intersect.tsv"
+# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/metilene_intersect.tsv"
 # # snakemake output:
-# pdf_boxplot_out = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/metilene_intersect_boxplot_beta_value_chr7_83648624_83648822_b.pdf"
-# pdf_lineplot_out = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/metilene_intersect_lineplot_median_beta_value_chr7_83648624_83648822_b.pdf"
+# pdf_boxplot_out = "/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/metilene_intersect_boxplot_beta_value_chr8_140238482_140238568_temp.pdf"
+# pdf_lineplot_out = "/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/metilene_intersect_lineplot_median_beta_value_chr8_140238482_140238568_temp.pdf"
 # # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_2"
-# project = "TCGA-CESC"
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_5"
+# project = "TCGA-CESC_TCGA-HNSC"
 # drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
 # gender = "female_male"
-# cutoff = "cutoff_0"
-# DMR = "chr7_83648624_83648822"
+# cutoff = "cutoff_5"
+# DMR = "chr8_140238482_140238568"
+
+# (Pdb) num_cols
+# 53
+# different width functions needed for box and lineplot:
+# box plot: 53 cols: -> 20 width y=0.24⋅x+7.280000000000001
+# lineplot: 53 cols: -> 13 width y=0.16⋅x+4.52
+
+# box plot: 3 cols: -> 8 width
+# lineplot: 3 cols: -> 5 width
+
+# box fct:
+
+# snakemake inputs:
+# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/metilene_intersect.tsv"
+# # snakemake output:
+# pdf_boxplot_out = "/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/metilene_intersect_boxplot_beta_value_chr6_32095336_32097234_temp.pdf"
+# pdf_lineplot_out = "/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/metilene_intersect_lineplot_median_beta_value_chr6_32095336_32097234_temp.pdf"
+# # snakemake wildcards:
+# output_path = "/scr/palinca/gabor/TCGA-pipeline_5"
+# project = "TCGA-CESC_TCGA-HNSC"
+# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+# gender = "female_male"
+# cutoff = "cutoff_5"
+# DMR = "chr6_32095336_32097234"
 
 ###############################################################################
 #                                   test set                                  #
@@ -106,14 +132,20 @@ hue = DF_to_plot['hue'].to_list()
 DF_to_plot = DF_to_plot.iloc[:, 2:-1]
 hue = hue * DF_to_plot.shape[1]
 DF_to_plot = DF_to_plot.melt()
+num_cols = DF_to_plot['Start'].nunique()
+# figsize = (0.09541062801932366*num_cols + 8.496376811594203, 5)
+figsize = (0.24*num_cols+7.280000000000001, 5)
+# figsize = (7, 5)
+# figsize = (5, 8)
 DF_to_plot.rename({'value': 'beta_value'}, axis=1, inplace=True)
 DF_to_plot['hue'] = hue
 DF_to_plot.sort_values(by=['Start', 'hue'], inplace=True)
 range_title = DMR.split('_')
 range_title = f'{range_title[0]}: {range_title[1]}-{range_title[2]}'
 color_palette = sns.color_palette('coolwarm_r', palette_len)
+sns.set(rc={'figure.figsize':figsize})
 sns.set(style="ticks", palette=color_palette)
-plot = sns.violinplot(x='Start', y='beta_value', hue='hue', data=DF_to_plot)
+plot = sns.boxplot(x='Start', y='beta_value', hue='hue', data=DF_to_plot)
 plt.title(f'Range: {range_title}')
 plot.set_xticklabels(plot.get_xticklabels(), rotation=45)
 plt.legend(title='vital state and projects', bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -121,6 +153,19 @@ plt.tight_layout()
 print(f'saving {pdf_boxplot_out}')
 plot.figure.savefig(pdf_boxplot_out)
 plt.clf()
+plt.cla()
+plt.close()
+
+plot = sns.violinplot(x='Start', y='beta_value', hue='hue', data=DF_to_plot)
+plt.title(f'Range: {range_title}')
+plot.set_xticklabels(plot.get_xticklabels(), rotation=45)
+plt.legend(title='vital state and projects', bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+plt.tight_layout()
+pdf_violinplot_out = pdf_boxplot_out.replace('boxplot', 'violinplot')
+print(f'saving {pdf_violinplot_out}')
+plot.figure.savefig(pdf_violinplot_out)
+plt.clf()
+plt.cla()
 plt.close()
 
 DF_to_plot = DF_DMR.loc[(slice(None), slice(None), slice(None), DMR), :]
@@ -150,10 +195,14 @@ DF_to_plot.rename({'value': 'beta-value median'}, axis=1, inplace=True)
 #     # plt.rcParams["figure.autolayout"] = True
 #     # DF_line_plot['Start'] =
 #     # pd.Categorical(DF_line_plot['Start'])
-plt.figure()
-plt.ticklabel_format(
-    style='plain', axis='x', useOffset=False)
+# plt.figure()
+# plt.ticklabel_format(
+    # style='plain', axis='x', useOffset=False)
 # # style='vital_proj', markers=True
+# figsize = (0.09541062801932366*num_cols + 8.496376811594203, 5)
+figsize = (0.16*num_cols+4.52,  5)
+sns.set(rc={'figure.figsize':figsize})
+sns.set(style="ticks", palette=color_palette)
 plot = sns.lineplot(
     data=DF_to_plot,
     x="Start",
@@ -190,7 +239,6 @@ mean_of_medians = st.mean([alive_median, dead_median])
 muted_green = sns.color_palette("muted")[2]  # You can adjust the index as needed
 # sns.color_palette("muted")
 
-sns.set(style="ticks", palette=color_palette)
 plt.axhline(alive_median, ls = '--', label='alive median', c=color_palette[0])
 plt.axhline(dead_median, ls = '--', label='dead median', c=color_palette[-1])
 plt.axhline(mean_of_medians, ls = '--', label='mean of medians', c=muted_green)

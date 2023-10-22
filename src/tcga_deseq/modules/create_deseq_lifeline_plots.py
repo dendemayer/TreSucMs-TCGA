@@ -7,7 +7,6 @@ def create_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold):
     for project in PROJECTS:
         for gender in ['female', 'male', 'female_male']:
             for cutoff in cutoffs:
-                cutoff = f'cutoff_{str(cutoff)}'
                 deseq_path = os.path.join( OUTPUT_PATH, project, 'DESeq2/DESeq2_output', DRUG_str, gender, cutoff)
                 for thresh in threshold:
                     thr = f'threshold_{str(thresh)}'

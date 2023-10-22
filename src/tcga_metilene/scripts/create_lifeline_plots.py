@@ -36,7 +36,6 @@ considered meaningful.
 python /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/
     tcga_metilene/scripts/create_lifeline_plots.py
 
-include the increasing or decreasing info within the filename and the mean methylation difference within the out table lifeline_out_tsv
 lifeline_out_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/{threshold}/metilene_intersect_lifeline_plot_{DMR}.tsv",
 
 include the mean median difference!:
@@ -532,7 +531,7 @@ else:
     # # limit the annotatin DF to the right chromosome:
     DF_annot = DF_annot.set_index('chr').loc[chrom,:].reset_index()
     # acces the ENSG:
-    DF_annot = DF_annot[(DF_annot['start'] <= start) & (DF_annot['stop'] > start)].loc[:, ["ENSG", "gene_type", "gene_status", "gene_name"]]
+    DF_annot = DF_annot[(DF_annot['start'] <= start) & (DF_annot['end'] > start)].loc[:, ["ENSG", "gene_type", "gene_status", "gene_name"]]
     if DF_annot.empty:
         DF_annot_2 = pd.read_table(annot_file_2).set_index('chr').loc[chrom,:].reset_index()
         DF_annot_2 = DF_annot_2[(DF_annot_2['start'] <= start) & (DF_annot_2['stop'] > start)].loc[:, ["ENST", "gene_type", "gene_status", "gene_name"]]

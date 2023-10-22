@@ -109,7 +109,7 @@ metilene_lifeline_eval_pdfs = snakemake.output[1] # metilene_lifeline_eval_pdfs
 
 DF_eval = pd.read_table(metilene_lifeline_aggregated)
 if DF_eval.empty:
-    DF_eval.to_csv(metilene_lifeline_eval)
+    DF_eval.to_csv(metilene_lifeline_eval, sep='\t')
     open(metilene_lifeline_eval_pdfs, 'a').close()
     os._exit(0)
 

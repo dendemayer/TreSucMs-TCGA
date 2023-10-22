@@ -36,6 +36,8 @@ rule create_deseq_output:
         #summary_out = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_results_summary.tsv",
         deseq_counts = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.tsv", in_de=['IN', 'DE'], count_type=['nt', 'raw', 'norm', 'vsd']),
         results = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_log2f{in_de}CREASE_result.tsv", in_de=['IN', 'DE']),
+        # TODO, change the deseq script to give homogen heatmap names
+        heatmaps = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.pdf", in_de=['IN', 'DE'], count_type=['nt', 'raw', 'norm', 'vsd']), category="DESeq2", subcategory = "{project}-{gender}-heatmaps"),
     conda:
         "envs/DESeq2.yaml"
     threads:
@@ -134,7 +136,7 @@ rule gzip_counts_all_cases:
     input:
         "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_{count_type}_counts_all_cases.tsv",  
     output:
-        "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_{count_type}_counts_all_cases.gz",
+        "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_{count_type}_counts_all_cases.tsv.gz",
     conda:
         "envs/gzip.yaml"
     threads:
@@ -166,7 +168,7 @@ rule create_deseq_lifeline_validation:
     input:
         meta_table = "{output_path}/{project}/DESeq2/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
         deseq_lifeline_tsv = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline.tsv.gz",
-        counts = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_{count_type}_counts_all_cases.gz",
+        counts = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_{count_type}_counts_all_cases.tsv.gz",
         script_file = os.path.join(script_path, "scripts/create_deseq_lifeline_plots_validation.py"),
     output:
         deseq_lifeline_tsv_UP = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/{threshold}/DESeq2_log2f_{in_de}CREASE_{count_type}_{ENSG}_lifeline_UP_val.tsv.gz",
@@ -244,7 +246,7 @@ rule evaluate_lifelines_all:
         script_file = os.path.join(script_path, "scripts/evaluate_lifelines_all.py")
     output:
         deseq_lifeline_eval = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.tsv.gz", threshold_str=threshold_str),
-        deseq_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.pdf", threshold_str=threshold_str)),
+        deseq_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.pdf", threshold_str=threshold_str), category="DESeq2", subcategory = "{project}-{gender}-evalueated-kaplan-meier"),
         #deseq_lifeline_aggregated = "/scr/DESeq2_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
     conda:
         "envs/pandas_pypdf.yaml"
