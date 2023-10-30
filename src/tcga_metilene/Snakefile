@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import glob
 #configfile: '../shared/config.yaml'
-include: "../shared/Snakefile"
+#include: "../shared/Snakefile"
 
 #configfile: os.path.join(script_path, os.path.pardir, os.path.pardir, 'shared/config.yaml')
 #include: os.path.join(script_path, os.path.pardir, os.path.pardir, 'shared/Snakefile')
@@ -12,7 +12,8 @@ threshold_list = config['thresh_list']
 
 #(Pdb) workflow.basedir
 #'/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene'
-script_path = workflow.basedir
+#script_path = workflow.basedir
+script_path = os.path.join(workflow.basedir, os.pardir, 'tcga_metilene')
 shared_path = os.path.join(script_path, os.path.pardir, 'shared')
 def get_data_files(wildcards):
     OUTPUT_PATH = wildcards[0]
@@ -29,7 +30,7 @@ def get_data_files(wildcards):
     data_path_list = [ i + '.gz' for i in data_path_list]
     return data_path_list
 
-rule create_summary_table:
+rule create_summary_table_metilene:
     """
     according to the flag composition the (projects, drugs) and the metadata
     given (dead/alive, female/male) create metilene input tables
@@ -135,7 +136,7 @@ rule metilene_plot_DMR_heatmaps:
         R_heatmap_script = os.path.join(script_path, "scripts/metilene_heatmap.R"),
         script_file = os.path.join(script_path, "scripts/metilene_heatmap.py"),
     output:
-        pdf_heatmap_out = report("{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_heatmaps_beta_value_{DMR}.pdf", category="metilene", subcategory = "{project}-{gender}-heatmaps"),
+        pdf_heatmap_out = report("{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_heatmaps_beta_value_{DMR}.pdf", category="metilene", subcategory = "{project}", labels={"Category": "heatmap", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
     conda:
         "../shared/envs/pheatmap.yaml"
     log:
@@ -324,7 +325,7 @@ def get_lifeline_all(wildcards):
         search_result = search_result + glob.glob(os.path.join(output_path, project, "metilene/metilene_output", drug_combi, gender, cutoff, f'{thresh}/metilene_intersect_lifeline*.tsv' ))
     return search_result
 
-rule aggregate_lifelines_all:
+rule aggregate_lifelines_all_metilene:
     """
     metilene out informations like mean methylation differences, q-value and #DMRs are added aswell
     """
@@ -349,7 +350,7 @@ rule aggregate_lifelines_all:
     script:
         "scripts/aggregate_lifelines_all.py"
 
-rule evaluate_lifelines_all:
+rule evaluate_lifelines_all_metilene:
     """
     including here the beta-val "wildcard", s.t. this is set as count-type, in
     the shared diff plot rule 
@@ -359,7 +360,7 @@ rule evaluate_lifelines_all:
         evaluate_script = os.path.join(script_path, "scripts/evaluate_lifelines_all.py")
     output:
         metilene_lifeline_eval = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.tsv.gz", threshold_str=threshold_str),
-        metilene_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.pdf", threshold_str=threshold_str), category="metilene", subcategory = "{project}-{gender}-evaluated-survivalplots"),
+        metilene_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.pdf", threshold_str=threshold_str), category="metilene", subcategory = "{project}", labels={"Category": "evaluated-survivalplots", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
         #metilene_lifeline_aggregated = "/scr/metilene_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
     conda:
         "envs/pandas_pypdf.yaml"

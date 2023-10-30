@@ -32,7 +32,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
 
     DRUG_str = '_'.join(sorted(DRUGS))
 
-    Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], 'Snakefile')
+    Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], os.path.pardir, 'shared', 'Snakefile')
 
     summary_tables_list = create_summary_table.create_summary_table(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs_str)
     Snakemake_all_files = summary_tables_list
@@ -134,25 +134,16 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     for project in PROJECTS:
         for cutoff in cutoffs_str:
             patients_overview.append(os.path.join(OUTPUT_PATH, project, pipeline, 'merged_meta_files', cutoff, 'meta_info_druglist_merged_drugs_combined_final.pdf'))
-    report_file = os.path.join(OUTPUT_PATH, PROJECTS[-1], pipeline, f'{pipeline}_output', DRUG_str, 'report.html')
     Snakemake_all_files = Snakemake_all_files + patients_overview
-    workflow = snakemake.snakemake(snakefile=Snakefile, targets= Snakemake_all_files,
-                        workdir=OUTPUT_PATH, cores=cores, forceall=False,
-                        force_incomplete=True, dryrun=dryrun, use_conda=True,
-                        rerun_triggers='mtime', printshellcmds=True,
-                        quiet=False, verbose=False,
-                                   configfiles=[config_file_shared],
-                                   config=config)
-                        #quiet=False, verbose=False, config={'thresh': thresh_str, 'thresh_list': thresh_list}, report=report_file)
     # workflow = snakemake.snakemake(snakefile=Snakefile, targets= Snakemake_all_files,
     #                     workdir=OUTPUT_PATH, cores=cores, forceall=False,
     #                     force_incomplete=True, dryrun=dryrun, use_conda=True,
     #                     rerun_triggers='mtime', printshellcmds=True,
     #                     quiet=False, verbose=False,
     #                                configfiles=[config_file_shared],
-    #                                config=config, report=report_file)
+    #                                config=config)
 
-    if not workflow:
-        print('snakemake run failed, exiting now')
-        os._exit(0)
+    # if not workflow:
+    #     print('snakemake run failed, exiting now')
+    #     os._exit(0)
     return Snakemake_all_files

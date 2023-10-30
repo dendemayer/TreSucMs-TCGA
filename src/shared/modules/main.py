@@ -278,23 +278,33 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
 
     major_file = os.path.join(OUTPUT_PATH, projects, '_'.join(execute),
                               '_'.join(DRUGS), 'final_majority_vote.tsv.gz')
+    major_file_pdf = os.path.join(OUTPUT_PATH, projects, '_'.join(execute),
+                              '_'.join(DRUGS), 'final_majority_vote_pipeline_project_final.pdf')
+
+    # workflow = snakemake.snakemake(snakefile=Snakefile, targets=[major_file],
+    #                                workdir=OUTPUT_PATH, cores=cores,
+    #                                forceall=False, force_incomplete=True,
+    #                                dryrun=dryrun, use_conda=True,
+    #                                configfiles=[config_file_shared],
+    #                                rerun_triggers='mtime', config=config)
+    # if not workflow:
+    #     print('snakemake execution failed, exiting now')
+    #     os._exit(0)
+
+    Snakemake_all_files = Snakemake_all_files + [major_file, major_file_pdf]
+
     report_file = os.path.join(OUTPUT_PATH, projects, '_'.join(execute),
                                '_'.join(DRUGS), 'report.html')
-    workflow = snakemake.snakemake(snakefile=Snakefile, targets=[major_file],
-                                   workdir=OUTPUT_PATH, cores=cores,
-                                   forceall=False, force_incomplete=True,
-                                   dryrun=dryrun, use_conda=True,
-                                   configfiles=[config_file_shared],
-                                   rerun_triggers='mtime', config=config)
 
-    breakpoint()
     workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                                    workdir=OUTPUT_PATH, cores=cores,
                                    forceall=False, force_incomplete=True,
                                    dryrun=dryrun, use_conda=True,
                                    configfiles=[config_file_shared],
                                    rerun_triggers='mtime', config=config,
-                                   report=report_file)
+                                   report=report_file,
+                                   report_stylesheet=os.path.join(os.path.split(__file__)[0], os.pardir, "report_src", "custom-stylesheet.css"))
+
     if not workflow:
         print('snakemake execution failed, exiting now')
         os._exit(0)

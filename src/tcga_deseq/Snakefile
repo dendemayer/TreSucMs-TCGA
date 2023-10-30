@@ -2,13 +2,13 @@ import glob
 import pandas as pd
 import os
 #configfile: '../shared/config.yaml'
-include: "../shared/Snakefile"
+#include: "../shared/Snakefile"
 
 threshold_str = config['thresh']
 threshold_list = config['thresh_list']
-script_path = workflow.basedir
+script_path = os.path.join(workflow.basedir, os.pardir, 'tcga_deseq')
 
-rule create_summary_table:
+rule create_summary_table_deseq:
     input:
         meta_table = "{output_path}/{project}/DESeq2/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
         script_file = os.path.join(script_path, "scripts/create_summary_table.py")
@@ -34,16 +34,16 @@ rule create_deseq_output:
         script_file = os.path.join(script_path, "scripts/create_deseq_output.py")
     output:
         #summary_out = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_results_summary.tsv",
-        deseq_counts = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.tsv", in_de=['IN', 'DE'], count_type=['nt', 'raw', 'norm', 'vsd']),
-        results = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_log2f{in_de}CREASE_result.tsv", in_de=['IN', 'DE']),
+        deseq_counts = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{{in_de}}CREASE_{count_type}_counts.tsv", count_type=['nt', 'raw', 'norm', 'vsd']),
+        results = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_log2f{in_de}CREASE_result.tsv",
         # TODO, change the deseq script to give homogen heatmap names
-        heatmaps = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.pdf", in_de=['IN', 'DE'], count_type=['nt', 'raw', 'norm', 'vsd']), category="DESeq2", subcategory = "{project}-{gender}-heatmaps"),
+        heatmaps = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{{in_de}}CREASE_{count_type}_counts.pdf", count_type=['nt', 'raw', 'norm', 'vsd']), category="DESeq2", subcategory = "{project}", labels={"Category": "heatmaps", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
     conda:
         "envs/DESeq2.yaml"
     threads:
         1
     log:
-        "{output_path}/{project}/DESeq2/logs/create_deseq_output/{drug_combi}_{gender}_{cutoff}.log",
+        "{output_path}/{project}/DESeq2/logs/create_deseq_output/{drug_combi}_{gender}_{cutoff}_{in_de}.log",
     script:
         "scripts/create_deseq_output.py"
 
@@ -206,7 +206,7 @@ def get_lifeline_all(wildcards):
         search_result = search_result + glob.glob(os.path.join(output_path, project, "DESeq2/DESeq2_output", drug_combi, gender, cutoff, f'{thresh}/DESeq2_log2f_*lifeline*.tsv.gz' ))
     return search_result
 
-rule aggregate_lifelines_all:
+rule aggregate_lifelines_all_deseq:
     """
     all expected ENSG which should be available can be gathered through the 
     DESeq2_log2fDECREASE_result.tsv 
@@ -236,7 +236,7 @@ rule aggregate_lifelines_all:
     script:
         "scripts/aggregate_lifelines_all.py"
 
-rule evaluate_lifelines_all:
+rule evaluate_lifelines_all_deseq:
     """
     the evaluation is done count_type specific and not count_type overlapping
     the specific count_type is ovarhanded through the given wildcard
@@ -246,7 +246,7 @@ rule evaluate_lifelines_all:
         script_file = os.path.join(script_path, "scripts/evaluate_lifelines_all.py")
     output:
         deseq_lifeline_eval = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.tsv.gz", threshold_str=threshold_str),
-        deseq_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.pdf", threshold_str=threshold_str), category="DESeq2", subcategory = "{project}-{gender}-evalueated-kaplan-meier"),
+        deseq_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.pdf", threshold_str=threshold_str), category="DESeq2", subcategory = "{project}",labels={"Category": "evaluated-kaplan-meier", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
         #deseq_lifeline_aggregated = "/scr/DESeq2_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
     conda:
         "envs/pandas_pypdf.yaml"

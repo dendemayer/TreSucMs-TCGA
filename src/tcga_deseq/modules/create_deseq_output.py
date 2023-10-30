@@ -9,7 +9,7 @@ def create_deseq_output(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs):
                 deseq_path = os.path.join(
                     OUTPUT_PATH, project, 'DESeq2/DESeq2_output', DRUG_str,
                     gender, cutoff)
-                for count_type in ['norm', 'raw', 'nt']:
+                for count_type in ['norm', 'raw', 'nt', 'vsd']:
                     for in_de in ['IN', 'DE']:
                         summary_tables.append(
                             os.path.join(

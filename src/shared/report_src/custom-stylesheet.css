@@ -1,0 +1,9 @@
+#brand {
+    margin: auto;
+    height: 90px;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: 50%;
+    background-position: center;
+    background-image: url("/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/report_src/WBM_UL_CMYK.svg");
+}
