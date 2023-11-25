@@ -21,5 +21,4 @@ def aggregate_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs,
                     metilene_path, threshold_str,
                     f'{pipeline}_lifelines_aggregated.tsv.gz')
                 aggregate_lifeline_plots_list.append(file_path)
-
     return aggregate_lifeline_plots_list

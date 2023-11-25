@@ -6,6 +6,7 @@ from tcga_metilene.modules import main_metilene
 from tcga_deseq.modules import main_deseq
 import snakemake
 from itertools import compress
+import re
 
 SCRIPT_PATH = os.path.split(__file__)[0]
 with open(os.path.join(SCRIPT_PATH, 'version.txt'), 'r') as f:
@@ -156,7 +157,11 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     types = [return_type(i) for i in execute]
     drug_str = '_'.join(DRUGS)
 
-    config={'thresh': thresh_str, 'thresh_list': thresh_list, 'pipelines': execute, 'projects_str': projects, 'cutoffs': cutoffs, 'types': types, 'OUTPUT_PATH': OUTPUT_PATH, 'drug_str': drug_str}
+    # count_type = []  # the count type is later specified within either deseq or
+    count_type = {'metilene': ['beta_vals'], 'DESeq2': ['norm_count']}
+    # metilene main module, must be defined here already since it is also set in
+    # the shared Snakefile
+    config={'thresh': thresh_str, 'thresh_list': thresh_list, 'pipelines': execute, 'projects_str': projects, 'cutoffs': cutoffs, 'types': types, 'OUTPUT_PATH': OUTPUT_PATH, 'drug_str': drug_str, 'count_type': count_type}
     # once we have to call snakemake in prior, s.t. the manifest file is
     # present on which all the following selections are done on, make sure that
     # here the dryrun flag is not set to True
@@ -245,11 +250,11 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # from here the shared modules and Snakemake scripts are getting pipeline
     # specific, hand over all outputfiles requested so far and enter the
     # pipeline specific main files:
-    Snakemake_all_files_met = []
-    Snakemake_all_files_des = []
+    Snakemake_report_met = []
+    Snakemake_report_des = []
     if 'metilene' in execute:
         print('entering metilene entry fct')
-        Snakemake_all_files_met = main_metilene.entry_fct(OUTPUT_PATH, PROJECT,
+        Snakemake_report_met = main_metilene.entry_fct(OUTPUT_PATH, PROJECT,
                                                           DRUGS,
                                                           Snakemake_all_files,
                                                           cutoffs, threshold,
@@ -259,16 +264,16 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
                                                           cutoffs_str)
     if 'DESeq2' in execute:
         print('entering deseq entry fct')
-        Snakemake_all_files_des = main_deseq.entry_fct(OUTPUT_PATH, PROJECT,
+        Snakemake_report_des = main_deseq.entry_fct(OUTPUT_PATH, PROJECT,
                                                        DRUGS,
                                                        Snakemake_all_files,
-                                                       cutoffs, threshold,
-                                                       cores, 'DESeq2',
+                                                       threshold, cores,
+                                                       'DESeq2',
                                                        config_file_shared,
                                                        config, dryrun,
                                                        cutoffs_str)
 
-    Snakemake_all_files = Snakemake_all_files + Snakemake_all_files_des + Snakemake_all_files_met
+    Snakemake_report_files = Snakemake_report_des + Snakemake_report_met
 
     # # one or both pipelines are finished here, final aggregation over both
     # pipelines:
@@ -281,6 +286,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     major_file_pdf = os.path.join(OUTPUT_PATH, projects, '_'.join(execute),
                               '_'.join(DRUGS), 'final_majority_vote_pipeline_project_final.pdf')
 
+
     # workflow = snakemake.snakemake(snakefile=Snakefile, targets=[major_file],
     #                                workdir=OUTPUT_PATH, cores=cores,
     #                                forceall=False, force_incomplete=True,
@@ -291,12 +297,17 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     #     print('snakemake execution failed, exiting now')
     #     os._exit(0)
 
-    Snakemake_all_files = Snakemake_all_files + [major_file, major_file_pdf]
+    Snakemake_report_files = Snakemake_report_files + [major_file, major_file_pdf]
 
     report_file = os.path.join(OUTPUT_PATH, projects, '_'.join(execute),
                                '_'.join(DRUGS), 'report.html')
 
-    workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+    # [i for i  in Snakemake_all_files if re.search('.*lifelines_evaluated-norm_count.*', i) ]
+    ###########################################################################
+    #                            final REPORT creation                        #
+    ###########################################################################
+
+    workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_report_files,
                                    workdir=OUTPUT_PATH, cores=cores,
                                    forceall=False, force_incomplete=True,
                                    dryrun=dryrun, use_conda=True,

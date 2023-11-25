@@ -136,13 +136,43 @@ rule metilene_plot_DMR_heatmaps:
         R_heatmap_script = os.path.join(script_path, "scripts/metilene_heatmap.R"),
         script_file = os.path.join(script_path, "scripts/metilene_heatmap.py"),
     output:
-        pdf_heatmap_out = report("{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_heatmaps_beta_value_{DMR}.pdf", category="metilene", subcategory = "{project}", labels={"Category": "heatmap", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
+        pdf_heatmap_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_heatmaps_beta_value_{DMR}.pdf",
     conda:
         "../shared/envs/pheatmap.yaml"
     log:
         "{output_path}/{project}/metilene/logs/metilene_plot_DMR_heatmaps/{drug_combi}_{gender}_{cutoff}_{DMR}.log",
     script:
         "scripts/metilene_heatmap.py"
+
+def return_heatmaps(wildcards):
+    """
+    to aggregate every heatmap with different DMR, glob them here:
+    """
+    #output_path
+    #"{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_heatmaps_beta_value_{DMR}.pdf",
+    project = wildcards.project
+    output_path = wildcards.output_path
+    drug_combi = wildcards.drug_combi
+    gender = wildcards.gender
+    cutoff = wildcards.cutoff
+    return glob.glob(os.path.join(f'{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_*_beta_value_chr*.pdf'))
+
+rule merge_metilene_heatmaps:
+    """
+    for report creation
+    """
+    input:
+        heatmaps = return_heatmaps,  # input can also be empty, no heatmaps available then...
+    output:
+        heatmaps_merged = report("{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_beta_value_merged.pdf", category="metilene", subcategory = "{project}", labels={"Category": "DMR-plots", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
+    conda:
+       "../shared/envs/pandas_pypdf_seaborn_natsort.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/{pipeline}/logs/merge_heatmaps/{drug_combi}_{gender}_{cutoff}.log",
+    script:
+        os.path.join(shared_path, "scripts/merge_heatmaps.py")
 
 rule create_metilene_lifeline_plots:
     """
@@ -360,7 +390,7 @@ rule evaluate_lifelines_all_metilene:
         evaluate_script = os.path.join(script_path, "scripts/evaluate_lifelines_all.py")
     output:
         metilene_lifeline_eval = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.tsv.gz", threshold_str=threshold_str),
-        metilene_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.pdf", threshold_str=threshold_str), category="metilene", subcategory = "{project}", labels={"Category": "evaluated-survivalplots", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
+        metilene_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.pdf", threshold_str=threshold_str), category="metilene", subcategory = "{project}", labels={"Category": "evaluated-kaplan-meier", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
         #metilene_lifeline_aggregated = "/scr/metilene_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
     conda:
         "envs/pandas_pypdf.yaml"

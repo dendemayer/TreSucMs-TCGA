@@ -14,13 +14,15 @@ PROJECTS = projects_str.split('_')  # ['TCGA-CESC', 'TCGA-HNSC']
 if len(PROJECTS) != 1:
     PROJECTS.append(projects_str)
 pipelines = config['pipelines']  # ['DESeq2', 'metilene']
-pipeline_str = '_'.join(pipelines)
+pipeline_str = '_'.join(pipelines) # 'DESeq2_metilene'
 drug_str = config['drug_str']
+count_types = config['count_type']
+# in case of accessing this main Snakefile for the report creation, the count type is set to the last value set (if deseq entry_fct was used, it would be norm_count
 script_path = workflow.basedir  #  '/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared'
 # the script path will change depending on the main module we have acces from
 # to it, but the scripts invoked here are always withing the shared dir, so go
 # one dir up an reenter into shared (either from shared back into shared or
-# metilene into shrared or deseq into shared:
+# metilene into shraed or deseq into shared:
 script_path = os.path.join(script_path, os.path.pardir, 'shared')
 
 
@@ -222,22 +224,27 @@ rule plot_diffs:
     diff, also together, if applied, with the different thresholds invoked
     """
     input:
-        lifeline_aggregated = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
+        lifeline_aggregated = "{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_lifelines_aggregated.tsv.gz",
         script_file = os.path.join(script_path, "scripts/plot_thresh_diff.py")
     output:
-        plot_diffs = report(expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_diffs_{{plot_type}}-{{count_type}}.pdf", threshold_str=threshold_str), category="{pipeline}", subcategory = "{project}", labels={"Category" : "lifeline_differences", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
-        plot_diffs_table = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_diffs_{{plot_type}}-{{count_type}}.tsv.gz", threshold_str=threshold_str),
+        plot_diffs = "{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_plot_diffs_{plot_type}-{count_type}.pdf",
+        #plot_diffs = report("{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_plot_diffs_{plot_type}-{count_type}.pdf",  category="{pipeline}", subcategory = "{project}", labels={"Category" : "lifeline_differences", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
+        plot_diffs_table = "{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_plot_diffs_{plot_type}-{count_type}.tsv.gz",
     conda:
         "envs/seab_matplot_plotl.yaml"
     threads:
         1
     log:
-        "{output_path}/{project}/{pipeline}/logs/plot_diffs/{drug_combi}_{gender}_{cutoff}_{plot_type}_{count_type}.log",
+        "{output_path}/{project}/{pipeline}/logs/plot_diffs/{drug_combi}_{gender}_{cutoff}_{threshold_str}_{plot_type}_{count_type}.log",
     script:
         "scripts/plot_thresh_diff.py"
 
 rule plot_diffs_eval:
     """
+    TODO - problems with the applied count types 
+    affected files:
+        /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-norm_count.tsv.gz
+        --> metilene is not allowed to have norm_count as count type (beta_vals)
     for every found ensg or start of a DMR, plot the pval or the life mean
     diff, also together, if applied, with the different thresholds invoked
     -> just for the evaluated features (scored ones)
@@ -245,19 +252,38 @@ rule plot_diffs_eval:
     keep reusability of the same script
     """
     input:
-        lifeline_aggregated = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_lifelines_evaluated-{{count_type}}.tsv.gz", threshold_str=threshold_str),
+        lifeline_aggregated = "{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_lifelines_evaluated-{count_type}.tsv.gz",
         script_file = os.path.join(script_path, "scripts/plot_thresh_diff.py")
     output:
-        plot_diffs = report(expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_eval_diffs_{{plot_type}}-{{count_type}}.pdf", threshold_str=threshold_str), category="{pipeline}", subcategory= "{project}", labels={"Category": "lifeline_differences_evaluated", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
-        plot_diffs_table = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/{{pipeline}}_plot_eval_diffs_{{plot_type}}-{{count_type}}.tsv.gz", threshold_str=threshold_str),
+        #plot_diffs = report("{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_plot_eval_diffs_{plot_type}-{count_type}.pdf", category="{pipeline}", subcategory= "{project}", labels={"Category": "lifeline_differences_evaluated", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
+        plot_diffs = "{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_plot_eval_diffs_{plot_type}-{count_type}.pdf",
+        plot_diffs_table = "{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_plot_eval_diffs_{plot_type}-{count_type}.tsv.gz",
     conda:
         "envs/seab_matplot_plotl.yaml"
     threads:
         1
     log:
-        "{output_path}/{project}/{pipeline}/logs/plot_diffs_eval/{drug_combi}_{gender}_{cutoff}_{plot_type}_{count_type}.log",
+        "{output_path}/{project}/{pipeline}/logs/plot_diffs_eval/{drug_combi}_{gender}_{cutoff}_{threshold_str}_{plot_type}_{count_type}.log",
     script:
         "scripts/plot_thresh_diff.py"
+
+rule merge_diffplots:
+    """
+    aggregate both diffs, (eval and alltogether diffs), include them into report
+    """
+    input:
+        plot_diffs_aggr = lambda wildcards: expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{{threshold_str}}/{{pipeline}}_plot_diffs_{plot_type}-{count_type}.pdf", plot_type=['UP_validation', 'DOWN_validation', 'base_plot'], count_type=count_types[wildcards.pipeline]),
+        plot_diffs_eval = lambda wildcards: expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{{threshold_str}}/{{pipeline}}_plot_eval_diffs_{plot_type}-{count_type}.pdf", plot_type=['UP_validation', 'DOWN_validation', 'base_plot'], count_type=count_types[wildcards.pipeline]),
+    output:
+        aggr_plots = report("{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_plot_aggr+eval_diffs_merged.pdf", category="{pipeline}", subcategory= "{project}", labels={"Category": "lifeline_differences", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"})
+    conda:
+        "../shared/envs/pandas_pypdf_seaborn_natsort.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/{pipeline}/logs/aggregate_diffs/{drug_combi}_{gender}_{cutoff}_{threshold_str}_merged.log",
+    script:
+        "scripts/merge_diffplots.py"
 
 def get_eval_input(wildcards):
     """
@@ -272,18 +298,24 @@ def get_eval_input(wildcards):
     drug_str = wildcards.drug_str
     cutoffs = config['cutoffs']  # [0, 5, 8]
     cutoff_strs = ['cutoff_' + str(i) for i in cutoffs]  # ['cutoff_0', 'cutoff_5', 'cutoff_8']
-    types = config['types']  # ['norm_counts', 'beta_vals']
     # requesting.
     #/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/DESeq2_metilene/carboplatin_carboplatin,paclitaxel_cisplatin/final_majority_vote.tsv
     # invoking f.e.:
     #/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.tsv.gz
     #/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/DESeq2/DESeq2_output/carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_evaluated-norm_count.tsv.gz
     evaluated_tables = []
-    for pipeline, type_  in zip(pipelines, types):
+    if 'metilene' in pipelines:
         for project in PROJECTS:
             for gender in ['female', 'male', 'female_male']:
                 for cutoff in cutoff_strs:
-                    evaluated_tables.append(os.path.join(output_path, project, pipeline, f'{pipeline}_output', drug_str, gender, cutoff, threshold_str, f'{pipeline}_lifelines_evaluated-{type_}.tsv.gz' ))
+                    evaluated_tables.append(os.path.join(output_path, project, 'metilene', 'metilene_output', drug_str, gender, cutoff, threshold_str, f'metilene_lifelines_evaluated-beta_vals.tsv.gz' ))
+    if 'DESeq2' in pipelines:
+        for count in count_types['DESeq2']:
+            for project in PROJECTS:
+                for gender in ['female', 'male', 'female_male']:
+                    for cutoff in cutoff_strs:
+                        evaluated_tables.append(os.path.join(output_path, project, 'DESeq2', 'DESeq2_output', drug_str, gender, cutoff, threshold_str, f'DESeq2_lifelines_evaluated-{count}.tsv.gz' ))
+    #[i for i  in evaluated_tables if re.search('.*metilene_lifelines_evaluated-norm_count.*', i) ]
     return evaluated_tables
 
 rule majority_vote_all:
@@ -307,12 +339,12 @@ rule majority_vote_all:
         HM450_annot = os.path.join(script_path, os.path.pardir,'tcga_metilene', 'resources', 'HM450.hg38.manifest.gencode.v36.tsv.gz'),
         script_file = os.path.join(script_path, "scripts/majority_vote_all.py")
     output:
-        major_table =  report('{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote.tsv.gz', category="{pipeline_str}_table", subcategory="final_majority_vote", labels={"Pipelines:": "{pipeline_str}", "type": "table"}),
+        major_table =  report('{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote.tsv.gz', category="{pipeline_str}", subcategory="final_majority_vote", labels={"Pipelines:": "{pipeline_str}", "type": "table"}),
         venn_project = '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_venn_projects.pdf',
         venn_pipeline = '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_venn_pipeline.pdf',
         md_aggr =  '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project.md',
         pdf_aggr =  '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project.pdf',
-        pdf_final =  report('{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project_final.pdf', category="{pipeline_str}_plot", subcategory="final_majority_vote", labels={"Pipelines:": "{pipeline_str}", "type": "pdf"}),
+        pdf_final =  report('{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project_final.pdf', category="{pipeline_str}", subcategory="final_majority_vote", labels={"Pipelines:": "{pipeline_str}", "type": "pdf"}),
         #major_table =  expand('{{output_path}}/{{project}}/{{pipeline_str}}/{{drug_str}}/final_majority_vote.tsv.gz', output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str),
         #venn_project = expand('{{output_path}}/{{project}}/{{pipeline_str}}/{{drug_str}}/final_majority_vote_venn_projects.pdf', output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str),
         #venn_pipeline = expand('{{output_path}}/{{project}}/{{pipeline_str}}/{{drug_str}}/final_majority_vote_venn_pipeline.pdf', output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str),

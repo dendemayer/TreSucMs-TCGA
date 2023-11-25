@@ -21,6 +21,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
 
     cutoffs = [f'cutoff_{str(i)}' for i in cutoffs]
 
+    # config['count_type'] = ['beta_vals']
     # an extra parameter can be handed over to the snakefile via the config
     # method in he snakemake call
     # # to be able to aggregate over the thresholds, txt file must be written
@@ -143,10 +144,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     eval_new = [i.replace('evaluated', 'evaluated-beta_vals') for i in  evaluate_lifelines_list]
 
     Snakemake_all_files = Snakemake_all_files + eval_new
-
-    # plot_diffs_all = [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_plot_diffs_base.pdf') for i in aggregate_lifelines_list]
-    # plot_diffs_all = plot_diffs_all + [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_plot_diffs.tsv.gz') for i in aggregate_lifelines_list]
-
+    Snakemake_report_files = eval_new
 
     plot_diffs_all = []
     plot_types = ['base_plot', 'UP_validation', 'DOWN_validation']
@@ -160,12 +158,20 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     Snakemake_all_files = Snakemake_all_files + plot_diffs_eval_all
 
     # /scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_final.pdf
+    DMR_intersect_merged = []  # they contain the metilene_intersect_[boxplot|heatmaps|lineplot|violinplot]_beta_value_{DMR}.pdf plots
     patients_overview = []
     for project in PROJECTS:
         for cutoff in cutoffs_str:
             patients_overview.append(os.path.join(OUTPUT_PATH, project, pipeline, 'merged_meta_files', cutoff, 'meta_info_druglist_merged_drugs_combined_final.pdf'))
+            for gender in ['male', 'female', 'female_male']:
+                DMR_intersect_merged.append(os.path.join(OUTPUT_PATH, project, pipeline, pipeline + '_output', DRUG_str, gender, cutoff, 'metilene_intersect_beta_value_merged.pdf'))
 
-    Snakemake_all_files = Snakemake_all_files + patients_overview
+    Snakemake_report_files = Snakemake_report_files + DMR_intersect_merged
+    Snakemake_all_files = Snakemake_all_files + patients_overview + DMR_intersect_merged
+    merged_diffs_list = [i.replace('lifelines_aggregated.tsv.gz', 'plot_aggr+eval_diffs_merged.pdf') for i in  aggregate_lifelines_list]
+    Snakemake_all_files = Snakemake_all_files + merged_diffs_list
+    Snakemake_report_files = Snakemake_report_files + merged_diffs_list
+
     # TODO
     # workflow = snakemake.snakemake(snakefile=Snakefile,
     #                                targets=Snakemake_all_files,
@@ -179,6 +185,6 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # if not workflow:
     #     print('snakemake execution failed, exiting now')
     #     os._exit(0)
-    return Snakemake_all_files
+    return Snakemake_report_files
     # # TODO
 # # ##### main_metilene ############

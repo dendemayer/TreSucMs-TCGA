@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 
-def create_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold):
+def create_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold, count_types):
     lifeline_plots = []
     for project in PROJECTS:
         for gender in ['female', 'male', 'female_male']:
@@ -10,7 +10,7 @@ def create_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs, threshold):
                 deseq_path = os.path.join( OUTPUT_PATH, project, 'DESeq2/DESeq2_output', DRUG_str, gender, cutoff)
                 for thresh in threshold:
                     thr = f'threshold_{str(thresh)}'
-                    for count_type in ['norm', 'raw', 'nt']:
+                    for count_type in [i.split('_')[0] for i in count_types]:
                         for in_de in ['IN', 'DE']:
                             try:
                                 ENSGs = pd.read_table(os.path.join(deseq_path, f'DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.tsv')).index.tolist()

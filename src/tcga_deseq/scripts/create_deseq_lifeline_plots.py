@@ -256,7 +256,7 @@ except Exception as e:
 p_value = cph.summary['p'].values[0]
 p_value_str = f'p_value = {Decimal(str(p_value)):.2e}'
 
-ax.set_title(f'{p_value_str}, threshold = {threshold.split("_")[1]}\nENSG: {ENSG}\n{project}, {drug_combi}\n{gender}, cutoff={cutoff}')
+ax.set_title(f'base plot, {p_value_str}, threshold = {threshold.split("_")[1]}\nENSG: {ENSG}\n{project}, {drug_combi}\n{gender}, cutoff={cutoff}')
 
 plt.tight_layout()
 print(f'saving: {deseq_lifeline_pdf}')

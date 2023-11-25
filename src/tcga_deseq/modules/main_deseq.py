@@ -1,3 +1,4 @@
+from numpy.ma import count
 import snakemake
 import os
 from tcga_deseq.modules import create_summary_table
@@ -15,9 +16,14 @@ src/tcga_deseq/Snakefile
 """
 
 
-def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
+def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
               threshold, cores, pipeline, config_file_shared, config, dryrun, cutoffs_str):
 
+    """
+    the different count types are created for the heatmaps, not needed for the lifeline creation:
+    """
+    count_types = ['norm_count']
+    # config['count_type'] = count_types
     SCRIPT_PATH = os.path.split(__file__)[0]
 
     thresh_list = [f'threshold_{str(i)}' for i in threshold]
@@ -61,10 +67,10 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # ###########################################################################
     # ###########################################################################
 
-    deseq_lifeline_list = create_deseq_lifeline_plots.create_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs_str, threshold)
+    deseq_lifeline_list = create_deseq_lifeline_plots.create_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs_str, threshold, count_types)
     Snakemake_all_files = Snakemake_all_files + deseq_lifeline_list
 
-    gz_count_files = gzip_counts_all_cases.create_gz_counts(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs_str)
+    gz_count_files = gzip_counts_all_cases.create_gz_counts(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs_str, count_types)
     Snakemake_all_files = Snakemake_all_files + gz_count_files
 
     deseq_lifeline_validation_list = create_deseq_lifeline_plots.create_lifeline_plots_validation(deseq_lifeline_list)
@@ -108,11 +114,12 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     evaluate_lifelines_list = evaluate_lifelines_list + [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_lifelines_evaluated.pdf') for i in aggregate_lifelines_list]
     eval_new = []
     # just request the evaluated norm counts, s.t. they are added to the report
-    # for count_type in ['raw_count', 'norm_count', 'nt_count']:
-    for eval_file in evaluate_lifelines_list:
-        eval_new.append(eval_file.replace('evaluated', f'evaluated-norm_count'))
+    for count_type in count_types:
+        for eval_file in evaluate_lifelines_list:
+            eval_new.append(eval_file.replace('evaluated', f'evaluated-{count_type}'))
 
     Snakemake_all_files = Snakemake_all_files + eval_new
+    Snakemake_report_files = eval_new
 
     # DESeq2_plot_diffs.pdf:
     plot_diffs_all = []
@@ -123,18 +130,29 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     plot_diffs_new = []
     # also here just request the norm counts
     for plot in plot_diffs_all:
-        # for count_type in ['raw_count', 'norm_count', 'nt_count']:
-        plot_diffs_new.append(plot.replace('.pdf', f'-norm_count.pdf'))
+        for count_type in count_types:
+            plot_diffs_new.append(plot.replace('.pdf', f'-{count_type}.pdf'))
 
     Snakemake_all_files = Snakemake_all_files + plot_diffs_new
     plot_diffs_eval_all = [i.replace('plot_diffs', 'plot_eval_diffs') for i in plot_diffs_new]
     Snakemake_all_files = Snakemake_all_files + plot_diffs_eval_all
 
     patients_overview = []
+    heatmap_merged = []
     for project in PROJECTS:
         for cutoff in cutoffs_str:
             patients_overview.append(os.path.join(OUTPUT_PATH, project, pipeline, 'merged_meta_files', cutoff, 'meta_info_druglist_merged_drugs_combined_final.pdf'))
+            for gender in ['male', 'female', 'female_male']:
+                heatmap_merged.append(os.path.join(OUTPUT_PATH, project, pipeline, pipeline + '_output', DRUG_str, gender, cutoff, 'DESeq2_heatmap_merged.pdf'))
+    Snakemake_report_files = Snakemake_report_files + heatmap_merged + patients_overview
+
     Snakemake_all_files = Snakemake_all_files + patients_overview
+    Snakemake_all_files = Snakemake_all_files + heatmap_merged
+    merged_diffs_list = [i.replace('lifelines_aggregated.tsv.gz', 'plot_aggr+eval_diffs_merged.pdf') for i in aggregate_lifelines_list]
+    Snakemake_all_files = Snakemake_all_files + merged_diffs_list
+    Snakemake_report_files = Snakemake_report_files + merged_diffs_list
+
+    # TODO
     # workflow = snakemake.snakemake(snakefile=Snakefile, targets= Snakemake_all_files,
     #                     workdir=OUTPUT_PATH, cores=cores, forceall=False,
     #                     force_incomplete=True, dryrun=dryrun, use_conda=True,
@@ -146,4 +164,6 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # if not workflow:
     #     print('snakemake run failed, exiting now')
     #     os._exit(0)
-    return Snakemake_all_files
+    # return Snakemake_all_files
+    # just return the report file
+    return Snakemake_report_files

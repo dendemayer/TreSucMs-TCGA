@@ -7,6 +7,7 @@ import os
 threshold_str = config['thresh']
 threshold_list = config['thresh_list']
 script_path = os.path.join(workflow.basedir, os.pardir, 'tcga_deseq')
+shared_path = os.path.join(workflow.basedir, os.pardir, 'shared')
 
 rule create_summary_table_deseq:
     input:
@@ -37,7 +38,7 @@ rule create_deseq_output:
         deseq_counts = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{{in_de}}CREASE_{count_type}_counts.tsv", count_type=['nt', 'raw', 'norm', 'vsd']),
         results = "{output_path}/{project}/DESeq2/DESeq2_output/{drug_combi}/{gender}/{cutoff}/DESeq2_log2f{in_de}CREASE_result.tsv",
         # TODO, change the deseq script to give homogen heatmap names
-        heatmaps = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{{in_de}}CREASE_{count_type}_counts.pdf", count_type=['nt', 'raw', 'norm', 'vsd']), category="DESeq2", subcategory = "{project}", labels={"Category": "heatmaps", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
+        heatmaps = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{{in_de}}CREASE_{count_type}_counts.pdf", count_type=['nt', 'raw', 'norm', 'vsd']),
     conda:
         "envs/DESeq2.yaml"
     threads:
@@ -46,6 +47,23 @@ rule create_deseq_output:
         "{output_path}/{project}/DESeq2/logs/create_deseq_output/{drug_combi}_{gender}_{cutoff}_{in_de}.log",
     script:
         "scripts/create_deseq_output.py"
+
+rule merge_deseq_out_heatmaps:
+    """
+    for report creation
+    """
+    input:
+        heatmaps = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.pdf", count_type=['nt', 'raw', 'norm', 'vsd'], in_de=["IN", "DE"]),
+    output:
+        heatmaps_merged = report("{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/DESeq2_heatmap_merged.pdf", category="DESeq2", subcategory = "{project}", labels={"Category": "heatmaps", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
+    conda:
+        "../shared/envs/pandas_pypdf_seaborn_natsort.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/{pipeline}/logs/merge_deseq_out_heatmaps/{drug_combi}_{gender}_{cutoff}.log",
+    script:
+        os.path.join(shared_path, "scripts/merge_heatmaps.py")
 
 rule create_deseq_lifeline_plots:
     """
@@ -203,7 +221,7 @@ def get_lifeline_all(wildcards):
     # the glob is still necessary but just include applied thresholds within the dynamic/thresholds.txt file.
     search_result = []
     for thresh in threshold_list:
-        search_result = search_result + glob.glob(os.path.join(output_path, project, "DESeq2/DESeq2_output", drug_combi, gender, cutoff, f'{thresh}/DESeq2_log2f_*lifeline*.tsv.gz' ))
+        search_result = search_result + glob.glob(os.path.join(output_path, project, "DESeq2/DESeq2_output", drug_combi, gender, cutoff, f'{thresh}/DESeq2_log2f_*norm*lifeline*.tsv.gz' ))
     return search_result
 
 rule aggregate_lifelines_all_deseq:
@@ -239,7 +257,7 @@ rule aggregate_lifelines_all_deseq:
 rule evaluate_lifelines_all_deseq:
     """
     the evaluation is done count_type specific and not count_type overlapping
-    the specific count_type is ovarhanded through the given wildcard
+    the specific count_type is overhanded through the given wildcard
     """
     input:
         deseq_lifeline_aggregated = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_aggregated.tsv.gz", threshold_str=threshold_str),
