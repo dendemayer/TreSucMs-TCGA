@@ -1,4 +1,3 @@
-from numpy.ma import count
 import snakemake
 import os
 from tcga_deseq.modules import create_summary_table
@@ -27,7 +26,6 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
     SCRIPT_PATH = os.path.split(__file__)[0]
 
     thresh_list = [f'threshold_{str(i)}' for i in threshold]
-    thresh_str = '_'.join(thresh_list)
 
     PROJECTS = []
     if len(PROJECT) > 1:
@@ -51,18 +49,18 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
     # created, ENSG is within the filenames
     ###########################################################################
     # # TODO uncomment this
-    # workflow = snakemake.snakemake(snakefile=Snakefile,
-    #                                targets=Snakemake_all_files,
-    #                                workdir=OUTPUT_PATH, cores=cores,
-    #                                forceall=False, force_incomplete=True,
-    #                                dryrun=dryrun, use_conda=True,
-    #                                printshellcmds=True, quiet=False,
-    #                                unlock=False, rerun_triggers='mtime',
-    #                                configfiles=[config_file_shared],
-    #                                config=config)
-    # if not workflow:
-    #     print('snakemake execution failed, exiting now')
-    #     os._exit(0)
+    workflow = snakemake.snakemake(snakefile=Snakefile,
+                                   targets=Snakemake_all_files,
+                                   workdir=OUTPUT_PATH, cores=cores,
+                                   forceall=False, force_incomplete=True,
+                                   dryrun=dryrun, use_conda=True,
+                                   printshellcmds=True, quiet=False,
+                                   unlock=False, rerun_triggers='mtime',
+                                   configfiles=[config_file_shared],
+                                   config=config)
+    if not workflow:
+        print('snakemake execution failed, exiting now')
+        os._exit(0)
     # TODO uncomment this
     # ###########################################################################
     # ###########################################################################
@@ -87,15 +85,15 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
     #     here the lifelineplots are created, both, base and validation plots #
     ###########################################################################
     # # ## TODO uncomment this !!!!
-    # workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
-    #                     workdir=OUTPUT_PATH, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=dryrun, use_conda=True,
-    #                     rerun_triggers='mtime', printshellcmds=True,
-    #                     quiet=False, configfiles=[config_file_shared],
-    #                                config=config)
-    # if not workflow:
-    #     print('snakemake run failed, exiting now')
-    #     os._exit(0)
+    workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
+                        workdir=OUTPUT_PATH, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=dryrun, use_conda=True,
+                        rerun_triggers='mtime', printshellcmds=True,
+                        quiet=False, configfiles=[config_file_shared],
+                                   config=config)
+    if not workflow:
+        print('snakemake run failed, exiting now')
+        os._exit(0)
     # ### TODO uncomment this !!!!
     ###############################################################################
     ## the previous snakemake runs must be completed before requesting the next
@@ -153,17 +151,15 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
     Snakemake_report_files = Snakemake_report_files + merged_diffs_list
 
     # TODO
-    # workflow = snakemake.snakemake(snakefile=Snakefile, targets= Snakemake_all_files,
-    #                     workdir=OUTPUT_PATH, cores=cores, forceall=False,
-    #                     force_incomplete=True, dryrun=dryrun, use_conda=True,
-    #                     rerun_triggers='mtime', printshellcmds=True,
-    #                     quiet=False, verbose=False,
-    #                                configfiles=[config_file_shared],
-    #                                config=config)
+    workflow = snakemake.snakemake(snakefile=Snakefile, targets= Snakemake_all_files,
+                        workdir=OUTPUT_PATH, cores=cores, forceall=False,
+                        force_incomplete=True, dryrun=dryrun, use_conda=True,
+                        rerun_triggers='mtime', printshellcmds=True,
+                        quiet=False, verbose=False,
+                                   configfiles=[config_file_shared],
+                                   config=config)
 
-    # if not workflow:
-    #     print('snakemake run failed, exiting now')
-    #     os._exit(0)
-    # return Snakemake_all_files
-    # just return the report file
+    if not workflow:
+        print('snakemake run failed, exiting now')
+        os._exit(0)
     return Snakemake_report_files

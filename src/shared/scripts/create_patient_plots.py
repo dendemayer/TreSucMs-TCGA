@@ -6,66 +6,69 @@ import subprocess
 from PyPDF2 import PdfMerger
 import sys
 
-sys.stderr = sys.stdout = open(snakemake.log[0], "w")
+if "snakemake" in dir():
+    sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 
-print('# snakemake inputs:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+    print('# snakemake inputs:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
 
-print('# snakemake output:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+    print('# snakemake output:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
 
-print('# snakemake wildcards:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+    print('# snakemake wildcards:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
-print('# snakemake params:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.params.items()]
+    print('# snakemake params:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.params.items()]
 
-meta_table = snakemake.input.meta_table
+    meta_table = snakemake.input.meta_table
 
-plot_file_age = snakemake.output.plot_file_age
-plot_file_age_in_therapy = snakemake.output.plot_file_age_in_therapy
-plot_file_age_not_in_therapy = snakemake.output.plot_file_age_not_in_therapy
+    plot_file_age = snakemake.output.plot_file_age
+    plot_file_age_in_therapy = snakemake.output.plot_file_age_in_therapy
+    plot_file_age_not_in_therapy = snakemake.output.plot_file_age_not_in_therapy
 
-plot_file_survival = snakemake.output.plot_file_survival
-plot_file_survival_in_therapy = snakemake.output.plot_file_survival_in_therapy
-plot_file_survival_not_in_therapy = snakemake.output.plot_file_survival_not_in_therapy
+    plot_file_survival = snakemake.output.plot_file_survival
+    plot_file_survival_in_therapy = snakemake.output.plot_file_survival_in_therapy
+    plot_file_survival_not_in_therapy = snakemake.output.plot_file_survival_not_in_therapy
 
-out_md_vital = snakemake.output.out_md_vital
-out_pdf_vital = snakemake.output.out_pdf_vital
-final_pdf = snakemake.output.final_pdf
+    out_md_vital = snakemake.output.out_md_vital
+    out_pdf_vital = snakemake.output.out_pdf_vital
+    final_pdf = snakemake.output.final_pdf
 
-drug_str = snakemake.params.drug_str
-project = snakemake.wildcards.project
-cutoff = snakemake.wildcards.cutoff
-pipeline = snakemake.wildcards.pipeline
+    drug_str = snakemake.params.drug_str
+    project = snakemake.wildcards.project
+    cutoff = snakemake.wildcards.cutoff
+    pipeline = snakemake.wildcards.pipeline
 
-###############################################################################
-#                               test input set                                #
-###############################################################################
+else:
+    ###############################################################################
+    #                               test input set                                #
+    ###############################################################################
 
-# # snakemake inputs:
-# meta_table = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_deseq/../shared/scripts/create_patient_plots.py"
-# # snakemake output:
-# final_pdf = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_final.pdf"
-# plot_file_age = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_age.pdf"
-# plot_file_age_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_age_in_therapy.pdf"
-# plot_file_age_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_age_not_in_therapy.pdf"
-# plot_file_survival = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_survival.pdf"
-# plot_file_survival_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_survival_in_therapy.pdf"
-# plot_file_survival_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_survival_not_in_therapy.pdf"
-# out_md_vital = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_vital.md"
-# out_pdf_vital = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_vital.pdf"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_7"
-# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-# pipeline = "DESeq2"
-# cutoff = "cutoff_0"
-# drug_str = "carboplatin_carboplatin,paclitaxel_cisplatin"
+    # snakemake inputs:
+    meta_table = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+    script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_deseq/../shared/scripts/create_patient_plots.py"
+    # snakemake output:
+    final_pdf = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_final.pdf"
+    plot_file_age = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_age.pdf"
+    plot_file_age_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_age_in_therapy.pdf"
+    plot_file_age_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_age_not_in_therapy.pdf"
+    plot_file_survival = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_survival.pdf"
+    plot_file_survival_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_survival_in_therapy.pdf"
+    plot_file_survival_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_survival_not_in_therapy.pdf"
+    out_md_vital = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_vital.md"
+    out_pdf_vital = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_vital.pdf"
+    # snakemake wildcards:
+    output_path = "/scr/palinca/gabor/TCGA-pipeline_8"
+    project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+    pipeline = "DESeq2"
+    cutoff = "cutoff_0"
+    drug_str = "carboplatin_carboplatin,paclitaxel_cisplatin"
 
-###############################################################################
-#                               test input set                                #
-###############################################################################
+    ###############################################################################
+    #                               test input set                                #
+    ###############################################################################
+
 project_str = ' + '.join(project.split('_'))
 drugs = drug_str.split('_')
 drug_header = '; '.join(drug_str.split('_'))
@@ -112,12 +115,11 @@ plt.subplots_adjust(top=0.9)
 g.fig.suptitle(f"Age at therapy start, patients not in therapy\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
 plt.savefig(plot_file_age_not_in_therapy)
 plt.close('all')
-
 sns.set_style("whitegrid")
 g = sns.displot(meta_add_proj_gen,
                 x="age_at_diagnosis", col="project_id", row="sex",
                 binwidth=len(meta_DF['sex'].value_counts()),
-                height=len(meta_DF['project_id'].value_counts()) + 0.7,
+                height=len(meta_DF['project_id'].value_counts()) + 0.4,
                 facet_kws=dict(margin_titles=True), hue='vital_status',
                 kde=True)
 plt.subplots_adjust(top=0.9)
