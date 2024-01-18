@@ -384,7 +384,7 @@ kmf_NO_THERAPY.plot_survival_function(ax=ax)
 add_at_risk_counts(kmf_THERAPY, kmf_NO_THERAPY, ax=ax)
 p_value_DOWN_str = f'p_value_DOWN = {Decimal(str(p_value_DOWN)):.2e}'
 
-ax.set_title(f'{p_value_DOWN_str}, threshold = {round(thresh)}\nDMR: {": ".join(DMR.split("_")[:2]) + "-" + DMR.split("_")[2]}\nStart: {start}\n{project}, {drug_combi}, {gender}, cutoff={cutoff}')
+ax.set_title(f'DOWN-validation plot, {p_value_DOWN_str}, threshold = {round(thresh)}\nDMR: {": ".join(DMR.split("_")[:2]) + "-" + DMR.split("_")[2]}\nStart: {start}\n{project}, {drug_combi},\n{gender}, cutoff={cutoff}')
 
 plt.tight_layout()
 print(f'saving: {DOWN_val_plot}')
@@ -408,7 +408,7 @@ kmf_NO_THERAPY.plot_survival_function(ax=ax)
 
 add_at_risk_counts(kmf_THERAPY, kmf_NO_THERAPY, ax=ax)
 p_value_UP_str = f'p_value_UP = {Decimal(str(p_value_UP)):.2e}'
-ax.set_title(f'{p_value_UP_str}, threshold = {round(thresh)}\nDMR: {": ".join(DMR.split("_")[:2]) + "-" + DMR.split("_")[2]}\nStart: {start}\n{project}, {drug_combi}, {gender}, cutoff={cutoff}')
+ax.set_title(f'UP_validation plot, {p_value_UP_str}, threshold = {round(thresh)}\nDMR: {": ".join(DMR.split("_")[:2]) + "-" + DMR.split("_")[2]}\nStart: {start}\n{project}, {drug_combi},\n{gender}, cutoff={cutoff}')
 
 plt.tight_layout()
 print(f'saving: {UP_val_plot}')

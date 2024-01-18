@@ -145,7 +145,8 @@ if 'DESeq2' in pipelines:
 
 final_DF = pd.concat(final_DF)
 # better namings of ambigous vars:
-final_DF = final_DF.rename({'p_value': 'life_p_value', 'pvalue': 'DESeq2_p_value'}, axis=1)
+# final_DF = final_DF.rename({'p_value': 'life_p_value', 'pvalue': 'DESeq2_p_value'}, axis=1)
+# done in previous steps already
 
 
 # we want to know which genes can be found over cutoffs, over projects and over

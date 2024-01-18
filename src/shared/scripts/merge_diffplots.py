@@ -36,59 +36,47 @@ evaluated:
     - DOWN_chr-start
 """
 
-sys.stderr = sys.stdout = open(snakemake.log[0], 'w')
+if 'snakemake' in dir():
+    sys.stderr = sys.stdout = open(snakemake.log[0], 'w')
 
-print('# snakemake inputs:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+    print('# snakemake inputs:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
 
-print('# snakemake output:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+    print('# snakemake output:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
 
-print('# snakemake wildcards:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+    print('# snakemake wildcards:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
-print('# snakemake params:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.params.items()]
+    print('# snakemake params:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.params.items()]
 
-plot_diffs_aggr = snakemake.input.plot_diffs_aggr
-plot_diffs_eval = snakemake.input.plot_diffs_eval
-aggr_plots = snakemake.output.aggr_plots
-pipeline = snakemake.wildcards.pipeline
-
-###############################################################################
-#                             test_set                                        #
-###############################################################################
-# # snakemake inputs:
-# plot_diffs_aggr = ["/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_UP_validation-beta_vals.pdf", "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_DOWN_validation-beta_vals.pdf", "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_base_plot-beta_vals.pdf"]
-# plot_diffs_eval = ["/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_UP_validation-beta_vals.pdf", "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_DOWN_validation-beta_vals.pdf", "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_base_plot-beta_vals.pdf"]
-# # snakemake output:
-# aggr_plots = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_aggr+eval_diffs_merged.pdf"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_7"
-# project = "TCGA-CESC"
-# pipeline = "metilene"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female_male"
-# cutoff = "cutoff_5"
-# threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
-# snakemake params:
-
-# # snakemake inputs:
-# plot_diffs_aggr = ["/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_UP_validation-beta_vals.pdf", "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_DOWN_validation-beta_vals.pdf", "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_base_plot-beta_vals.pdf"]
-# plot_diffs_eval = ["/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_UP_validation-beta_vals.pdf", "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_DOWN_validation-beta_vals.pdf", "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_base_plot-beta_vals.pdf"]
-# # snakemake output:
-# aggr_plots = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_aggr+eval_diffs_merged.pdf"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_7"
-# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-# pipeline = "metilene"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female_male"
-# cutoff = "cutoff_8"
-# threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
-###############################################################################
-#                             test_set                                        #
-###############################################################################
+    plot_diffs_aggr = snakemake.input.plot_diffs_aggr
+    plot_diffs_eval = snakemake.input.plot_diffs_eval
+    plot_diffs_eval_p_aggr = snakemake.input.plot_diffs_eval_p_aggr
+    aggr_plots = snakemake.output.aggr_plots
+    pipeline = snakemake.wildcards.pipeline
+else:
+    ###############################################################################
+    #                             test_set                                        #
+    ###############################################################################
+    # snakemake inputs:
+    plot_diffs_aggr = ["/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_UP_validation-beta_vals.pdf", "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_DOWN_validation-beta_vals.pdf", "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_base_plot-beta_vals.pdf"]
+    plot_diffs_eval = ["/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_UP_validation-beta_vals.pdf", "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_DOWN_validation-beta_vals.pdf", "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_base_plot-beta_vals.pdf"]
+    plot_diffs_eval_p_aggr= ["/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_base_plot-beta_vals_p_aggr.pdf"]
+    # snakemake output:
+    aggr_plots = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_aggr+eval_diffs_merged.pdf"
+    # snakemake wildcards:
+    output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
+    project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+    pipeline = "metilene"
+    drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+    gender = "female_male"
+    cutoff = "cutoff_0"
+    threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
+    ###############################################################################
+    #                             test_set                                        #
+    ###############################################################################
 
 plot_diffs_aggr = plot_diffs_aggr + plot_diffs_eval
 # add the metilene chr-start diff plots if they are present:
@@ -105,7 +93,6 @@ if len(plot_diffs_aggr) == 0:
 
 # parsing out UP_validation, DOWN_validation, or base_plot:
 DF = pd.DataFrame({'full_path': plot_diffs_aggr, 'type': ['_'.join(os.path.split(plot)[1].split('-')[0].split('_')[-2:]) for plot in plot_diffs_aggr]})
-
 # adding the aggregated or evaluated info:
 DF['aggregation'] = DF['full_path'].apply(lambda x: 'evaluated' if re.search('eval', os.path.split(x)[1]) else 'aggregated')
 
@@ -126,7 +113,8 @@ else:
 #             UP_validation   DMR        /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_T...
 #                             chr-start  /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_T...
 #             DOWN_validation DMR        /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_T...
-#                             chr-start  /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_T... evaluated   base_plot       DMR        /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_T...
+#                             chr-start  /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_T...
+# evaluated   base_plot       DMR        /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_T...
 #                             chr-start  /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_T...
 #             UP_validation   DMR        /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_T...
 #                             chr-start  /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_T...
@@ -142,6 +130,8 @@ else:
 #             UP_validation    /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_T...
 #             DOWN_validation  /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_T...
 
+# prepend the compined pval plot:
+pdfs_to_merge = plot_diffs_eval_p_aggr + pdfs_to_merge
 print(f'writing pdfs to merge:\n{pdfs_to_merge}\nto:\n{aggr_plots}')
 merger = PyPDF2.PdfMerger()
 [merger.append(pdf) for pdf in pdfs_to_merge]

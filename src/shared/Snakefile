@@ -241,10 +241,12 @@ rule plot_diffs:
 
 rule plot_diffs_eval:
     """
-    TODO - problems with the applied count types 
-    affected files:
-        /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-norm_count.tsv.gz
-        --> metilene is not allowed to have norm_count as count type (beta_vals)
+    Done...
+        TODO - problems with the applied count types 
+        affected files:
+            /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-norm_count.tsv.gz
+    ...Done
+            --> metilene is not allowed to have norm_count as count type (beta_vals)
     for every found ensg or start of a DMR, plot the pval or the life mean
     diff, also together, if applied, with the different thresholds invoked
     -> just for the evaluated features (scored ones)
@@ -267,6 +269,38 @@ rule plot_diffs_eval:
     script:
         "scripts/plot_thresh_diff.py"
 
+rule plot_thresh_diff_p_aggr:
+    """
+    Done...
+        TODO - problems with the applied count types 
+        affected files:
+            /scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-norm_count.tsv.gz
+    ...Done
+            --> metilene is not allowed to have norm_count as count type (beta_vals)
+    for every found ensg or start of a DMR, plot the pval or the life mean
+    diff, also together, if applied, with the different thresholds invoked
+    -> just for the evaluated features (scored ones)
+    -> the evaluated tables are also called lifeline_aggregated in the input to
+    keep reusability of the same script
+    """
+    input:
+        lifelines_evaluated = "{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_lifelines_evaluated-{count_type}.tsv.gz",
+        script_file = os.path.join(script_path, "scripts/plot_thresh_diff_p_aggr.py")
+    output:
+        #plot_diffs = report("{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_plot_eval_diffs_{plot_type}-{count_type}.pdf", category="{pipeline}", subcategory= "{project}", labels={"Category": "lifeline_differences_evaluated", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
+        plot_diffs = "{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_plot_eval_diffs-{count_type}_p_aggr.pdf",
+        plot_diffs_table = "{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_plot_eval_diffs-{count_type}_p_aggr.tsv.gz",
+    conda:
+        "envs/seab_matplot_plotl.yaml"
+    threads:
+        1
+    log:
+        "{output_path}/{project}/{pipeline}/logs/plot_diffs_eval/{drug_combi}_{gender}_{cutoff}_{threshold_str}_{count_type}.log",
+    script:
+        "scripts/plot_thresh_diff_p_aggr.py"
+        # this is not working:
+        #"{input.script_file}"
+
 rule merge_diffplots:
     """
     aggregate both diffs, (eval and alltogether diffs), include them into report
@@ -274,6 +308,7 @@ rule merge_diffplots:
     input:
         plot_diffs_aggr = lambda wildcards: expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{{threshold_str}}/{{pipeline}}_plot_diffs_{plot_type}-{count_type}.pdf", plot_type=['UP_validation', 'DOWN_validation', 'base_plot'], count_type=count_types[wildcards.pipeline]),
         plot_diffs_eval = lambda wildcards: expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{{threshold_str}}/{{pipeline}}_plot_eval_diffs_{plot_type}-{count_type}.pdf", plot_type=['UP_validation', 'DOWN_validation', 'base_plot'], count_type=count_types[wildcards.pipeline]),
+        plot_diffs_eval_p_aggr = lambda wildcards: expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{{threshold_str}}/{{pipeline}}_plot_eval_diffs-{count_type}_p_aggr.pdf", count_type=count_types[wildcards.pipeline]),
     output:
         aggr_plots = report("{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/{threshold_str}/{pipeline}_plot_aggr+eval_diffs_merged.pdf", category="{pipeline}", subcategory= "{project}", labels={"Category": "lifeline_differences", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"})
     conda:

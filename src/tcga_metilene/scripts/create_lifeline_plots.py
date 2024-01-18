@@ -468,7 +468,7 @@ else:
 
     add_at_risk_counts(kmf_UP, kmf_DOWN, ax=ax)
     ax.set_title(
-        f'{p_value_str}, threshold = {threshold.split("_")[1]} \nDMR: {": ".join(DMR.split("_")[:2]) + "-" + DMR.split("_")[2]}, Start: {str(starts[plot_index])}\n{project}, {drug_combi}, {gender}, cutoff={cutoff}')
+        f'base plot, {p_value_str}, threshold = {threshold.split("_")[1]} \nDMR: {": ".join(DMR.split("_")[:2]) + "-" + DMR.split("_")[2]}, Start: {str(starts[plot_index])}\n{project}, {drug_combi},\n{gender}, cutoff={cutoff}')
 
     plt.tight_layout()
     print(f'saving: {lifeline_out_pdf}')

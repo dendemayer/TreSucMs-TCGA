@@ -51,12 +51,15 @@ HOME = os.getenv('HOME')
 @click.option('--dryrun', '-D', default=False, multiple=False,
               show_default=True, is_flag=True, help='snakemake dryrun',
               required=False)
+@click.option('--report', '-r', default=False, multiple=False,
+              show_default=True, is_flag=True, help='just create a report',
+              required=False)
 @click.option('--version', '-v',
               help='printing out version information: {}'.format(version),
               is_flag=True, callback=print_version,
               expose_value=False, is_eager=True)
 def call_with_options(out_path, project, drugs, cores, execute, cutoff,
-                      threshold, dryrun):
+                      threshold, dryrun, report):
     '''
     tcga pipelines a tool to choose, harvest and analyse methylation and rna
     count data of the TCGA-projects with help of the package metilene and
@@ -166,18 +169,19 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # present on which all the following selections are done on, make sure that
     # here the dryrun flag is not set to True
     # TODO uncomment this !!!
-    workflow =  snakemake.snakemake(snakefile=Snakefile,
-                                    targets=Snakemake_all_files,
-                                    rerun_triggers='mtime',
-                                    workdir=OUTPUT_PATH, cores=cores,
-                                    forceall=False, force_incomplete=True,
-                                    dryrun=dryrun, use_conda=True,
-                                    configfiles=[config_file_shared],
-                                    config=config)
-    if not workflow:
-        print('snakemake execution failed, exiting now')
-        os._exit(0)
-    # TODO uncomment this !!!
+    if not report:
+        workflow =  snakemake.snakemake(snakefile=Snakefile,
+                                        targets=Snakemake_all_files,
+                                        rerun_triggers='mtime',
+                                        workdir=OUTPUT_PATH, cores=cores,
+                                        forceall=False, force_incomplete=True,
+                                        dryrun=dryrun, use_conda=True,
+                                        configfiles=[config_file_shared],
+                                        config=config)
+        if not workflow:
+            print('snakemake execution failed, exiting now')
+            os._exit(0)
+        # TODO uncomment this !!!
 
     # auxfiles for both pipelines:
     # OUTPUT_PATH/PROJECT/aux_files/nationwidechildrens.....
@@ -232,17 +236,18 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # # without this option this rule would be ran everytime, since everything
     # # following is based on those aux file, every rule would be triggered
     # # then again
-    workflow = snakemake.snakemake(snakefile=Snakefile,
-                                   targets=Snakemake_all_files,
-                                   workdir=OUTPUT_PATH, cores=cores,
-                                   forceall=False, force_incomplete=True,
-                                   dryrun=dryrun, use_conda=True,
-                                   rerun_triggers='mtime',
-                                   configfiles=[config_file_shared],
-                                   config=config)
-    if not workflow:
-        print('snakemake execution failed, exiting now')
-        os._exit(0)
+    if not report:
+        workflow = snakemake.snakemake(snakefile=Snakefile,
+                                    targets=Snakemake_all_files,
+                                    workdir=OUTPUT_PATH, cores=cores,
+                                    forceall=False, force_incomplete=True,
+                                    dryrun=dryrun, use_conda=True,
+                                    rerun_triggers='mtime',
+                                    configfiles=[config_file_shared],
+                                    config=config)
+        if not workflow:
+            print('snakemake execution failed, exiting now')
+            os._exit(0)
     ########################################################################
     # TODO uncomment this !!!
     ########################################################################
@@ -261,7 +266,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
                                                           cores, 'metilene',
                                                           config_file_shared,
                                                           config, dryrun,
-                                                          cutoffs_str)
+                                                          cutoffs_str, report)
     if 'DESeq2' in execute:
         print('entering deseq entry fct')
         Snakemake_report_des = main_deseq.entry_fct(OUTPUT_PATH, PROJECT,
@@ -271,7 +276,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
                                                        'DESeq2',
                                                        config_file_shared,
                                                        config, dryrun,
-                                                       cutoffs_str)
+                                                       cutoffs_str, report)
 
     Snakemake_report_files = Snakemake_report_des + Snakemake_report_met
 
@@ -286,36 +291,42 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     major_file_pdf = os.path.join(OUTPUT_PATH, projects, '_'.join(execute),
                               '_'.join(DRUGS), 'final_majority_vote_pipeline_project_final.pdf')
 
-
-    workflow = snakemake.snakemake(snakefile=Snakefile, targets=[major_file],
-                                   workdir=OUTPUT_PATH, cores=cores,
-                                   forceall=False, force_incomplete=True,
-                                   dryrun=dryrun, use_conda=True,
-                                   configfiles=[config_file_shared],
-                                   rerun_triggers='mtime', config=config)
-    if not workflow:
-        print('snakemake execution failed, exiting now')
-        os._exit(0)
-
     Snakemake_report_files = Snakemake_report_files + [major_file, major_file_pdf]
+    Snakemake_report_files.sort()
+
+    if not report:
+        workflow = snakemake.snakemake(snakefile=Snakefile, targets=[major_file],
+                                    workdir=OUTPUT_PATH, cores=cores,
+                                    forceall=False, force_incomplete=True,
+                                    dryrun=dryrun, use_conda=True,
+                                    configfiles=[config_file_shared],
+                                    rerun_triggers='mtime', config=config)
+        if not workflow:
+            print('snakemake execution failed, exiting now')
+            os._exit(0)
 
     report_file = os.path.join(OUTPUT_PATH, projects, '_'.join(execute),
                                '_'.join(DRUGS), 'report.html')
 
-    # [i for i  in Snakemake_all_files if re.search('.*lifelines_evaluated-norm_count.*', i) ]
     ###########################################################################
     #                            final REPORT creation                        #
     ###########################################################################
+    # sort the report files according to their subcategory:
 
-    workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_report_files,
-                                   workdir=OUTPUT_PATH, cores=cores,
-                                   forceall=False, force_incomplete=True,
-                                   dryrun=dryrun, use_conda=True,
-                                   configfiles=[config_file_shared],
-                                   rerun_triggers='mtime', config=config,
-                                   report=report_file,
-                                   report_stylesheet=os.path.join(os.path.split(__file__)[0], os.pardir, "report_src", "custom-stylesheet.css"))
+    # also with dryrun set, the report file would be created, catch that
+    # beforehand:
+    if not dryrun:
+        workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_report_files,
+                                    workdir=OUTPUT_PATH, cores=cores,
+                                    forceall=False, force_incomplete=True,
+                                    use_conda=True,
+                                    configfiles=[config_file_shared],
+                                    rerun_triggers='mtime', config=config,
+                                    report=report_file,
+                                    report_stylesheet=os.path.join(
+                                        os.path.split(__file__)[0], os.pardir,
+                                        "report_src", "custom-stylesheet.css"))
 
-    if not workflow:
-        print('snakemake execution failed, exiting now')
-        os._exit(0)
+        if not workflow:
+            print('snakemake execution failed, exiting now')
+            os._exit(0)

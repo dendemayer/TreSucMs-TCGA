@@ -53,7 +53,7 @@ rule merge_deseq_out_heatmaps:
     for report creation
     """
     input:
-        heatmaps = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.pdf", count_type=['nt', 'raw', 'norm', 'vsd'], in_de=["IN", "DE"]),
+        heatmaps = expand("{{output_path}}/{{project}}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_heatmap_log2f{in_de}CREASE_{count_type}_counts.pdf", count_type=['nt', 'vsd'], in_de=["IN", "DE"]),
     output:
         heatmaps_merged = report("{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/DESeq2_heatmap_merged.pdf", category="DESeq2", subcategory = "{project}", labels={"Category": "heatmaps", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
     conda:
@@ -234,11 +234,12 @@ rule aggregate_lifelines_all_deseq:
     # aggregation also over threshold
     # the count_type is a col within deseq_lifeline_aggregated and can be used
     # in the following evaluation and diff steps
+    here, all possible  p_sum and p_prod cols are created over the different thresholds and cutoffs
     """
     input:
         # not using a input fct, we rather expand here the thresholds which should be aggregated explicitly, with that its still possible to get different aggregated results for different threshold combinations:
         # so the threshold inclusion depends on the interface threshold input in each single run
-        lifeline_all = get_lifeline_all, # first lifeline plots with therapy set invoked and validation plot for UP and for DOWN regulated expressions
+        lifeline_all = get_lifeline_all, # first, base lifeline plots with therapy set invoked and validation plot for UP and for DOWN regulated expressions
         # the results are not needed within the aggregate_lifelines_all.py script, but shall be a precondition to run this rule
         deseq_results = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/DESeq2_log2f{in_de}CREASE_result.tsv", in_de=['IN', 'DE']),
         script_file = os.path.join(script_path, "scripts/aggregate_lifelines_all.py")
@@ -264,7 +265,8 @@ rule evaluate_lifelines_all_deseq:
         script_file = os.path.join(script_path, "scripts/evaluate_lifelines_all.py")
     output:
         deseq_lifeline_eval = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.tsv.gz", threshold_str=threshold_str),
-        deseq_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.pdf", threshold_str=threshold_str), category="DESeq2", subcategory = "{project}",labels={"Category": "evaluated-kaplan-meier", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
+        deseq_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.pdf",caption="report_src/captions/evaluate_lifelines_all_deseq_caption.rst", threshold_str=threshold_str), category="DESeq2", subcategory = "{project}",labels={"Category": "evaluated-kaplan-meier", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
+        deseq_lifeline_eval_combined_pvals = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}_pval_combined.tsv.gz", threshold_str=threshold_str),
         #deseq_lifeline_aggregated = "/scr/DESeq2_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
     conda:
         "envs/pandas_pypdf.yaml"

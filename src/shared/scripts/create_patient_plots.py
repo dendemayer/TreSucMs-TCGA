@@ -135,7 +135,7 @@ g = sns.displot(meta_add_proj_gen[meta_add_proj_gen['in_therapy']],
                 facet_kws=dict(margin_titles=True), hue='vital_status',
                 kde=True)
 plt.subplots_adjust(top=0.9)
-g.fig.suptitle(f"Survivaltime at therapy start, patients in therapy\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
+g.fig.suptitle(f"Survivaltime, patients in therapy\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
 plt.savefig(plot_file_survival_in_therapy)
 plt.close('all')
 
@@ -147,7 +147,7 @@ g = sns.displot(meta_add_proj_gen[~meta_add_proj_gen['in_therapy']],
                 facet_kws=dict(margin_titles=True), hue='vital_status',
                 kde=True)
 plt.subplots_adjust(top=0.9)
-g.fig.suptitle(f"Survivaltime at therapy start, patients not in therapy\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
+g.fig.suptitle(f"Survivaltime, patients not in therapy\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
 plt.savefig(plot_file_survival_not_in_therapy)
 plt.close('all')
 
@@ -159,7 +159,7 @@ g = sns.displot(meta_add_proj_gen,
                 facet_kws=dict(margin_titles=True), hue='vital_status',
                 kde=True)
 plt.subplots_adjust(top=0.9)
-g.fig.suptitle(f"Survivaltime at therapy start, all patients\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
+g.fig.suptitle(f"Survivaltime, all patients\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
 plt.savefig(plot_file_survival)
 plt.close('all')
 

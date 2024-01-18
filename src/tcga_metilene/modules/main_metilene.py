@@ -15,7 +15,8 @@ src/tcga_metilene/Snakefile
 
 
 def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
-              threshold, cores, pipeline, config_file_shared, config, dryrun, cutoffs_str):
+              threshold, cores, pipeline, config_file_shared, config, dryrun,
+              cutoffs_str, report):
 
     SCRIPT_PATH = os.path.split(__file__)[0]
 
@@ -28,7 +29,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # # into file. , this is then read by Snakemake
     # thresh_file = os.path.join(os.path.split(SCRIPT_PATH)[0], 'dynamic',
     #                            'thresholds.txt')
-    thresh_list = [f'threshold_{str(i)}' for i in threshold]
+    # thresh_list = [f'threshold_{str(i)}' for i in threshold]
 
     PROJECTS = []
     if len(PROJECT) > 1:
@@ -42,7 +43,8 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # shared_workdir = os.path.join(
     #     os.path.split(os.path.split(SCRIPT_PATH)[0])[0], 'shared')
     # Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], 'Snakefile')
-    Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], os.path.pardir, 'shared', 'Snakefile')
+    Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], os.path.pardir,
+                             'shared', 'Snakefile')
 
     metilene_intersect_tables = \
         bed_intersect_metilene.return_bed_interesect_metilene_files(
@@ -52,17 +54,18 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     # IMPORTANT the intersect tables define the DMRs which are requested in the
     # following, they must be completed here!
     # TODO uncomment this !!!
-    workflow = snakemake.snakemake(snakefile=Snakefile,
-                                   targets=Snakemake_all_files,
-                                   workdir=OUTPUT_PATH, cores=cores,
-                                   forceall=False, rerun_triggers='mtime',
-                                   force_incomplete=True, dryrun=dryrun,
-                                   use_conda=True,
-                                   configfiles=[config_file_shared],
-                                   config=config)
-    if not workflow:
-        print('snakemake execution failed, exiting now')
-        os._exit(0)
+    if not report:
+        workflow = snakemake.snakemake(snakefile=Snakefile,
+                                       targets=Snakemake_all_files,
+                                       workdir=OUTPUT_PATH, cores=cores,
+                                       forceall=False, rerun_triggers='mtime',
+                                       force_incomplete=True, dryrun=dryrun,
+                                       use_conda=True,
+                                       configfiles=[config_file_shared],
+                                       config=config)
+        if not workflow:
+            print('snakemake execution failed, exiting now')
+            os._exit(0)
     # TODO uncomment this !!!
 
     # ## up to this point, every download, preprocessing and metilene analyse
@@ -114,18 +117,19 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
 
     Snakemake_all_files = Snakemake_all_files + merged_plots
     # TODO
-    workflow = snakemake.snakemake(snakefile=Snakefile,
-                                   targets=Snakemake_all_files,
-                                   workdir=OUTPUT_PATH, cores=cores,
-                                   forceall=False, force_incomplete=True,
-                                   dryrun=dryrun, use_conda=True,
-                                   printshellcmds=True,
-                                   rerun_triggers='mtime',
-                                   configfiles=[config_file_shared],
-                                   config=config)
-    if not workflow:
-        print('snakemake execution failed, exiting now')
-        os._exit(0)
+    if not report:
+        workflow = snakemake.snakemake(snakefile=Snakefile,
+                                       targets=Snakemake_all_files,
+                                       workdir=OUTPUT_PATH, cores=cores,
+                                       forceall=False, force_incomplete=True,
+                                       dryrun=dryrun, use_conda=True,
+                                       printshellcmds=True,
+                                       rerun_triggers='mtime',
+                                       configfiles=[config_file_shared],
+                                       config=config, unlock=True)
+        if not workflow:
+            print('snakemake execution failed, exiting now')
+            os._exit(0)
     # TODO
 
     aggregate_lifelines_list = \
@@ -134,9 +138,9 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
                                                          threshold, pipeline)
     Snakemake_all_files = Snakemake_all_files + aggregate_lifelines_list
 
-    evaluate_lifelines_list = [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_lifelines_evaluated.tsv.gz') for i in aggregate_lifelines_list]
-    evaluate_lifelines_list = evaluate_lifelines_list + [ i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_lifelines_evaluated.pdf') for i in aggregate_lifelines_list]
-    eval_new = [i.replace('evaluated', 'evaluated-beta_vals') for i in  evaluate_lifelines_list]
+    evaluate_lifelines_list = [i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_lifelines_evaluated.tsv.gz') for i in aggregate_lifelines_list]
+    evaluate_lifelines_list = evaluate_lifelines_list + [i.replace(f'{pipeline}_lifelines_aggregated.tsv.gz', f'{pipeline}_lifelines_evaluated.pdf') for i in aggregate_lifelines_list]
+    eval_new = [i.replace('evaluated', 'evaluated-beta_vals') for i in evaluate_lifelines_list]
 
     Snakemake_all_files = Snakemake_all_files + eval_new
     Snakemake_report_files = eval_new
@@ -161,25 +165,25 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
             for gender in ['male', 'female', 'female_male']:
                 DMR_intersect_merged.append(os.path.join(OUTPUT_PATH, project, pipeline, pipeline + '_output', DRUG_str, gender, cutoff, 'metilene_intersect_beta_value_merged.pdf'))
 
-    Snakemake_report_files = Snakemake_report_files + DMR_intersect_merged
+    Snakemake_report_files = Snakemake_report_files + DMR_intersect_merged + patients_overview
     Snakemake_all_files = Snakemake_all_files + patients_overview + DMR_intersect_merged
-    merged_diffs_list = [i.replace('lifelines_aggregated.tsv.gz', 'plot_aggr+eval_diffs_merged.pdf') for i in  aggregate_lifelines_list]
+    merged_diffs_list = [i.replace('lifelines_aggregated.tsv.gz', 'plot_aggr+eval_diffs_merged.pdf') for i in aggregate_lifelines_list]
     Snakemake_all_files = Snakemake_all_files + merged_diffs_list
     Snakemake_report_files = Snakemake_report_files + merged_diffs_list
-
     # TODO
-    workflow = snakemake.snakemake(snakefile=Snakefile,
-                                   targets=Snakemake_all_files,
-                                   workdir=OUTPUT_PATH, cores=cores,
-                                   forceall=False, force_incomplete=True,
-                                   dryrun=dryrun, use_conda=True,
-                                   printshellcmds=True,
-                                   rerun_triggers='mtime',
-                                   configfiles=[config_file_shared],
-                                   config=config)
-    if not workflow:
-        print('snakemake execution failed, exiting now')
-        os._exit(0)
+    if not report:
+        workflow = snakemake.snakemake(snakefile=Snakefile,
+                                       targets=Snakemake_all_files,
+                                       workdir=OUTPUT_PATH, cores=cores,
+                                       forceall=False, force_incomplete=True,
+                                       dryrun=dryrun, use_conda=True,
+                                       printshellcmds=True,
+                                       rerun_triggers='mtime',
+                                       configfiles=[config_file_shared],
+                                       config=config)
+        if not workflow:
+            print('snakemake execution failed, exiting now')
+            os._exit(0)
     return Snakemake_report_files
     # # TODO
 # # ##### main_metilene ############

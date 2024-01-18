@@ -1,223 +1,97 @@
 import os
-from matplotlib.patches import bbox_artist
+# from matplotlib.patches import bbox_artist
+import matplotlib.transforms as transforms
 import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sns
 import sys
 import re
 
-sys.stdout = sys.stderr = open(snakemake.log[0], 'w')
-
-print('# snakemake inputs:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
-
-print('# snakemake output:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
-
-print('# snakemake wildcards:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
-
-lifeline_aggregated = snakemake.input.lifeline_aggregated
-plot_diffs = snakemake.output.plot_diffs
-plot_diffs_table = snakemake.output.plot_diffs_table
-
-projects = ', '.join(snakemake.wildcards.project.split('_'))
-gender = ', '.join(snakemake.wildcards.gender.split('_'))
-drugs = '; '.join(snakemake.wildcards.drug_combi.split('_'))
-pipeline = snakemake.wildcards.pipeline
-plot_type = snakemake.wildcards.plot_type
-cutoff = snakemake.wildcards.cutoff.split('_')[1]
-count_type = snakemake.wildcards.count_type
-
 """
 visualize the impact of the threshold parameter, based on the variances of
-p_value and the life_mean_diff
+p_value_life and the life_mean_diff
 """
 
-###############################################################################
-#                                 test input                                  #
-###############################################################################
+if 'snakemake' in dir():
+    sys.stdout = sys.stderr = open(snakemake.log[0], 'w')
 
-# # snakemake inputs:
-# lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_evaluated-norm_count.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff.py"
-# # snakemake output:
-# plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_eval_diffs_DOWN_validation-norm_count.pdf"
-# plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_eval_diffs_DOWN_validation-norm_count.tsv.gz"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_7"
-# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-# pipeline = "DESeq2"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "male"
-# cutoff = "cutoff_0"
-# cutoff = cutoff.split('_')[1]
-# threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
-# plot_type = "DOWN_validation"
-# count_type = "norm_count"
-# projects = ', '.join(project.split('_'))
-# drugs = ', '.join(drug_combi.split('_'))
-# # snakemake inputs:
-# lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_evaluated-norm_count.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff.py"
-# # snakemake output:
-# plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_eval_diffs_UP_validation-norm_count.pdf"
-# plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_eval_diffs_UP_validation-norm_count.tsv.gz"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_7"
-# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-# pipeline = "DESeq2"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female"
-# cutoff = "cutoff_0"
-# threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
-# plot_type = "UP_validation"
-# count_type = "norm_count"
-# projects = ', '.join(project.split('_'))
-# drugs = ', '.join(drug_combi.split('_'))
+    print('# snakemake inputs:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
 
-# # touch back to: 2023-10-20 09:12
-# # Oct 11 20:05  2023-10-11 20:05
-# # snakemake inputs:
-# lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_evaluated-norm_count.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_deseq/../shared/scripts/plot_thresh_diff.py"
-# # snakemake output:
-# plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_eval_diffs_base_plot-norm_count.pdf"
-# plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_eval_diffs_base_plot-norm_count.tsv.gz"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_7"
-# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-# pipeline = "DESeq2"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female"
-# cutoff = "cutoff_0"
-# plot_type = "base_plot"
-# count_type = "norm_count"
-# projects = ', '.join(project.split('_'))
-# drugs = ', '.join(drug_combi.split('_'))
+    print('# snakemake output:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
 
-# lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff.py"
-# # snakemake output:
-# plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_DOWN-beta_vals.pdf"
-# plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_DOWN-beta_vals.tsv.gz"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_7"
-# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-# pipeline = "metilene"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "male"
-# cutoff = "cutoff_5"
-# threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
-# plot_type = "DOWN"
-# count_type = "beta_vals"
-# drugs = ', '.join(drug_combi.split('_'))
-# projects = ', '.join(project.split('_'))
+    print('# snakemake wildcards:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
-# # snakemake inputs:
-# lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/../shared/scripts/plot_thresh_diff.py"
-# # snakemake output:
-# plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_base_plot-beta_vals.pdf"
-# plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_base_plot-beta_vals.tsv.gz"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_7"
-# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-# pipeline = "metilene"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female"
-# cutoff = "cutoff_0"
-# plot_type = "base_plot"
-# count_type = "beta_vals"
-# projects = ', '.join(project.split('_'))
-# drugs = ', '.join(drug_combi.split('_'))
+    lifeline_aggregated = snakemake.input.lifeline_aggregated
+    plot_diffs = snakemake.output.plot_diffs
+    plot_diffs_table = snakemake.output.plot_diffs_table
+    project = snakemake.wildcards.project
+    # projects = ', '.join(snakemake.wildcards.project.split('_'))
+    # gender = ', '.join(snakemake.wildcards.gender.split('_'))
+    gender = snakemake.wildcards.gender
+    # drugs = '; '.join(snakemake.wildcards.drug_combi.split('_'))
+    drug_combi = snakemake.wildcards.drug_combi
+    pipeline = snakemake.wildcards.pipeline
+    plot_type = snakemake.wildcards.plot_type
+    # cutoff = snakemake.wildcards.cutoff.split('_')[1]
+    cutoff = snakemake.wildcards.cutoff
+    count_type = snakemake.wildcards.count_type
+else:
+    # snakemake inputs:
+    lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_aggregated.tsv.gz"
+    script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff.py"
+    # snakemake output:
+    plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_diffs_base_plot-norm_count.pdf"
+    plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_diffs_base_plot-norm_count.tsv.gz"
+    # snakemake wildcards:
+    output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
+    project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+    pipeline = "DESeq2"
+    drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+    gender = "male"
+    cutoff = "cutoff_0"
+    threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
+    plot_type = "base_plot"
+    count_type = "norm_count"
+    # # snakemake inputs:
+    # lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_evaluated-norm_count.tsv.gz"
+    # script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff.py"
+    # # snakemake output:
+    # plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_eval_diffs_base_plot-norm_count.pdf"
+    # plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_eval_diffs_base_plot-norm_count.tsv.gz"
+    # # snakemake wildcards:
+    # output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
+    # project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+    # pipeline = "DESeq2"
+    # drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+    # gender = "female"
+    # cutoff = "cutoff_0"
+    # threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
+    # plot_type = "base_plot"
+    # count_type = "norm_count"
+    # # snakemake inputs:
+    # lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_aggregated.tsv.gz"
+    # script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff.py"
+    # # snakemake output:
+    # plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_diffs_base_plot-norm_count.pdf"
+    # plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_diffs_base_plot-norm_count.tsv.gz"
+    # # snakemake wildcards:
+    # output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
+    # project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+    # pipeline = "DESeq2"
+    # drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+    # gender = "female_male"
+    # cutoff = "cutoff_0"
+    # threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
+    # plot_type = "base_plot"
+    # count_type = "norm_count"
 
-# # snakemake inputs:
-# lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_aggregated.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_deseq/../shared/scripts/plot_thresh_diff.py"
-# # snakemake output:
-# plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_diffs_base_plot-norm_count.pdf"
-# plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_diffs_base_plot-norm_count.tsv.gz"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_3"
-# project = "TCGA-CESC"
-# pipeline = "DESeq2"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female"
-# cutoff = "cutoff_0"
-# plot_type = "base_plot"
-# count_type = "norm_count"
-# projects = ', '.join(project.split('_'))
-# drugs = ', '.join(drug_combi.split('_'))
-
-# # snakemake inputs:
-# lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_aggregated.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/../shared/scripts/plot_thresh_diff.py"
-# # snakemake output:
-# plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_base_plot-beta_vals.pdf"
-# plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_base_plot-beta_vals.tsv.gz"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_3"
-# project = "TCGA-CESC"
-# pipeline = "metilene"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female"
-# cutoff = "cutoff_0"
-# plot_type = "base_plot"
-# count_type = "beta_vals"
-# projects = ', '.join(project.split('_'))
-# drugs = ', '.join(drug_combi.split('_'))
-
-# # snakemake inputs:
-# lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_aggregated.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_deseq/../shared/scripts/plot_thresh_diff.py"
-# # snakemake output:
-# plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_diffs_base_plot-norm_count.pdf"
-# plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_diffs_base_plot-norm_count.tsv.gz"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_3"
-# project = "TCGA-CESC"
-# pipeline = "DESeq2"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female"
-# cutoff = "cutoff_5"
-# plot_type = "base_plot"
-# count_type = "norm_count"
-# projects = ', '.join(project.split('_'))
-# drugs = ', '.join(drug_combi.split('_'))
-
-# # snakemake inputs:
-# lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_aggregated.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/../shared/scripts/plot_thresh_diff.py"
-# # snakemake output:
-# plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_base_plot.pdf"
-# plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_diffs_base_plot.tsv.gz"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_3"
-# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-# pipeline = "metilene"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female_male"
-# cutoff = "cutoff_8"
-# plot_type = "base_plot"
-# projects = ', '.join(project.split('_'))
-# drugs = ', '.join(drug_combi.split('_'))
-
-# # snakemake inputs:
-# lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/../shared/scripts/plot_thresh_diff.py"
-# # snakemake output:
-# plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_DOWN_validation.pdf"
-# plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_DOWN_validation.tsv.gz"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_3"
-# project = "TCGA-HNSC"
-# pipeline = "metilene"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female"
-# cutoff = "cutoff_5"
-# plot_type = "DOWN_validation"
-
+projects = ', '.join(project.split('_'))
+gender = ', '.join(gender.split('_'))
+drugs = '; '.join(drug_combi.split('_'))
+cutoff = cutoff.split('_')[1]
 ###############################################################################
 #                                 test input                                  #
 ###############################################################################
@@ -225,7 +99,6 @@ p_value and the life_mean_diff
 ###############################################################################
 #                    input to estimate the plot dimansions                    #
 ###############################################################################
-
 # # (Pdb) len(base_DF_pval_sort['chr_start'].drop_duplicates())
 # # 443
 # # snakemake inputs:
@@ -291,9 +164,8 @@ p_value and the life_mean_diff
 
 #bei 21 -> 10.5,  bei 442 -> 22.1
 # 435 -> 50
-
 ###############################################################################
-#                    input to estimate the plot dimansions                    #
+#                    input to estimate the plot dimensions                    #
 ###############################################################################
 
 
@@ -318,10 +190,10 @@ def plot_dynamical_metilene(DF, out_file, out_file_table, plot_type):
     # p_val_sorted_DMR = base_DF.set_index('threshold').loc[0, :].sort_values(what_to_plot)['DMR'].to_list()
     try:
         if re.search('lifelines_evaluated',os.path.split(lifeline_aggregated)[1]):
-            # in the evaluated case, the best p_value is already given
-            p_val_sorted_DMR = base_DF.sort_values('p_value')['DMR'].to_list()
+            # in the evaluated case, the best p_value_life is already given
+            p_val_sorted_DMR = base_DF.sort_values('p_value_life')['DMR'].to_list()
         else:
-            p_val_sorted_DMR = base_DF.set_index('threshold').loc[0, :].sort_values('p_value')['DMR'].to_list()
+            p_val_sorted_DMR = base_DF.set_index('threshold').loc[0, :].sort_values('p_value_life')['DMR'].to_list()
     except Exception as e:
         print(f'exception {e}\nnot enough values for plot, writing empty files {out_file} and {out_file_table}')
         pd.DataFrame().to_csv(out_file_table, sep='\t')
@@ -343,10 +215,15 @@ def plot_dynamical_metilene(DF, out_file, out_file_table, plot_type):
         fig.suptitle(f'evaluated life mean diffs and p-values for all DMRs\np-value sorted\n{projects}, {gender}, {drugs}, cutoff={cutoff}\nplot type={" ".join(plot_type.split("_"))}')
     else:
         fig.suptitle(f'aggregated life mean diffs and p-values for all DMRs\np-value sorted for threshold=0\n{projects}, {gender}, {drugs}, cutoff={cutoff}\nplot type={" ".join(plot_type.split("_"))}')
-    sns.lineplot(ax=ax[0], data=base_DF_pval_sort, x='DMR', y='p_value', marker='.', hue='threshold', palette=sns.cubehelix_palette()[:thresh_len][::-1])
+    sns.lineplot(ax=ax[0], data=base_DF_pval_sort, x='DMR', y='p_value_life', marker='.', hue='threshold', palette=sns.cubehelix_palette()[:thresh_len][::-1])
     sns.lineplot(ax=ax[1], data=base_DF_pval_sort, x='DMR', y='life_mean_diff', marker='.', hue='threshold', legend=False, palette=sns.cubehelix_palette()[:thresh_len][::-1])
-    ax[1].axhline(y=0)
     ax[0].grid()
+    ax[0].set_yscale('log')
+    ax[0].axhline(y=0.05)
+    trans = transforms.blended_transform_factory(ax[0].get_yticklabels()[0].get_transform(), ax[0].transData)
+    ax[0].text(0.01, 0.05, "0.05", color="black", transform=trans, ha="left", va="bottom")
+
+    ax[1].axhline(y=0)
     ax[1].grid()
     plt.xticks(rotation=90)
     plt.xlim(left=-1)
@@ -365,14 +242,18 @@ def plot_dynamical_metilene(DF, out_file, out_file_table, plot_type):
     fig, ax = plt.subplots(2,1,figsize=figsize, sharex=True)
     if re.search('lifelines_evaluated',os.path.split(lifeline_aggregated)[1]):
         fig.suptitle(f'evaluated life mean diffs and p-values for all chromosome - start positions\np-value sorted for threshold=0\n{projects}, {gender}, {drugs}, cutoff={cutoff}\nplot type={" ".join(plot_type.split("_"))}')
-        sns.lineplot(ax=ax[0], data=base_DF_pval_sort, x='chromosome - start', y='p_value', marker='.', palette=sns.cubehelix_palette()[:thresh_len][::-1])
+        sns.lineplot(ax=ax[0], data=base_DF_pval_sort, x='chromosome - start', y='p_value_life', marker='.', palette=sns.cubehelix_palette()[:thresh_len][::-1])
         sns.lineplot(ax=ax[1], data=base_DF_pval_sort, x='chromosome - start', y='life_mean_diff', marker='.', legend=False, palette=sns.cubehelix_palette()[:thresh_len][::-1])
     else:
         fig.suptitle(f'aggregated life mean diffs and p-values for all chromosome - start positions\np-value sorted for threshold=0\n{projects}, {gender}, {drugs}, cutoff={cutoff}\nplot type={" ".join(plot_type.split("_"))}')
-        sns.lineplot(ax=ax[0], data=base_DF_pval_sort, x='chromosome - start', y='p_value', marker='.', hue='threshold', palette=sns.cubehelix_palette()[:thresh_len][::-1])
+        sns.lineplot(ax=ax[0], data=base_DF_pval_sort, x='chromosome - start', y='p_value_life', marker='.', hue='threshold', palette=sns.cubehelix_palette()[:thresh_len][::-1])
         sns.lineplot(ax=ax[1], data=base_DF_pval_sort, x='chromosome - start', y='life_mean_diff', marker='.', hue='threshold', legend=False, palette=sns.cubehelix_palette()[:thresh_len][::-1])
-    ax[1].axhline(y=0)
     ax[0].grid()
+    ax[0].set_yscale('log')
+    ax[0].axhline(y=0.05)
+    trans = transforms.blended_transform_factory(ax[0].get_yticklabels()[0].get_transform(), ax[0].transData)
+    ax[0].text(0.01, 0.05, "0.05", color="black", transform=trans, ha="left", va="bottom")
+    ax[1].axhline(y=0)
     ax[1].grid()
     chr_start_list = base_DF_pval_sort.loc[:, 'chr_start'].values.tolist()
     base_DF_pval_sort.reset_index().set_index('chr_start', inplace=True)
@@ -398,22 +279,23 @@ def plot_dynamical_deseq(DF, out_file, out_file_table, plot_type, count_type):
     thresh_len = len(DF['threshold'].value_counts())
     # limit the plot to one count type
     base_DF = DF.loc[plot_type, :]
-    # ENSGs might occur doubled, since it is possible that in one thresh no
-    # scoring happended, but in another it was, drop those doubled ENSGs which
-    # are not scored
-    if len(base_DF.value_counts('ENSG').value_counts() > 1):
-        base_DF = base_DF.reset_index()
-        ensg_to_delete = base_DF.value_counts('ENSG')[base_DF.value_counts('ENSG') > 1 ].index
-        num_index = base_DF.set_index(['ENSG', 'scored'], append=True).reset_index(0).loc[(ensg_to_delete, True), 'level_0'].values
-        base_DF = base_DF.drop(num_index).set_index('plot_type')
+    if re.search('lifelines_evaluated',os.path.split(lifeline_aggregated)[1]):
+        if len(base_DF.value_counts('ENSG').value_counts() > 1):
+            # ENSGs might occur doubled, since it is possible that in one thresh no
+            # scoring happended, but in another it was, drop those doubled ENSGs which
+            # are not scored
+            base_DF = base_DF.reset_index()
+            ensg_to_delete = base_DF.value_counts('ENSG')[base_DF.value_counts('ENSG') > 1 ].index
+            num_index = base_DF.set_index(['ENSG', 'scored'], append=True).reset_index(0).loc[(ensg_to_delete, True), 'level_0'].values
+            base_DF = base_DF.drop(num_index).set_index('plot_type')
     # in deseq, the count_type wildcard is available:
     base_DF = base_DF[base_DF['count_type'] == count_type]
     try:
         if re.search('lifelines_evaluated',os.path.split(lifeline_aggregated)[1]):
-            # in the evaluated case, the best p_value is already given
-            p_val_sorted_ENSG = base_DF.sort_values('p_value')['ENSG'].to_list()
+            # in the evaluated case, the best p_value_life is already given
+            p_val_sorted_ENSG = base_DF.sort_values('p_value_life')['ENSG'].to_list()
         else:
-            p_val_sorted_ENSG = base_DF.set_index('threshold').loc[0, :].sort_values('p_value')['ENSG'].to_list()
+            p_val_sorted_ENSG = base_DF.set_index('threshold').loc[0, :].sort_values('p_value_life')['ENSG'].to_list()
     except Exception as e:
         print(f'exception {e}\nnot enough values for plot, writing empty files {out_file} and {out_file_table}')
         pd.DataFrame().to_csv(out_file_table, sep='\t')
@@ -429,14 +311,18 @@ def plot_dynamical_deseq(DF, out_file, out_file_table, plot_type, count_type):
     if re.search('lifelines_evaluated',os.path.split(lifeline_aggregated)[1]):
         fig.suptitle(f'evaluated life mean diffs and p-adjusted for all ENSGs ({count_type})\np-value sorted\n{projects}, {gender}, {drugs}, cutoff={cutoff}\nplot type={" ".join(plot_type.split("_"))}')
         # in evaluated, no hue, and therefore no palette is needed
-        sns.lineplot(ax=ax[0], data=base_DF_pval_sort, x='ENSG', y='p_value', marker='.')
+        sns.lineplot(ax=ax[0], data=base_DF_pval_sort, x='ENSG', y='p_value_life', marker='.')
         sns.lineplot(ax=ax[1], data=base_DF_pval_sort, x='ENSG', y='life_mean_diff', marker='.', legend=False)
     else:
         fig.suptitle(f'aggregated life mean diffs and p-adjusted for all ENSGs ({count_type})\np-value sorted for threshold=0\n{projects}, {gender}, {drugs}, cutoff={cutoff}\nplot type={" ".join(plot_type.split("_"))}')
-        sns.lineplot(ax=ax[0], data=base_DF_pval_sort, x='ENSG', y='p_value', marker='.', hue='threshold', palette=sns.cubehelix_palette()[:thresh_len][::-1])
+        sns.lineplot(ax=ax[0], data=base_DF_pval_sort, x='ENSG', y='p_value_life', marker='.', hue='threshold', palette=sns.cubehelix_palette()[:thresh_len][::-1])
         sns.lineplot(ax=ax[1], data=base_DF_pval_sort, x='ENSG', y='life_mean_diff', marker='.', hue='threshold', legend=False, palette=sns.cubehelix_palette()[:thresh_len][::-1])
     ax[1].axhline(y=0)
+    ax[0].axhline(y=0.05)
     ax[0].grid()
+    ax[0].set_yscale('log')
+    trans = transforms.blended_transform_factory(ax[0].get_yticklabels()[0].get_transform(), ax[0].transData)
+    ax[0].text(0.01, 0.05, "0.05", color="black", transform=trans, ha="left", va="bottom")
     ax[1].grid()
     # ENSG:
     # base_DF_pval_sort.iloc[0, :].name
@@ -446,10 +332,10 @@ def plot_dynamical_deseq(DF, out_file, out_file_table, plot_type, count_type):
     # base_DF_pval_sort.iloc[0, 0]
     # life_mean_diff:
     # base_DF_pval_sort.iloc[0, 7]
-    # adding the threshol value to the marker points:
     # ax[1].text(base_DF_pval_sort.iloc[0, :].name, base_DF_pval_sort.iloc[0, 7], base_DF_pval_sort.iloc[0, 0])
     base_DF_pval_sort = base_DF_pval_sort.reset_index().reset_index().set_index('ENSG')
-    # [ax[0].text(base_DF_pval_sort.loc[ensg, 'index'] - 0.3, base_DF_pval_sort.loc[ensg, 'p_value'] + 0.05, base_DF_pval_sort.loc[ensg, 'threshold']) for ensg in base_DF_pval_sort.index.tolist()]
+    # [ax[0].text(base_DF_pval_sort.loc[ensg, 'index'] - 0.3, base_DF_pval_sort.loc[ensg, 'p_value_life'] + 0.05, base_DF_pval_sort.loc[ensg, 'threshold']) for ensg in base_DF_pval_sort.index.tolist()]
+    # adding the threshold value to the marker points:
     if re.search('lifelines_evaluated',os.path.split(lifeline_aggregated)[1]):
         [ax[1].text(base_DF_pval_sort.loc[ensg, 'index'] - 0.25, base_DF_pval_sort.loc[ensg, 'life_mean_diff'] + 0.02, base_DF_pval_sort.loc[ensg, 'threshold']) for ensg in base_DF_pval_sort.index.tolist()]
         # for ensg in base_DF_pval_sort.index.tolist():
@@ -471,4 +357,4 @@ if pipeline == 'metilene':
     plot_dynamical_metilene(DF, plot_diffs, plot_diffs_table, plot_type)
 elif pipeline == 'DESeq2':
     plot_dynamical_deseq(DF, plot_diffs, plot_diffs_table, plot_type, count_type)
-# plot_dynamical(base_DF, 'p_value', plot_diffs_p_val , plot_diffs_p_val_table)
+# plot_dynamical(base_DF, 'p_value_life', plot_diffs_p_val , plot_diffs_p_val_table)
