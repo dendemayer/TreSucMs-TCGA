@@ -40,9 +40,9 @@ else:
     # m = snakemake.wildcards[5]
     # M = snakemake.wildcards[6]
     # d = snakemake.wildcards[7]
-    m = 3
-    M = 1000
-    d = 0.03
+    m = 3  # -m, --mincpgs	Integer	10	The minimum # of CpGs in a DMR
+    M = 1000  # -M, --maxdist	Integer	300	The allowed nt distance between two CpGs within a DMR
+    d = 0.03  # -d, --minMethDiff	double	0.1	The minimum mean methylation difference for calling DMRs
     resource_path = os.path.join(os.path.split(os.path.split(__file__)[0])[0], 'resources')
     metilene = os.path.join(resource_path, 'metilene_linux64')
     metilene_sorted_out = snakemake.output[0]

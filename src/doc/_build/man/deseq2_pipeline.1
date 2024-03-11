@@ -1,0 +1,1423 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "DESEQ2_PIPELINE" "1" "Dec 07, 2021" "" "DESeq2_pipeline"
+.SH NAME
+deseq2_pipeline \- DESeq2_pipeline 1.0
+.sp
+“DESeq2_pipeline” a tool to choose, harvest and analyse expression data of
+the TCGA\-projects with help of the DESeq2 R package
+.SH BUILD AND ACTIVATE THE PROVIDED CONDA ENV:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ conda env create \-f deseq_env.yaml
+$ conda activate deseq_pipeline
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+call the script without any options to enter the interactive mode and set
+each option step by step:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ python main_deseq.py
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+print help page:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ python main_deseq.py \-\-help
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Usage: main_deseq.py [OPTIONS]
+.INDENT 0.0
+.TP
+.B Options:
+.INDENT 7.0
+.TP
+.B  \-D\fP,\fB  \-\-download_data
+perform download and merging steps, without the
+DESeq2 analysis
+.TP
+.B  \-A\fP,\fB  \-\-analyse_data
+perform the DESeq2 analysis (the download step must
+be completed in prior for your chosen projects)
+.TP
+.BI \-o\fP,\fB  \-\-out_path \ TEXT
+The Path, where all results are saved to.
+.TP
+.BI \-p\fP,\fB  \-\-project \ TEXT
+TCGA project to be applied. Any TCGA project can be
+choosen, like: \-p TCGA\-CESC \-p TCGA\-HNSC …
+.TP
+.BI \-d\fP,\fB  \-\-drugs \ TEXT
+drug(s), like: \-d drug1 \-d drug2 or
+drugcombination(s), like: \-d drug1,drug2
+.TP
+.BI \-f\fP,\fB  \-\-function \ INTEGER
+running functions separately, important for the
+snakemake functionality. Look up the documentation
+or the man page for detailed description  of each
+function
+.TP
+.BI \-t\fP,\fB  \-\-threshold \ INTEGER
+threshold for a higher division of the kaplan meier
+plots  [default: 0]
+.TP
+.B  \-s\fP,\fB  \-\-snakerun
+needed for the snakemake functionality, NOT to be
+set manually by the user
+.TP
+.BI \-c\fP,\fB  \-\-cutoff \ FLOAT
+cutoff parameter: convert dead cases to alive cases
+if they outlive the cutoff parameter (in years) no
+conversion performed if default (or no) value
+applied  [default: 0]
+.TP
+.B  \-v\fP,\fB  \-\-version
+printing out version information: Version 1.0
+.TP
+.B  \-\-help
+Show this message and exit.
+.UNINDENT
+.UNINDENT
+.SH SHORT TUTORIAL:
+.SS Performing an example analysis:
+.sp
+The easiest way of applying a run is entering the interactive mode (it is
+supposed that you cloned the deseq_pipeline git repository and cd into that
+dir):
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ python main_deseq.py
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+With it, every needed parameter is offered for further analyses. First, the
+available projects are presented, based on that selection, available drugs
+or drug combinations can be chosen.
+.sp
+In contrast to that, the parameter needed could be applied via command line.
+An example terminal call for the projects TCGA\-CESC and TCGA\-HNSC together with
+the drug cisplatin and the combination carboplatin,paclitaxel would be:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ python main_deseq.py \-p TCGA\-CESC \-p TCGA\-HNSC
+\-d cisplatin \-d carboplatin,paclitaxel \-o /OUTPUT_path \-D \-A
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+First of all, the needed data for the selected projects is loaded via the
+TCGA API and stored in:
+.INDENT 0.0
+.IP \(bu 2
+/OUTPUT_path/TCGA\-CESC/TCGA\-CESC_data_files/ and
+.IP \(bu 2
+/OUTPUT_path/TCGA\-HNSC/TCGA\-HNSC_data_files/
+.UNINDENT
+.sp
+Intermediate merged tables and additional meta_data tables are stored in the
+project directories:
+.INDENT 0.0
+.IP \(bu 2
+/OUTPUT_path/TCGA\-CESC/
+.IP \(bu 2
+/OUTPUT_path/TCGA\-HNSC/
+.UNINDENT
+.sp
+First, single project analyses are performed. The actual analysis is
+determined by the project, and by the drugs combination. The directory for
+the drugs combination is created out of the applied drugs, so here, the
+DRUGS_title is ‘carboplatin,paclitaxel_cisplatin’.
+.sp
+Everything below that drugs directory, is restricted to the chosen drugs
+s.t. the results of both single project analyses are placed in:
+.INDENT 0.0
+.IP \(bu 2
+/OUTPUT_path/TCGA\-CESC/carboplatin,paclitaxel_cisplatin/
+.IP \(bu 2
+/OUTPUT_path/TCGA\-HNSC/carboplatin,paclitaxel_cisplatin/
+.UNINDENT
+.sp
+After the single project analysis, the projects are combined. Those results
+are stored in an additional directory, composed out of the applied projects,
+so here, the PROJECT_title is: ‘TCGA\-CESC_TCGA\-HNSC’, those results are saved
+in the directory:
+.INDENT 0.0
+.IP \(bu 2
+/OUTPUT_path/TCGA\-CESC_TCGA\-HNSC/carboplatin,paclitaxel_cisplatin/
+.UNINDENT
+.sp
+Since the analysis is determined by the project and drug combination, results
+for 3 different approaches are created, two for the single projects and one
+for the aggregation of the two projects. For all of them, a respective
+REPORT.pdf is created, containing a summarized representation of the most
+important results and plots, along with some explanations to them. They are
+stored at:
+.INDENT 0.0
+.IP \(bu 2
+/OUTPUT_path/TCGA\-CESC/carboplatin,paclitaxel_cisplatin/REPORT.pdf
+.IP \(bu 2
+/OUTPUT_path/TCGA\-HNSC/carboplatin,paclitaxel_cisplatin/REPORT.pdf
+.IP \(bu 2
+/OUTPUT_path/TCGA\-CESC_TCGA\-HNSC/carboplatin,paclitaxel_cisplatin/REPORT.pdf
+.UNINDENT
+.SS Recreate the performed analysis:
+.sp
+To rerun the analysis and reproduce all the outputs and results created with
+it, a single Snakemake configuration file is created. It is stored in the
+cloned repository location under the ‘Snakes’ subdir.
+Since the analysis is determined by the composition of projects and drugs, the
+unique filename of this configuration file is composed out of it. For the
+example with CESC and HNSC, together with cisplatin and carboplatin,paclitaxel,
+that would be:
+.INDENT 0.0
+.IP \(bu 2
+SCRIPT_path/Snakes/snakemake_config_TCGA\-CESC_TCGA\-HNSC_carboplatin,paclitaxel_cisplatin.yaml
+.UNINDENT
+.sp
+The Snakefile needed is also hold available at:
+.INDENT 0.0
+.IP \(bu 2
+SCRIPT_path/Snakes/Snakefile
+.UNINDENT
+.sp
+This file must be edited and the path to the config yaml file, the OUTPUT_path
+and the SCRIPT_path must be inserted.
+.sp
+With that, the Snakefile is configured to run the analyses again. Change the
+directory into the SCRIPT_path/Snakes/ path and run for example:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ snakemake \-\-cores 7
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+This would use 7 cores of your machine if available and make use of
+parallelisation of steps where it is feasible.
+.SH DIRECT FUNCTION CALLING VIA TERMINAL CALL:
+.sp
+The possibility to call some functions directly through the terminal is
+necessary for the Snakemake functionality, but not an actual use case, besides
+of function 11.
+.sp
+The \-D option is an alias to call function 1 to 6, the \-A option is an alias to
+call function 7 to 15.
+.sp
+If you want to add a new threshold for your Kaplan Meier plots, this could be
+done with function 11. The config yaml file is updated automatically, s.t. this
+would be included to your fixed workflow.
+.INDENT 0.0
+.IP \(bu 2
+\fI\%\-f 1 meta_filter()\fP
+.IP \(bu 2
+\fI\%\-f 2 download_clinical_tables()\fP
+.IP \(bu 2
+\fI\%\-f 3 download_data_files()\fP
+.IP \(bu 2
+\fI\%\-f 4 merging_meta_infos()\fP
+.IP \(bu 2
+\fI\%\-f 5 create_summary_table()\fP
+.IP \(bu 2
+\fI\%\-f 6 correct_drugs()\fP
+.IP \(bu 2
+\fI\%\-f 7 provide_DESeq2_table()\fP
+.IP \(bu 2
+\fI\%\-f 8 create_statistics_from_DESeq2_tables()\fP
+.IP \(bu 2
+\fI\%\-f 9 provide_DESeq2_table()\fP
+.IP \(bu 2
+\fI\%\-f 10 create_statistics_from_DESeq2_tables()\fP
+.IP \(bu 2
+\fI\%\-f 11 lifelines_ENSG()\fP
+.IP \(bu 2
+\fI\%\-f 12 drug_frequency()\fP
+.IP \(bu 2
+\fI\%\-f 13 create_report_pdf()\fP
+.IP \(bu 2
+\fI\%\-f 14 drug_frequency_all_single_projects()\fP
+.IP \(bu 2
+\fI\%\-f 15 create_snake_config()\fP
+.UNINDENT
+.SH THE DESEQ2 PIPELINE SPECIFIC THRESHOLD PARAMETER:
+.sp
+With the \-T parameter the gene specific Kaplan\-Meyer plots can be
+adjusted. The plots are created for both, the 10 most differentially expressed
+genes in the alive cases and in the dead cases. Based on the normalized
+countmatrix given by DESeq2, the median of the count values serve as pivot
+element for the division of cases in the groups UP and DOWN and are plotted
+accordingly to those groupings.
+It was desired to achieve a better separation of the graphs, with help
+of the threshold parameter. Therefore, counts from cases lying to close to the
+median shall be omitted. The threshold determines the percentage
+depending on the pivot element, in what range around of it counts of respective
+cases shall be omitted, invoking cases to the plot which show a more clear
+expression level either above or below the median.
+.SH DOCUMENTATION OF MODULES, CLASSES AND FUNCTIONS:
+.sp
+within this, every parameter needed for the analysis is set
+.INDENT 0.0
+.TP
+.B param
+out_path: path for DESeq2 pipeline outputs
+.TP
+.B type
+out_path: str
+.TP
+.B param
+script_path: path to the DESeq2_pipeline repo
+.TP
+.B type
+script_path: str
+.TP
+.B param
+function: apply, if a specific function should be executed solely        (also multiple functions possible)
+.TP
+.B type
+function: int
+.TP
+.B param
+drugs: applied drug(s)
+.TP
+.B type
+drugs: list of str
+.TP
+.B param
+project: list of projects chosen
+.TP
+.B type
+project: list of str
+.TP
+.B param
+download_data: bool flag, whether raw data needs to be downloaded
+.TP
+.B type
+download_data: bool
+.TP
+.B param
+analyse_data: bool flag, whether the deseq analyses shall be        started
+.TP
+.B param
+threshold: parameter for the lifeline plots helping for the        classification of expression data
+.TP
+.B type
+threshold: int
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_matrix_new.correct_drugs(PROJECT, OUTPUT_PATH, logger)
+.INDENT 7.0
+.TP
+.B Param
+PROJECT: list of projects chosen
+.TP
+.B Type
+PROJECT: list of str
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+logger: the adjustet logger with the right filehandler
+.TP
+.B Type
+logger: logging instance
+.UNINDENT
+.sp
+creating table: ‘OUTPUT_PATH/DF_3t_both_with_DRUG_combi.tsv’,
+drugcombination in field ‘drugnames’ as ordered set, comma seperated.
+header includes: UUID    case_id gender  vital_status    drugnames
+survivaltime    years_to_last_follow_up year_of_birth   year_of_death
+age_at_diagnosis        PROJECT
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 6 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 6
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_matrix_new.create_log_for_A(OUTPUT_PATH, PROJECT_list, PROJECT_title, DRUGS_title)
+.INDENT 7.0
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+PROJECT_list: list of applied projects
+.TP
+.B Type
+PROJECT_list: list of str
+.TP
+.B Param
+PROJECT_title: concatenated str of multiple projects
+.TP
+.B Type
+PROJECT_title: str
+.TP
+.B Param
+DRUGS_title: concatenated str of multiple drugs
+.TP
+.B Type
+DRUGS_title: str
+.UNINDENT
+.sp
+in case the \-A option is set without the \-D, the log file has to be createt
+in advance. With that, it is simultaneously checked if the files needed
+(downloaded datafiles, etc) are actually already present
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_matrix_new.create_snake_config(OUTPUT_PATH, PROJECT_title, DRUGS_title, PROJECT_list, DRUGS, SCRIPT_PATH, cutoff)
+.INDENT 7.0
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+PROJECT_title: concatenated str of multiple projects
+.TP
+.B Type
+PROJECT_title: str
+.TP
+.B Param
+DRUGS_title: concatenated str of multiple drugs
+.TP
+.B Type
+DRUGS_title: str
+.TP
+.B Param
+PROJECT_list: list of applied projects
+.TP
+.B Type
+PROJECT_list: list of str
+.TP
+.B Param
+DRUGS: applied drug(s)
+.TP
+.B Type
+DRUGS: list of str
+.TP
+.B Param
+SCRIPT_PATH: path to the DESeq2_pipeline repo
+.TP
+.B Type
+SCRIPT_PATH: str
+.TP
+.B Param
+cutoff: path to the DESeq2_pipeline repo
+.TP
+.B Type
+cutoff: float
+.UNINDENT
+.sp
+out of the log files in PROJECT_title/DRUGS_title/test_log.log
+parse out all outputfiles of the applied run and create
+PROJECT_title/DRUGS_title/snakemake_config.yaml
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 15 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_matrix_new.create_statistics_from_DESeq2_tables(OUTPUT_PATH, DRUGS, SCRIPT_PATH, PROJECT, logger, DRUGS_title)
+.INDENT 7.0
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+DRUGS: applied drug(s)
+.TP
+.B Type
+DRUGS: list of str
+.TP
+.B Param
+SCRIPT_PATH: path to the DESeq2_pipeline repo
+.TP
+.B Type
+SCRIPT_PATH: str
+.TP
+.B Param
+PROJECT: list of projects chosen
+.TP
+.B Type
+PROJECT: list of str
+.TP
+.B Param
+logger: the adjustet logger with the right filehandler
+.TP
+.B Type
+logger: logging instance
+.UNINDENT
+.sp
+adding some statistics to the result output tables from DESeq2
+table is saved in
+OUTPUT_PATH/PROJECT_title/DRUGS_title/DESeq2_out***/results_statistics.tsv
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 8 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 8
+
+# when choosing multiple projects, call:
+$ python main_deseq.py \-p TCGA\-CESC  \-p TCGA\-HNSC \-d cisplatin \-f 10
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_matrix_new.create_summary_table(OUTPUT_PATH, PROJECT, logger)
+.INDENT 7.0
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+PROJECT: list of projects chosen
+.TP
+.B Type
+PROJECT: list of str
+.TP
+.B Param
+logger: the adjustet logger with the right filehandler
+.TP
+.B Type
+logger: logging instance
+.UNINDENT
+.sp
+get the raw data out of the gzip compressed files and merge them together,
+save complete merged table in OUTPUT_PATH/PROJECT/summary_DF.tsv
+.SH EXAMPLE STRUCTURE FOR SUMMARY_DF.TSV:
+.TS
+center;
+|l|l|.
+_
+T{
+gene identifier
+T}	T{
+case_id with counts
+T}
+_
+T{
+genes
+T}	T{
+6ff12a54\-10da\-4941\-bfea\-7b66e19b4be9 …
+T}
+_
+T{
+ENSG00000000003
+T}	T{
+3423 …
+T}
+_
+T{
+ENSG00000000005
+T}	T{
+0 …
+T}
+_
+.TE
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 5 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 5
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_matrix_new.download_clinical_tables(UUID, PROJECT, OUTPUT_PATH, logger)
+.INDENT 7.0
+.TP
+.B Param
+UUID: unique file identifier of the meta table
+.TP
+.B Type
+UUID: str
+.TP
+.B Param
+PROJECT: list of projects chosen
+.TP
+.B Type
+PROJECT: list of str
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+logger: the adjustet logger with the right filehandler
+.TP
+.B Type
+logger: logging instance
+.UNINDENT
+.sp
+with the UUID the clinical tables will be downloaded in the
+OUTPUT_PATH/PROJECT:
+.INDENT 7.0
+.INDENT 3.5
+.INDENT 0.0
+.IP \(bu 2
+nationwidechildrens.org_clinical_patient_****.txt
+.IP \(bu 2
+nationwidechildrens.org_clinical_drug_****.txt
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 2 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 2
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_matrix_new.download_data_files(PROJECT, FILE_TYPE, OUTPUT_PATH, logger, snakerun, PROJECT_title, DRUGS_title, SCRIPT_PATH)
+.INDENT 7.0
+.TP
+.B Param
+PROJECT: list of projects chosen
+.TP
+.B Type
+PROJECT: list of str
+.TP
+.B Param
+FILE_TYPE: type of raw data to download from TCGA
+.TP
+.B Type
+FILE_TYPE: str
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+logger: the adjustet logger with the right filehandler
+.TP
+.B Type
+logger: logging instance
+.UNINDENT
+.sp
+dowloading all data files and the belonging manifest with UUID to each file
+creating a subdir in the OUTPUT_PATH/PROJECT/ folder named
+“{PROJECT}_data_files”
+the belonging MANIFEST.txt is saved in OUTPUT_PATH/PROJECT
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 3 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 3
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_matrix_new.merging_meta_infos(OUTPUT_PATH, PROJECT, logger)
+.INDENT 7.0
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+PROJECT: list of projects chosen
+.TP
+.B Type
+PROJECT: list of str
+.TP
+.B Param
+logger: the adjustet logger with the right filehandler
+.TP
+.B Type
+logger: logging instance
+.UNINDENT
+.sp
+merging the infos out of the 3 tables together(nationewidechildrens.org..,
+manifest, metainfo)
+creating 3 new tables, one with innerjoin(both), two with left and right
+outer join to save those files where information is missing:
+* DF_3t_left: no information about therapeutic_agents
+* DF_3t_right: missing filename (case_id present)
+.INDENT 7.0
+.IP \(bu 2
+DF_3t_both holds infos like UUID, filename, md5, size, state, case_id,        gender, vital_status, year_of_birth, year_of_death and some more..
+.UNINDENT
+.sp
+every table saved in OUTPUT_PATH/PROJECT/
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 4 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 4
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_matrix_new.meta_filter(PROJECT, FILE_TYPE, OUTPUT_PATH, DRUGS_title, logger, SCRIPT_PATH, PROJECT_title, snakerun)
+.INDENT 7.0
+.TP
+.B Param
+PROJECT: list of projects chosen
+.TP
+.B Type
+PROJECT: list of str
+.TP
+.B Param
+FILE_TYPE: type of raw data to download from TCGA
+.TP
+.B Type
+FILE_TYPE: str
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+DRUGS_title: merged drug title out of multiple drugs
+.TP
+.B Type
+DRUGS_title: str
+.TP
+.B Param
+logger: the adjustet logger with the right filehandler
+.TP
+.B Type
+logger: logging instance
+.TP
+.B Param
+SCRIPT_PATH: path to the deseq_pipeline repo
+.TP
+.B Type
+SCRIPT_PATH: str
+.TP
+.B Param
+PROJECT_title: merged project title out of multiple projects
+.TP
+.B Type
+PROJECT_title: str
+.TP
+.B Param
+snakerun: the adjustet logger with the right filehandler
+.TP
+.B Type
+logger: logging instance
+.UNINDENT
+.sp
+creating the meta_info.dat file in your OUTPUT_PATH/PROJECT directory
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 1 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 1
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_matrix_new.provide_DESeq2_table(PROJECT, OUTPUT_PATH, DRUGS, SCRIPT_PATH, logger, cutoff, DRUGS_title)
+.INDENT 7.0
+.TP
+.B Param
+PROJECT: list of projects chosen
+.TP
+.B Type
+PROJECT: list of str
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+DRUGS: applied drug(s)
+.TP
+.B Type
+DRUGS: list of str
+.TP
+.B Param
+SCRIPT_PATH: path to the DESeq2_pipeline repo
+.TP
+.B Type
+SCRIPT_PATH: str
+.TP
+.B Param
+logger: the adjustet logger with the right filehandler
+.TP
+.B Type
+logger: logging instance
+.UNINDENT
+.sp
+filtering case_id according to DRUG query
+providing new table for DESeq2 analysis
+dependend on distinguishable factors of the tables provided, a
+singlefactorial (at least differences in vital state) or a mutlifactorial
+run in DESeq2 is performed (gender, therapy or project )
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 7 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 7
+
+# when choosing multiple projects, call:
+$ python main_deseq.py \-p TCGA\-CESC  \-p TCGA\-HNSC \-d cisplatin \-f 9
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_matrix_new.set_logger(OUTPUT_PATH, PROJECT_title, DRUGS_title)
+.INDENT 7.0
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+PROJECT_title: merged project title out of multiple projects
+.TP
+.B Type
+PROJECT_title: str
+.TP
+.B Param
+DRUGS_title: merged drug title out of multiple drugs
+.TP
+.B Type
+DRUGS_title: str
+.UNINDENT
+.sp
+every paths and options are set, configure here the logfiles, with which
+the snakemake config files are going to be created we create 2 loggers, in
+case just one project is applied the logs are written in
+PROJECT/DRUGS_title/test_log.log in case multi project is applied, the logs
+are written in PROJECT_title/DRUGS_title/test_log.log with that, it is
+clear which config file shall be createt out of the logfiles present in one
+outputpath (the drugs path must therefore be created from the first fct, to
+write the log file also, the dir of the logfile must be logged, s.t.
+snakemake knows where the input file for the final snakemake configuratioin
+file is located
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_matrix_new.snake_meta(PROJECT, FILE_TYPE, OUTPUT_PATH, DRUGS_title, SCRIPT_PATH, PROJECT_title)
+.INDENT 7.0
+.TP
+.B Param
+PROJECT: list of projects chosen
+.TP
+.B Type
+PROJECT: list of str
+.TP
+.B Param
+FILE_TYPE: type of raw data to download from TCGA
+.TP
+.B Type
+FILE_TYPE: str
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+DRUGS_title: concatenated str of multiple drugs
+.TP
+.B Type
+DRUGS_title: str
+.TP
+.B Param
+SCRIPT_PATH: path to the DESeq2_pipeline repo
+.TP
+.B Type
+SCRIPT_PATH: str
+.TP
+.B Param
+PROJECT_title: concatenated str of multiple projects
+.TP
+.B Type
+PROJECT_title: str
+.UNINDENT
+.sp
+copy the respective
+SCRIPT_PATH/Snakes/meta_infos/PROJECT_title/DRUGS_title*/meta_info.dat
+into the actual OUTPUT_PATH/PROJECT/ path
+.UNINDENT
+.INDENT 0.0
+.TP
+.B choose_therapy.Choose_drugs(SCRIPT_PATH, PROJECTS)
+.INDENT 7.0
+.TP
+.B Param
+SCRIPT_PATH: path to the DESeq2_pipeline repo
+.TP
+.B Type
+SCRIPT_PATH: str
+.TP
+.B Param
+PROJECTS: list of projects chosen
+.TP
+.B Type
+PROJECTS: list of str
+.UNINDENT
+.sp
+interactively requesting the drugs which shall be applied to the deseq
+approach
+.UNINDENT
+.INDENT 0.0
+.TP
+.B choose_therapy.Choose_path_and_option(OUTPUT_PATH, PROJECTS, DRUGS, function, SCRIPT_PATH, analyse_data, download_data, threshold)
+.INDENT 7.0
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+PROJECTS: list of projects chosen
+.TP
+.B Type
+PROJECTS: list of str
+.TP
+.B Param
+DRUGS: applied drug(s)
+.TP
+.B Type
+DRUGS: list of str
+.TP
+.B Param
+function: applied functions
+.TP
+.B Type
+function: int
+.TP
+.B Param
+SCRIPT_PATH: path to the DESeq2_pipeline repo
+.TP
+.B Type
+SCRIPT_PATH: str
+.UNINDENT
+.sp
+interactively requesting whether download steps, analysis or both should be
+performed
+.UNINDENT
+.INDENT 0.0
+.TP
+.B choose_therapy.Choose_project()
+interactively requesting the Projects that shall be applied to the deseq
+approach
+.UNINDENT
+.INDENT 0.0
+.TP
+.B class lifeline_summary_test_2.Lifeline_plot(OUTPUT_PATH, PROJECT_title, DRUGS_title, path_to_result, prefix, threshold, multi_project)
+returning the ENSG on which the gene specific KaplanMeier plots are created
+.UNINDENT
+.INDENT 0.0
+.TP
+.B lifeline_summary_test_2.lifelines_ENSG(OUTPUT_PATH, DRUGS, PROJECT_DRUG_UUID, threshold, DRUGS_title)
+.INDENT 7.0
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+DRUGS: applied drug(s)
+.TP
+.B Type
+DRUGS: list of strings
+.TP
+.B Param
+PROJECT_DRUG_UUID: hash holding a project to the UUID of the    belonging drugtable
+.TP
+.B Type
+PROJECT_DRUG_UUID: dict
+.TP
+.B Param
+threshold: parameter for the lifeline plots helping for the    classification of expression data
+.TP
+.B Type
+threshold: int
+.UNINDENT
+.nf
+script creates the plots:
+lifelines_cumulative_density.svg,
+lifelines_multiple_groups.svg,
+lifelines_parametric_models_2.svg,
+lifelines_survival_fct.svg,
+lifelines_table.tsv in OUTPUT_PATH
+.fi
+.sp
+.INDENT 7.0
+.IP \(bu 2
+with the different expression ENSGs (normalized counts given from        deseq, median from them and separated in UP and DOWN)         groups plottet with lifeline
+.UNINDENT
+.sp
+\fBneeded\fP:
+.INDENT 7.0
+.IP \(bu 2
+ALL_PROJECTS_summary_dead_alive_reduced_INFO.tsv as
+.UNINDENT
+.sp
+\fBcount_DF_MI\fP (just the info for building the multiindex for    \fBcount_DF\fP):
+.SH EXAMPLE MULTIINDEX TABLE
+.TS
+center;
+|l|l|.
+_
+T{
+variable
+T}	T{
+value
+T}
+_
+T{
+vital_status
+T}	T{
+alive
+T}
+_
+T{
+gender
+T}	T{
+female
+T}
+_
+T{
+case_id
+T}	T{
+6ff12a54\-10da\-4941\-bfea\-7b66e19b4be9
+T}
+_
+T{
+PROJECT
+T}	T{
+TCGA\-CESC
+T}
+_
+.TE
+.INDENT 7.0
+.IP \(bu 2
+DESeq2_MF_normalized_counts_reduced.tsv as
+.UNINDENT
+.SH ENSG TABLE, COUNT_DF (NORMALIZED COUNTS WITH HELP OF DESEQ2)
+.TS
+center;
+|l|l|.
+_
+T{
+variable
+T}	T{
+value
+T}
+_
+T{
+ENSG00000000003
+T}	T{
+4109.0073147311
+T}
+_
+T{
+ENSG00000000005
+T}	T{
+0
+T}
+_
+.TE
+.INDENT 7.0
+.IP \(bu 2
+OUTPUT_PATH/DRUGS/DESeq2_MF_results_reduced.tsv as \fBDF_res\fP
+.UNINDENT
+.sp
+creates the \fBENSG_list\fP on the basis of the DESeq_results in
+dependence of the resulttables, we get the 10 highest and 10 lowest
+logfoldchange
+.sp
+–> here we sort log2fold change wise and merge then the most different
+INCREASING and DECREASING cases with the
+TCGA\-*/DF_3t_both_with_DRUG_combi.tsv, in this table we have the
+fields:
+.sp
+UUID case_id gender, vital_status, drugnames, survivaltime,
+years_to_last_follow_up, year_of_birth, year_of_death,
+age_at_diagnosis, PROJECT,
+.sp
+[the survivaltime is created ot of the
+nationwidechildrens.org_clinical_patient_cesc.txt table, col days_to_death,
+this is performed in fct. 6, correct_drugs()]
+.sp
+with it we create the table for lifeline
+.SH EXAMPLE TABLE FOR LIFELINE INPUT
+.TS
+center;
+|l|l|l|l|.
+_
+T{
+index
+T}	T{
+T
+T}	T{
+E
+T}	T{
+case_id
+T}
+_
+T{
+0
+T}	T{
+5.197260273972604
+T}	T{
+True
+T}	T{
+9ffa79fa\-d2d8\-48e1\-8fd6\-4b020ecf357c
+T}
+_
+T{
+1
+T}	T{
+0.8602739726027397
+T}	T{
+False
+T}	T{
+0de19185\-3517\-4e30\-925b\-7eb1f5079ec2
+T}
+_
+.TE
+.INDENT 7.0
+.IP \(bu 2
+the up and down separation depends on the median of the normalized     count matrix
+.IP \(bu 2
+setting the threshold based on the median of the logfoldchange, delete         out 10 % around it if \-f 11 is applied
+.UNINDENT
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 11 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 11
+
+# you can try out different thresholds, new directorys are
+# created therefore:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 11 \-t 10
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B walk_all_drug_frequency.drug_frequency(OUTPUT_PATH, DRUGS, SCRIPT_PATH, PROJECT_DRUG_UUID, DRUGS_title)
+.INDENT 7.0
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+DRUGS: applied drug(s)
+.TP
+.B Type
+DRUGS: list of str
+.TP
+.B Param
+SCRIPT_PATH: path to the DESeq2_pipeline repo
+.TP
+.B Type
+SCRIPT_PATH: str
+.TP
+.B Param
+PROJECT_DRUG_UUID: hash holding a project to the UUID of the    belonging drugtable
+.TP
+.B Type
+PROJECT_DRUG_UUID: dict
+.UNINDENT
+.sp
+create an overview of all available drugs, of the applied projects in
+DESeq2 output dir
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 12 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 12
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B walk_all_drug_frequency.drug_frequency_all_single_projects(OUTPUT_PATH, DRUGS, SCRIPT_PATH, PROJECT_DRUG_UUID, DRUGS_title)
+.INDENT 7.0
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+DRUGS: applied drug(s)
+.TP
+.B Type
+DRUGS: list of str
+.TP
+.B Param
+SCRIPT_PATH: path to the DESeq2_pipeline repo
+.TP
+.B Type
+SCRIPT_PATH: str
+.TP
+.B Param
+PROJECT_DRUG_UUID: hash holding a project to the UUID of the    belonging drugtable
+.TP
+.B Type
+PROJECT_DRUG_UUID: dict
+.UNINDENT
+.sp
+take every drug frequency out of the single project folders, therefore walk
+in the OUTPUT_PATH/TCGA\-[2..4] folders…
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 14 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 14
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B create_report.create_report_pdf(OUTPUT_PATH, DRUGS, SCRIPT_PATH, PROJECT_DRUG_UUID, threshold, cutoff, DRUGS_title)
+.INDENT 7.0
+.TP
+.B Param
+OUTPUT_PATH: path for DESeq2 pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+DRUGS: applied drug(s)
+.TP
+.B Type
+DRUGS: list of str
+.TP
+.B Param
+SCRIPT_PATH: path to the DESeq2_pipeline repo
+.TP
+.B Type
+SCRIPT_PATH: str
+.TP
+.B Param
+PROJECT_DRUG_UUID: hash holding a project to the UUID of the    belonging drugtable
+.TP
+.B Type
+PROJECT_DRUG_UUID: dict
+.TP
+.B Param
+threshold: parameter for the lifeline plots helping for the    classification of expression data
+.TP
+.B Type
+threshold: int
+.UNINDENT
+.sp
+creating a report file with all visual outputs created in an analysis,
+saved at OUTPUT_PATH/PROJECT_title/DRUGS_title/REPORT.pdf
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# for executing this step via terminal, issue \-f 13 to your call,
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 13 \-t 0
+# if you want to include several thresholds you had created in prior
+# with the KaplanMeier function (\-f 11 or within \-A), apply them here
+# as well, for
+# example:
+$ python main_deseq.py \-p TCGA\-CESC \-d cisplatin \-f 13 \-t 0 \-t 50 \-t
+100
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SH TABLES
+.INDENT 0.0
+.IP \(bu 2
+\fI\%example structure for summary_DF.tsv:\fP
+.IP \(bu 2
+\fI\%example multiindex table\fP
+.IP \(bu 2
+\fI\%ENSG table, count_DF (normalized counts with help of DESeq2)\fP
+.IP \(bu 2
+\fI\%example table for lifeline input\fP
+.UNINDENT
+.SH INDICES AND TABLES
+.INDENT 0.0
+.IP \(bu 2
+genindex
+.IP \(bu 2
+modindex
+.IP \(bu 2
+search
+.UNINDENT
+.SH AUTHOR
+Gabor Balogh
+.SH COPYRIGHT
+2021, Gabor Balogh
+.\" Generated by docutils manpage writer.
+.

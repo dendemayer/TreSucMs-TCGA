@@ -30,18 +30,31 @@ if 'snakemake' in dir():
 ###############################################################################
 else:
     # snakemake inputs:
-    metilene_lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_aggregated.tsv.gz"
+    metilene_lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/male/cutoff_0/threshold_0/metilene_lifelines_aggregated.tsv.gz"
     evaluate_script = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../tcga_metilene/scripts/evaluate_lifelines_all.py"
     # snakemake output:
-    metilene_lifeline_eval = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.tsv.gz"
-    metilene_lifeline_eval_pdfs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.pdf"
-    metilene_lifeline_eval_combined_pvals = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals_combined_pvals.tsv.gz"
+    metilene_lifeline_eval = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/male/cutoff_0/threshold_0/metilene_lifelines_evaluated-beta_vals.tsv.gz"
+    metilene_lifeline_eval_pdfs = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/male/cutoff_0/threshold_0/metilene_lifelines_evaluated-beta_vals.pdf"
+    metilene_lifeline_eval_combined_pvals = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/male/cutoff_0/threshold_0/metilene_lifelines_evaluated-beta_vals_combined_pvals.tsv.gz"
     # snakemake wildcards:
-    output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
-    project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-    drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-    gender = "female_male"
+    output_path = "/scr/palinca/gabor/TCGA-pipeline_8"
+    project = "TCGA-HNSC"
+    drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine"
+    gender = "male"
     cutoff = "cutoff_0"
+    # # snakemake inputs:
+    # metilene_lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_aggregated.tsv.gz"
+    # evaluate_script = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../tcga_metilene/scripts/evaluate_lifelines_all.py"
+    # # snakemake output:
+    # metilene_lifeline_eval = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.tsv.gz"
+    # metilene_lifeline_eval_pdfs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.pdf"
+    # metilene_lifeline_eval_combined_pvals = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals_combined_pvals.tsv.gz"
+    # # snakemake wildcards:
+    # output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
+    # project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+    # drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+    # gender = "female_male"
+    # cutoff = "cutoff_0"
 ###############################################################################
 #                                  test set                                   #
 ###############################################################################
@@ -120,38 +133,82 @@ complement_dict = {'DOWN': 'UP', 'UP': 'DOWN'}
 DF_final_final = pd.DataFrame()
 for start in starts:
     cmp = DF_eval_cross.set_index('chr_start').loc[start,:]['CMP'].drop_duplicates().values[0]
-    try:
-        base_DF = DF_eval_cross.set_index(['chr_start', 'plot_type']).loc[start, 'base_plot'].sort_values('p_value_life').iloc[0,:].to_frame().T
-        val_DF = DF_eval_cross.set_index(['chr_start', 'plot_type']).loc[start, f'{cmp}_validation'].sort_values('p_value_life').iloc[0,:].to_frame().T
-    except Exception as e:
-        print(f'{start}, {e}')
-    try:
-        compl_DF = DF_eval.set_index(['chr_start', 'plot_type']).loc[start, f'{complement_dict[cmp]}_validation'].sort_values('p_value_life').iloc[0,:].to_frame().T
-    except KeyError:
-        compl_DF = pd.DataFrame()
-    temp_DF = pd.concat([base_DF, val_DF, compl_DF])
-    # print(temp_DF)
-    temp_DF['p_val_life_prod_scored'] = temp_DF[temp_DF['scored'].values].loc[:, 'p_value_life'].prod()
-    temp_DF['p_val_life_sum_scored'] = temp_DF[temp_DF['scored'].values].loc[:, 'p_value_life'].sum()
-    DF_final_final = pd.concat([DF_final_final, temp_DF])
+    if isinstance(DF_eval_cross.set_index(['chr_start', 'plot_type']).loc[start, 'base_plot'], pd.DataFrame):
+        try:
+            base_DF = DF_eval_cross.set_index(['chr_start', 'plot_type']).loc[start, 'base_plot'].sort_values('p_value_life').iloc[0,:].to_frame().T
+            val_DF = DF_eval_cross.set_index(['chr_start', 'plot_type']).loc[start, f'{cmp}_validation'].sort_values('p_value_life').iloc[0,:].to_frame().T
+        except Exception as e:
+            print(f'{start}, {e}')
+        try:
+            compl_DF = DF_eval.set_index(['chr_start', 'plot_type']).loc[start, f'{complement_dict[cmp]}_validation'].sort_values('p_value_life').iloc[0,:].to_frame().T
+        except KeyError:
+            compl_DF = pd.DataFrame()
+        temp_DF = pd.concat([base_DF, val_DF, compl_DF])
+        # print(temp_DF)
+        temp_DF['p_val_life_prod_scored'] = temp_DF[temp_DF['scored'].values].loc[:, 'p_value_life'].prod()
+        temp_DF['p_val_life_sum_scored'] = temp_DF[temp_DF['scored'].values].loc[:, 'p_value_life'].sum()
+        DF_final_final = pd.concat([DF_final_final, temp_DF])
+    else:
+        try:
+            base_DF = DF_eval_cross.set_index(['chr_start', 'plot_type']).loc[start, 'base_plot']
+            val_DF = DF_eval_cross.set_index(['chr_start', 'plot_type']).loc[start, f'{cmp}_validation']
+        except Exception as e:
+            print(f'{start}, {e}')
+        try:
+            compl_DF = DF_eval.set_index(['chr_start', 'plot_type']).loc[start, f'{complement_dict[cmp]}_validation']
+        except KeyError:
+            compl_DF = pd.DataFrame()
+        temp_DF = pd.concat([base_DF.to_frame().T, val_DF.to_frame().T, compl_DF.to_frame().T])
+        # print(temp_DF)
+        temp_DF['p_val_life_prod_scored'] = temp_DF[temp_DF['scored'].values].loc[:, 'p_value_life'].prod()
+        temp_DF['p_val_life_sum_scored'] = temp_DF[temp_DF['scored'].values].loc[:, 'p_value_life'].sum()
+        DF_final_final = pd.concat([DF_final_final, temp_DF])
 
 DF_eval_final = DF_final_final
 DF_eval_final = DF_eval_final.reset_index().rename({'level_0': 'chr_start', 'level_1': 'plot_type'}, axis=1)
 DF_eval_final = DF_eval_final.sort_values('p_val_life_prod_scored')
 
-temp_base = DF_eval_final.set_index('plot_type').loc['base_plot', :].reset_index()
-temp_val = DF_eval_final[DF_eval_final['scored'].values & (DF_eval_final['plot_type'] != 'base_plot').values]
-temp_rest = DF_eval_final[~DF_eval_final['scored'].values]
-
-starts = temp_base['chr_start'].values
-DF_temp = []
+starts = DF_eval_final['chr_start'].value_counts().index.drop_duplicates()
+DF_final_final = pd.DataFrame()
 for start in starts:
+    cmp = DF_eval_final.set_index('chr_start').loc[start,:]['CMP'].drop_duplicates().values[0]
     try:
-        DF_temp.append(pd.concat([temp_base.set_index('chr_start').loc[start, :], temp_val.set_index('chr_start').loc[start, :], temp_rest.set_index('chr_start').loc[start, :]], axis=1).T)
-    except Exception as e:
-        continue
+        # base_DF = DF_eval_final.set_index(['chr_start', 'plot_type']).loc[start, 'base_plot']
+        base_DF = DF_eval_final.set_index(['chr_start', 'plot_type']).loc[start, 'base_plot'].to_frame().T.reset_index().rename({'level_0': 'chr_start', 'level_1': 'plot_type'}, axis=1)
 
-DF_eval_final = pd.concat(DF_temp)
+        # base_DF = DF_eval_final.set_index(['chr_start', 'plot_type']).loc[start, 'base_plot'].sort_values('p_value_life').iloc[0,:].to_frame().T
+        # val_DF = DF_eval_final.set_index(['chr_start', 'plot_type']).loc[start, f'{cmp}_validation'].sort_values('p_value_life').iloc[0,:].to_frame().T
+        val_DF = DF_eval_final.set_index(['chr_start', 'plot_type']).loc[start, f'{cmp}_validation'].to_frame().T.reset_index().rename({'level_0': 'chr_start', 'level_1': 'plot_type'}, axis=1)
+        compl_DF = DF_eval_final.set_index(['chr_start', 'plot_type']).loc[start, f'{complement_dict[cmp]}_validation'].to_frame().T.reset_index().rename({'level_0': 'chr_start', 'level_1': 'plot_type'}, axis=1)
+    except Exception as e:
+        print(f'{start}, {e}')
+    # try:
+    #     if isinstance(DF_eval.set_index(['chr_start', 'plot_type']).loc[start, f'{complement_dict[cmp]}_validation'], pd.DataFrame):
+    #         compl_DF = DF_eval.set_index(['chr_start', 'plot_type']).loc[start, f'{complement_dict[cmp]}_validation'].sort_values('p_value_life').reset_index().iloc[0,:]
+    #     else:
+    #         compl_DF = DF_eval.set_index(['chr_start', 'plot_type']).loc[start, f'{complement_dict[cmp]}_validation'].to_frame().T.reset_index().rename({'level_0': 'chr_start', 'level_1': 'plot_type'}, axis=1)
+    #     # compl_DF = DF_eval.set_index(['chr_start', 'plot_type']).loc[start, f'{complement_dict[cmp]}_validation'].sort_values('p_value_life').iloc[0,:].to_frame().T
+    # except KeyError:
+    #     compl_DF = pd.DataFrame()
+    temp_DF = pd.concat([base_DF, val_DF, compl_DF])
+    DF_final_final = pd.concat([DF_final_final, temp_DF])
+
+DF_eval_final = DF_final_final
+
+# temp_base = DF_eval_final.set_index('plot_type').loc['base_plot', :].reset_index()
+# temp_val = DF_eval_final[DF_eval_final['scored'].values & (DF_eval_final['plot_type'] != 'base_plot').values]
+# temp_rest = DF_eval_final[~DF_eval_final['scored'].values]
+
+# starts = temp_base['chr_start'].values
+# DF_temp = []
+# for start in starts:
+#     try:
+#         DF_temp.append(pd.concat([temp_base.set_index('chr_start').loc[start, :], temp_val.set_index('chr_start').loc[start, :], temp_rest.set_index('chr_start').loc[start, :]], axis=1).T)
+#     except Exception as e:
+#         continue
+
+# DF_eval_final = pd.concat(DF_temp)
+
 print(f'saving table {metilene_lifeline_eval}')
 
 DF_eval_final.to_csv(metilene_lifeline_eval, sep='\t', index=None)

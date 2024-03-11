@@ -265,13 +265,15 @@ rule evaluate_lifelines_all_deseq:
         script_file = os.path.join(script_path, "scripts/evaluate_lifelines_all.py")
     output:
         deseq_lifeline_eval = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.tsv.gz", threshold_str=threshold_str),
-        deseq_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.pdf",caption="report_src/captions/evaluate_lifelines_all_deseq_caption.rst", threshold_str=threshold_str), category="DESeq2", subcategory = "{project}",labels={"Category": "evaluated-kaplan-meier", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
+        deseq_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}.pdf", threshold_str=threshold_str), caption="report_src/captions/evaluate_lifelines_all_deseq_caption.rst", category="DESeq2", subcategory = "{project}",labels={"Category": "evaluated-kaplan-meier", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
         deseq_lifeline_eval_combined_pvals = expand("{{output_path}}/{{project}}/DESeq2/DESeq2_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/DESeq2_lifelines_evaluated-{{count_type}}_pval_combined.tsv.gz", threshold_str=threshold_str),
         #deseq_lifeline_aggregated = "/scr/DESeq2_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
     conda:
         "envs/pandas_pypdf.yaml"
     threads:
         1
+    wildcard_constraints:
+        count_type = 'norm_count'
     log:
         "{output_path}/{project}/DESeq2/logs/evaluate_lifelines_all/{drug_combi}_{gender}_{cutoff}_{count_type}.log",
     script:

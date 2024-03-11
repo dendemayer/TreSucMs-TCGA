@@ -126,7 +126,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
                                        printshellcmds=True,
                                        rerun_triggers='mtime',
                                        configfiles=[config_file_shared],
-                                       config=config, unlock=True)
+                                       config=config, unlock=False)
         if not workflow:
             print('snakemake execution failed, exiting now')
             os._exit(0)
@@ -161,7 +161,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
     patients_overview = []
     for project in PROJECTS:
         for cutoff in cutoffs_str:
-            patients_overview.append(os.path.join(OUTPUT_PATH, project, pipeline, 'merged_meta_files', cutoff, 'meta_info_druglist_merged_drugs_combined_final.pdf'))
+            patients_overview.append(os.path.join(OUTPUT_PATH, project, pipeline, 'merged_meta_files', cutoff, DRUG_str, 'meta_info_druglist_merged_drugs_combined_final.pdf'))
             for gender in ['male', 'female', 'female_male']:
                 DMR_intersect_merged.append(os.path.join(OUTPUT_PATH, project, pipeline, pipeline + '_output', DRUG_str, gender, cutoff, 'metilene_intersect_beta_value_merged.pdf'))
 

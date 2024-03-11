@@ -1,0 +1,29 @@
+\indexentry{call\_with\_options() (in module main\_deseq)@\spxentry{call\_with\_options()}\spxextra{in module main\_deseq}|hyperpage}{1}
+\indexentry{module@\spxentry{module}!choose\_therapy@\spxentry{choose\_therapy}|hyperpage}{1}
+\indexentry{choose\_therapy@\spxentry{choose\_therapy}!module@\spxentry{module}|hyperpage}{1}
+\indexentry{Choose\_drugs() (in module choose\_therapy)@\spxentry{Choose\_drugs()}\spxextra{in module choose\_therapy}|hyperpage}{1}
+\indexentry{Choose\_path\_and\_option() (in module choose\_therapy)@\spxentry{Choose\_path\_and\_option()}\spxextra{in module choose\_therapy}|hyperpage}{2}
+\indexentry{Choose\_project() (in module choose\_therapy)@\spxentry{Choose\_project()}\spxextra{in module choose\_therapy}|hyperpage}{2}
+\indexentry{module@\spxentry{module}!create\_matrix\_new@\spxentry{create\_matrix\_new}|hyperpage}{2}
+\indexentry{create\_matrix\_new@\spxentry{create\_matrix\_new}!module@\spxentry{module}|hyperpage}{2}
+\indexentry{correct\_drugs() (in module create\_matrix\_new)@\spxentry{correct\_drugs()}\spxextra{in module create\_matrix\_new}|hyperpage}{2}
+\indexentry{create\_snake\_config() (in module create\_matrix\_new)@\spxentry{create\_snake\_config()}\spxextra{in module create\_matrix\_new}|hyperpage}{2}
+\indexentry{create\_statistics\_from\_DESeq2\_tables() (in module create\_matrix\_new)@\spxentry{create\_statistics\_from\_DESeq2\_tables()}\spxextra{in module create\_matrix\_new}|hyperpage}{3}
+\indexentry{create\_summary\_table() (in module create\_matrix\_new)@\spxentry{create\_summary\_table()}\spxextra{in module create\_matrix\_new}|hyperpage}{3}
+\indexentry{download\_clinical\_tables() (in module create\_matrix\_new)@\spxentry{download\_clinical\_tables()}\spxextra{in module create\_matrix\_new}|hyperpage}{4}
+\indexentry{download\_data\_files() (in module create\_matrix\_new)@\spxentry{download\_data\_files()}\spxextra{in module create\_matrix\_new}|hyperpage}{4}
+\indexentry{merging\_meta\_infos() (in module create\_matrix\_new)@\spxentry{merging\_meta\_infos()}\spxextra{in module create\_matrix\_new}|hyperpage}{5}
+\indexentry{meta\_filter() (in module create\_matrix\_new)@\spxentry{meta\_filter()}\spxextra{in module create\_matrix\_new}|hyperpage}{5}
+\indexentry{provide\_DESeq2\_table() (in module create\_matrix\_new)@\spxentry{provide\_DESeq2\_table()}\spxextra{in module create\_matrix\_new}|hyperpage}{5}
+\indexentry{set\_logger() (in module create\_matrix\_new)@\spxentry{set\_logger()}\spxextra{in module create\_matrix\_new}|hyperpage}{6}
+\indexentry{module@\spxentry{module}!lifeline\_summary\_test\_2@\spxentry{lifeline\_summary\_test\_2}|hyperpage}{6}
+\indexentry{lifeline\_summary\_test\_2@\spxentry{lifeline\_summary\_test\_2}!module@\spxentry{module}|hyperpage}{6}
+\indexentry{Lifeline\_plot (class in lifeline\_summary\_test\_2)@\spxentry{Lifeline\_plot}\spxextra{class in lifeline\_summary\_test\_2}|hyperpage}{6}
+\indexentry{lifelines\_ENSG() (in module lifeline\_summary\_test\_2)@\spxentry{lifelines\_ENSG()}\spxextra{in module lifeline\_summary\_test\_2}|hyperpage}{6}
+\indexentry{module@\spxentry{module}!walk\_all\_drug\_frequency@\spxentry{walk\_all\_drug\_frequency}|hyperpage}{8}
+\indexentry{walk\_all\_drug\_frequency@\spxentry{walk\_all\_drug\_frequency}!module@\spxentry{module}|hyperpage}{8}
+\indexentry{drug\_frequency() (in module walk\_all\_drug\_frequency)@\spxentry{drug\_frequency()}\spxextra{in module walk\_all\_drug\_frequency}|hyperpage}{8}
+\indexentry{drug\_frequency\_all\_single\_projects() (in module walk\_all\_drug\_frequency)@\spxentry{drug\_frequency\_all\_single\_projects()}\spxextra{in module walk\_all\_drug\_frequency}|hyperpage}{8}
+\indexentry{module@\spxentry{module}!create\_report@\spxentry{create\_report}|hyperpage}{8}
+\indexentry{create\_report@\spxentry{create\_report}!module@\spxentry{module}|hyperpage}{8}
+\indexentry{create\_report\_pdf() (in module create\_report)@\spxentry{create\_report\_pdf()}\spxextra{in module create\_report}|hyperpage}{8}

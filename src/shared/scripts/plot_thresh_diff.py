@@ -40,54 +40,37 @@ if 'snakemake' in dir():
     count_type = snakemake.wildcards.count_type
 else:
     # snakemake inputs:
-    lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_aggregated.tsv.gz"
+    lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.tsv.gz"
     script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff.py"
     # snakemake output:
-    plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_diffs_base_plot-norm_count.pdf"
-    plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_diffs_base_plot-norm_count.tsv.gz"
+    plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_base_plot-beta_vals.pdf"
+    plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_8/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_base_plot-beta_vals.tsv.gz"
     # snakemake wildcards:
     output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
-    project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-    pipeline = "DESeq2"
+    project = "TCGA-HNSC"
+    pipeline = "metilene"
     drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-    gender = "male"
-    cutoff = "cutoff_0"
+    gender = "female"
+    cutoff = "cutoff_8"
     threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
     plot_type = "base_plot"
-    count_type = "norm_count"
+    count_type = "beta_vals"
     # # snakemake inputs:
-    # lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_evaluated-norm_count.tsv.gz"
+    # lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.tsv.gz"
     # script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff.py"
     # # snakemake output:
-    # plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_eval_diffs_base_plot-norm_count.pdf"
-    # plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_eval_diffs_base_plot-norm_count.tsv.gz"
+    # plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_DOWN_validation-beta_vals.pdf"
+    # plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_DOWN_validation-beta_vals.tsv.gz"
     # # snakemake wildcards:
     # output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
     # project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-    # pipeline = "DESeq2"
-    # drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-    # gender = "female"
-    # cutoff = "cutoff_0"
-    # threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
-    # plot_type = "base_plot"
-    # count_type = "norm_count"
-    # # snakemake inputs:
-    # lifeline_aggregated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_aggregated.tsv.gz"
-    # script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff.py"
-    # # snakemake output:
-    # plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_diffs_base_plot-norm_count.pdf"
-    # plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_plot_diffs_base_plot-norm_count.tsv.gz"
-    # # snakemake wildcards:
-    # output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
-    # project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-    # pipeline = "DESeq2"
+    # pipeline = "metilene"
     # drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
     # gender = "female_male"
     # cutoff = "cutoff_0"
     # threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
-    # plot_type = "base_plot"
-    # count_type = "norm_count"
-
+    # plot_type = "DOWN_validation"
+    # count_type = "beta_vals"
 projects = ', '.join(project.split('_'))
 gender = ', '.join(gender.split('_'))
 drugs = '; '.join(drug_combi.split('_'))

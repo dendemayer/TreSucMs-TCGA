@@ -163,6 +163,7 @@ rule merge_metilene_heatmaps:
     """
     input:
         heatmaps = return_heatmaps,  # input can also be empty, no heatmaps available then...
+        script_file = os.path.join(shared_path, "scripts/merge_heatmaps.py")
     output:
         heatmaps_merged = report("{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_beta_value_merged.pdf", category="metilene", subcategory = "{project}", labels={"Category": "DMR-plots", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
     conda:
@@ -392,7 +393,7 @@ rule evaluate_lifelines_all_metilene:
         evaluate_script = os.path.join(script_path, "scripts/evaluate_lifelines_all.py")
     output:
         metilene_lifeline_eval = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.tsv.gz", threshold_str=threshold_str),
-        metilene_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.pdf", threshold_str=threshold_str), category="metilene", subcategory = "{project}", labels={"Category": "evaluated-kaplan-meier", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
+        metilene_lifeline_eval_pdfs = report(expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals.pdf", threshold_str=threshold_str), caption="report_src/captions/evaluate_lifelines_all_deseq_caption.rst", category="metilene", subcategory = "{project}", labels={"Category": "evaluated-kaplan-meier", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),
         metilene_lifeline_eval_combined_pvals = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/{threshold_str}/metilene_lifelines_evaluated-beta_vals_combined_pvals.tsv.gz", threshold_str=threshold_str),
         #metilene_lifeline_aggregated = "/scr/metilene_heatmap_log2fDECREASE_raw_counts_aggregated.tsv",
     conda:

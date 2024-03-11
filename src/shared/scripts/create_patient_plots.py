@@ -35,7 +35,7 @@ if "snakemake" in dir():
     out_pdf_vital = snakemake.output.out_pdf_vital
     final_pdf = snakemake.output.final_pdf
 
-    drug_str = snakemake.params.drug_str
+    drug_combi = snakemake.wildcards.drug_combi
     project = snakemake.wildcards.project
     cutoff = snakemake.wildcards.cutoff
     pipeline = snakemake.wildcards.pipeline
@@ -44,34 +44,51 @@ else:
     ###############################################################################
     #                               test input set                                #
     ###############################################################################
-
     # snakemake inputs:
-    meta_table = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-    script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_deseq/../shared/scripts/create_patient_plots.py"
+    meta_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+    script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/create_patient_plots.py"
     # snakemake output:
-    final_pdf = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_final.pdf"
-    plot_file_age = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_age.pdf"
-    plot_file_age_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_age_in_therapy.pdf"
-    plot_file_age_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_age_not_in_therapy.pdf"
-    plot_file_survival = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_survival.pdf"
-    plot_file_survival_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_survival_in_therapy.pdf"
-    plot_file_survival_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_survival_not_in_therapy.pdf"
-    out_md_vital = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_vital.md"
-    out_pdf_vital = "/scr/palinca/gabor/TCGA-pipeline_8/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined_vital.pdf"
+    final_pdf = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_final.pdf"
+    plot_file_age = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_age.pdf"
+    plot_file_age_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_age_in_therapy.pdf"
+    plot_file_age_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_age_not_in_therapy.pdf"
+    plot_file_survival = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_survival.pdf"
+    plot_file_survival_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_survival_in_therapy.pdf"
+    plot_file_survival_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_survival_not_in_therapy.pdf"
+    out_md_vital = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_vital.md"
+    out_pdf_vital = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_vital.pdf"
     # snakemake wildcards:
-    output_path = "/scr/palinca/gabor/TCGA-pipeline_8"
-    project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-    pipeline = "DESeq2"
+    output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
+    project = "TCGA-HNSC"
+    pipeline = "metilene"
     cutoff = "cutoff_0"
-    drug_str = "carboplatin_carboplatin,paclitaxel_cisplatin"
-
+    drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine"
+    # # snakemake inputs:
+    # meta_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+    # script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/create_patient_plots.py"
+    # # snakemake output:
+    # final_pdf = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_final.pdf"
+    # plot_file_age = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_age.pdf"
+    # plot_file_age_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_age_in_therapy.pdf"
+    # plot_file_age_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_age_not_in_therapy.pdf"
+    # plot_file_survival = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_survival.pdf"
+    # plot_file_survival_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_survival_in_therapy.pdf"
+    # plot_file_survival_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_survival_not_in_therapy.pdf"
+    # out_md_vital = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_vital.md"
+    # out_pdf_vital = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_vital.pdf"
+    # # snakemake wildcards:
+    # output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
+    # project = "TCGA-CESC"
+    # pipeline = "metilene"
+    # cutoff = "cutoff_0"
+    # drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
     ###############################################################################
     #                               test input set                                #
     ###############################################################################
 
 project_str = ' + '.join(project.split('_'))
-drugs = drug_str.split('_')
-drug_header = '; '.join(drug_str.split('_'))
+drugs = drug_combi.split('_')
+drug_header = '; '.join(drug_combi.split('_'))
 cutoff = cutoff.split('_')[1]
 
 meta_DF = pd.read_table(meta_table)
@@ -81,6 +98,11 @@ meta_DF['Survivaltime'] = meta_DF.loc[:, 'survivaltime'].fillna(meta_DF.loc[:, '
 meta_DF.sort_values(['vital_status', 'sex'], ascending=False, inplace=True)
 
 # add a hue col for in therapy or not in therapy
+#just loc the drugs which are actual part of the given metatable, it's not said
+# that all projects must share the same drug, for example HNSC has no cisplatin,
+# drugs available:
+drugs_available = meta_DF['pharmaceutical_therapy_drug_name'].drop_duplicates().to_list()
+drugs = [i for i in drugs if i in drugs_available]
 meta_DF.set_index('pharmaceutical_therapy_drug_name').loc[drugs, :]
 meta_DF['in_therapy'] = [True if (i in drugs) else False for i in meta_DF['pharmaceutical_therapy_drug_name'].tolist()]
 

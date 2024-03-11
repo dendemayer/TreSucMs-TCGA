@@ -12,11 +12,14 @@ OUTPUT_PATH = config['OUTPUT_PATH']
 projects_str = config['projects_str']  # 'TCGA-CESC_TCGA-HNSC'
 PROJECTS = projects_str.split('_')  # ['TCGA-CESC', 'TCGA-HNSC']
 if len(PROJECTS) != 1:
-    PROJECTS.append(projects_str)
+    PROJECTS.append(projects_str) # ['TCGA-CESC', 'TCGA-HNSC', 'TCGA-CESC_TCGA-HNSC']
 pipelines = config['pipelines']  # ['DESeq2', 'metilene']
 pipeline_str = '_'.join(pipelines) # 'DESeq2_metilene'
 drug_str = config['drug_str']
 count_types = config['count_type']
+cutoffs = config['cutoffs']  # [0, 5, 8]
+cutoff_strs = ['cutoff_' + str(i) for i in cutoffs]  # ['cutoff_0', 'cutoff_5', 'cutoff_8']
+cutoff_str = '-'.join(cutoff_strs)
 # in case of accessing this main Snakefile for the report creation, the count type is set to the last value set (if deseq entry_fct was used, it would be norm_count
 script_path = workflow.basedir  #  '/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared'
 # the script path will change depending on the main module we have acces from
@@ -200,21 +203,21 @@ rule create_patient_plots:
         meta_table = "{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined.tsv",
         script_file = os.path.join(script_path, "scripts/create_patient_plots.py")
     output:
-        final_pdf = report("{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_final.pdf", category="{pipeline}", subcategory="{project}", labels={"Category": "patient_overview", "cutoff": "{cutoff}", "type": "pdf"}),
-        plot_file_age = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_age.pdf',
-        plot_file_age_in_therapy = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_age_in_therapy.pdf',
-        plot_file_age_not_in_therapy = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_age_not_in_therapy.pdf',
-        plot_file_survival = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_survival.pdf',
-        plot_file_survival_in_therapy = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_survival_in_therapy.pdf',
-        plot_file_survival_not_in_therapy = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_survival_not_in_therapy.pdf',
-        out_md_vital = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_vital.md',
-        out_pdf_vital = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/meta_info_druglist_merged_drugs_combined_vital.pdf',
+        final_pdf = report("{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/{drug_combi}/meta_info_druglist_merged_drugs_combined_final.pdf", category="{pipeline}", subcategory="{project}", labels={"Category": "patient_overview", "cutoff": "{cutoff}", "type": "pdf"}),
+        plot_file_age = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/{drug_combi}/meta_info_druglist_merged_drugs_combined_age.pdf',
+        plot_file_age_in_therapy = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/{drug_combi}/meta_info_druglist_merged_drugs_combined_age_in_therapy.pdf',
+        plot_file_age_not_in_therapy = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/{drug_combi}/meta_info_druglist_merged_drugs_combined_age_not_in_therapy.pdf',
+        plot_file_survival = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/{drug_combi}/meta_info_druglist_merged_drugs_combined_survival.pdf',
+        plot_file_survival_in_therapy = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/{drug_combi}/meta_info_druglist_merged_drugs_combined_survival_in_therapy.pdf',
+        plot_file_survival_not_in_therapy = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/{drug_combi}/meta_info_druglist_merged_drugs_combined_survival_not_in_therapy.pdf',
+        out_md_vital = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/{drug_combi}/meta_info_druglist_merged_drugs_combined_vital.md',
+        out_pdf_vital = '{output_path}/{project}/{pipeline}/merged_meta_files/{cutoff}/{drug_combi}/meta_info_druglist_merged_drugs_combined_vital.pdf',
     conda:
         "envs/pandas_pypdf_seaborn.yaml"
     log:
-        "{output_path}/{project}/{pipeline}/logs/create_patient_overview/{cutoff}.log"
-    params:
-        drug_str = drug_str,
+        "{output_path}/{project}/{pipeline}/logs/create_patient_overview/{cutoff}_{drug_combi}.log"
+    #params:
+        #drug_str = drug_str,
     script:
         "scripts/create_patient_plots.py"
 
@@ -295,11 +298,34 @@ rule plot_thresh_diff_p_aggr:
     threads:
         1
     log:
-        "{output_path}/{project}/{pipeline}/logs/plot_diffs_eval/{drug_combi}_{gender}_{cutoff}_{threshold_str}_{count_type}.log",
+        "{output_path}/{project}/{pipeline}/logs/plot_thresh_diff_p_aggr/{drug_combi}_{gender}_{cutoff}_{threshold_str}_{count_type}.log",
+    wildcard_constraints:
+        count_type = 'beta_vals|norm_count'
     script:
         "scripts/plot_thresh_diff_p_aggr.py"
         # this is not working:
         #"{input.script_file}"
+
+rule sum_up_p_aggr:
+    """
+    same p_val_prod_sum for all 3 val plots, take the base_plot rows, throw away cols which are plot type specific, kepp all which are shared over the 3 plot_types:
+    """
+    input:
+        plot_diffs_table = expand("{{output_path}}/{project}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/{gender}/{cutoff}/{{threshold_str}}/{{pipeline}}_plot_eval_diffs-{{count_type}}_p_aggr.tsv.gz", project=PROJECTS, pipeline=pipelines, gender=['male', 'female', 'female_male'], cutoff=cutoff_strs),
+        #plot_diffs_table_metilene = expand("{{output_path}}/{project}/metilene/metilene_output/{{drug_combi}}/{gender}/{cutoff}/{{threshold_str}}/metilene_plot_eval_diffs-beta_vals_p_aggr.tsv.gz", project=PROJECTS,pipeline=pipelines, gender=['male', 'female', 'female_male'], cutoff=cutoff_strs),
+    output:
+        p_val_prod_sum = report(expand("{{output_path}}/{projects_str}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/female_male/{cutoff}/{{threshold_str}}/{{pipeline}}-{{count_type}}_p_prod_sum.pdf", projects_str=projects_str, cutoff=cutoff_str), category="{pipeline}", subcategory=projects_str, labels={"Category": "p-val_product sum aggregation"}),
+        p_val_prod_sum_table = expand("{{output_path}}/{projects_str}/{{pipeline}}/{{pipeline}}_output/{{drug_combi}}/female_male/{cutoff}/{{threshold_str}}/{{pipeline}}-{{count_type}}_p_prod_sum.tsv.gz", projects_str=projects_str, cutoff=cutoff_str),
+    conda:
+        "envs/seab_matplot_plotl_2.yaml"
+    threads:
+        1
+    log:
+        expand("{{output_path}}/{projects_str}/{{pipeline}}/logs/sum_up_p_aggr/{{drug_combi}}_female_male_{cutoff}_{{threshold_str}}_{{count_type}}.log", projects_str=projects_str, cutoff=cutoff_str),
+    wildcard_constraints:
+        count_type = 'norm_count|beta_vals'
+    script:
+        "scripts/sum_up_p_aggr.py"
 
 rule merge_diffplots:
     """
@@ -331,8 +357,6 @@ def get_eval_input(wildcards):
     projects_str = wildcards.project
     pipeline_str = wildcards.pipeline_str
     drug_str = wildcards.drug_str
-    cutoffs = config['cutoffs']  # [0, 5, 8]
-    cutoff_strs = ['cutoff_' + str(i) for i in cutoffs]  # ['cutoff_0', 'cutoff_5', 'cutoff_8']
     # requesting.
     #/scr/palinca/gabor/TCGA-pipeline_5/TCGA-CESC_TCGA-HNSC/DESeq2_metilene/carboplatin_carboplatin,paclitaxel_cisplatin/final_majority_vote.tsv
     # invoking f.e.:
@@ -377,6 +401,7 @@ rule majority_vote_all:
         major_table =  report('{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote.tsv.gz', category="{pipeline_str}", subcategory="final_majority_vote", labels={"Pipelines:": "{pipeline_str}", "type": "table"}),
         venn_project = '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_venn_projects.pdf',
         venn_pipeline = '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_venn_pipeline.pdf',
+        venn_pipeline_project = '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_venn_pipeline_project.pdf',
         md_aggr =  '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project.md',
         pdf_aggr =  '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project.pdf',
         pdf_final =  report('{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project_final.pdf', category="{pipeline_str}", subcategory="final_majority_vote", labels={"Pipelines:": "{pipeline_str}", "type": "pdf"}),
@@ -395,4 +420,3 @@ rule majority_vote_all:
         #expand("{{output_path}}/{{project}}/{{pipeline_str}}/logs/majority_vote_all/{{drug_str}}.log",output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str)
     script:
         "scripts/majority_vote_all.py"
-

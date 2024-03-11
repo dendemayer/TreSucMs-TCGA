@@ -247,6 +247,10 @@ def apply_list(value):
     # for BRCA merge arimidex and anastrozole:
     if re.search("anastrozole", value):
         return "arimidex"
+    # for TCGA-GBM (Glioblastoma Multiforme) and TCGA-LGG (Brain Lower Grade
+    # Glioma) merge temozolomide and temodar:
+    if re.search("temozolomide", value):
+        return "temodar"
     else:
         return value
 

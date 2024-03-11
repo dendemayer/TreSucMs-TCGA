@@ -5,21 +5,43 @@ import seaborn as sns
 import statistics as st
 import sys
 
-sys.stdout = sys.stderr = open(snakemake.log[0], 'w')
+if 'snakemake' in dir():
+    sys.stdout = sys.stderr = open(snakemake.log[0], 'w')
 
-print('# snakemake inputs:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+    print('# snakemake inputs:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
 
-print('# snakemake output:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+    print('# snakemake output:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
 
-print('# snakemake wildcards:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+    print('# snakemake wildcards:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
-metilene_intersect = snakemake.input.metilene_intersect
-pdf_boxplot_out = snakemake.output.pdf_boxplot_out
-pdf_lineplot_out = snakemake.output.pdf_lineplot_out
-DMR = snakemake.wildcards.DMR
+    metilene_intersect = snakemake.input.metilene_intersect
+    pdf_boxplot_out = snakemake.output.pdf_boxplot_out
+    pdf_lineplot_out = snakemake.output.pdf_lineplot_out
+    project = snakemake.wildcards.project
+    drug_combi = snakemake.wildcards.drug_combi
+    gender = snakemake.wildcards.gender
+    cutoff = snakemake.wildcards.cutoff
+    DMR = snakemake.wildcards.DMR
+else:
+    # snakemake inputs:
+    metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv"
+    script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../tcga_metilene/scripts/plot_DMR_regions.py"
+    # snakemake output:
+    pdf_boxplot_out = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect_boxplot_beta_value_chr20_58850459_58852155.pdf"
+    pdf_lineplot_out = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect_lineplot_median_beta_value_chr20_58850459_58852155.pdf"
+    # snakemake wildcards:
+    output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
+    project = "TCGA-CESC"
+    drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+    gender = "female"
+    cutoff = "cutoff_0"
+    DMR = "chr20_58850459_58852155"
+    project = 'TCGA-CESC'
+    drug_combi = 'carboplatin_carboplatin,paclitaxel_cisplatin'
+    gender = 'female'
 
 ###############################################################################
 #                                   test set                                  #
@@ -146,9 +168,10 @@ color_palette = sns.color_palette('coolwarm_r', palette_len)
 sns.set(rc={'figure.figsize':figsize})
 sns.set(style="ticks", palette=color_palette)
 plot = sns.boxplot(x='Start', y='beta_value', hue='hue', data=DF_to_plot)
-plt.title(f'Range: {range_title}')
+plt.title(f'DMR: {range_title}\n{project}, {drug_combi},\n{gender}, cutoff={cutoff}')
 plot.set_xticklabels(plot.get_xticklabels(), rotation=45)
 plt.legend(title='vital state and projects', bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+plt.grid(axis='y')
 plt.tight_layout()
 print(f'saving {pdf_boxplot_out}')
 plot.figure.savefig(pdf_boxplot_out)
@@ -157,9 +180,10 @@ plt.cla()
 plt.close()
 
 plot = sns.violinplot(x='Start', y='beta_value', hue='hue', data=DF_to_plot)
-plt.title(f'Range: {range_title}')
 plot.set_xticklabels(plot.get_xticklabels(), rotation=45)
+plt.title(f'DMR: {range_title}\n{project}, {drug_combi},\n{gender}, cutoff={cutoff}')
 plt.legend(title='vital state and projects', bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+plt.grid(axis='y')
 plt.tight_layout()
 pdf_violinplot_out = pdf_boxplot_out.replace('boxplot', 'violinplot')
 print(f'saving {pdf_violinplot_out}')
@@ -209,7 +233,8 @@ plot = sns.lineplot(
     marker='o',
     y="beta-value median", #  linewidth=3,
     hue="hue")
-plt.title(f'Range: {range_title}')
+plt.title(f'DMR: {range_title}\n{project}, {drug_combi},\n{gender}, cutoff={cutoff}')
+
 
 plot.set_xticks(DF_to_plot['Start'].value_counts().index.tolist()) # <--- set the ticks first
 label_list = DF_to_plot['Start'].value_counts().index.astype('str').tolist()
@@ -236,12 +261,12 @@ mean_of_medians = st.mean([alive_median, dead_median])
 # overall_beta_median = DF_DMR.apply(lambda x: x.median(), axis=1).median()
 # (Pdb) DF_DMR.loc[(slice(None), [3848400, 3848556], slice(None), slice(None)), (slice(None), slice(None), slice(None), slice(None), 'TCGA-LUSC')].apply(lambda x: x.mean(), axis=1)
 # plt.hlines(overall_beta_median, ls = '--', label='median', xmin=0.5, xmax=0.5, colors='green')
-muted_green = sns.color_palette("muted")[2]  # You can adjust the index as needed
+# muted_green = sns.color_palette("muted")[2]  # You can adjust the index as needed
 # sns.color_palette("muted")
 
-plt.axhline(alive_median, ls = '--', label='alive median', c=color_palette[0])
-plt.axhline(dead_median, ls = '--', label='dead median', c=color_palette[-1])
-plt.axhline(mean_of_medians, ls = '--', label='mean of medians', c=muted_green)
+# plt.axhline(alive_median, ls = '--', label='alive median', c=color_palette[0])
+# plt.axhline(dead_median, ls = '--', label='dead median', c=color_palette[-1])
+# plt.axhline(mean_of_medians, ls = '--', label='mean of medians', c=muted_green)
 # plt.text(0,0 , "median of all medians")
 
 # which position has the highest diff in terms of its median? -> this is going
@@ -274,7 +299,7 @@ for legobj in legend.legend_handles:
 #     # plt.legend(
 #     # title='vital state of all projects', bbox_to_anchor=(1,
 #     # 1))
-
+plt.grid(axis='y')
 plt.tight_layout()
 print(f'saving {pdf_lineplot_out}')
 plot.figure.savefig(pdf_lineplot_out)

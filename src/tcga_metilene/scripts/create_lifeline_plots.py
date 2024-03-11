@@ -41,146 +41,54 @@ lifeline_out_tsv = "{output_path}/{project}/metilene/metilene_output/{drug_combi
 include the mean median difference!:
 """
 # # # # # #################################################
-sys.stderr = sys.stdout = open(snakemake.log[0], "w")
+if 'snakemake' in dir():
+    sys.stderr = sys.stdout = open(snakemake.log[0], "w")
+    metilene_intersect = snakemake.input[0]
+    meta_table = snakemake.input[1]
+    annot_file = snakemake.input[2]
+    annot_file_2 = snakemake.input[3]
+    metilene_out = snakemake.input[4]
+    DMR = snakemake.wildcards.DMR
+    lifeline_out_pdf = snakemake.output.lifeline_out_pdf
+    lifeline_out_tsv = snakemake.output.lifeline_out_tsv
+    threshold = snakemake.wildcards.threshold
+    cutoff = snakemake.wildcards.cutoff.split('_')[1]
+    drug_combi = snakemake.wildcards.drug_combi.replace('_', ';')
+    project = ', '.join(snakemake.wildcards.project.split('_'))
+    gender = ', '.join(snakemake.wildcards.gender.split('_'))
 
-metilene_intersect = snakemake.input[0]
-meta_table = snakemake.input[1]
-annot_file = snakemake.input[2]
-annot_file_2 = snakemake.input[3]
-metilene_out = snakemake.input[4]
-DMR = snakemake.wildcards.DMR
-lifeline_out_pdf = snakemake.output.lifeline_out_pdf
-lifeline_out_tsv = snakemake.output.lifeline_out_tsv
-threshold = snakemake.wildcards.threshold
-cutoff = snakemake.wildcards.cutoff.split('_')[1]
-drug_combi = snakemake.wildcards.drug_combi.replace('_', ';')
-project = ', '.join(snakemake.wildcards.project.split('_'))
-gender = ', '.join(snakemake.wildcards.gender.split('_'))
+    print('# snakemake inputs:')
+    [print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
 
-print('# snakemake inputs:')
-[print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+    print('# snakemake output:')
+    [print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
 
-print('# snakemake output:')
-[print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
-
-print('# snakemake wildcards:')
-[print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+    print('# snakemake wildcards:')
+    [print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
 # # # #######################################################################
 
 ###############################################################################
 # #                                 test_input                                  #
 # ###############################################################################
-# # snakemake inputs:
-# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/metilene_intersect.tsv"
-# meta_table = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-LUSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-# annot_file = "/scr/palinca/gabor/TCGA-pipeline_3/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
-# annot_file_2 = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/../shared/resources/annot_from_betafile.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/scripts/create_lifeline_plots.py"
-# # snakemake output:
-# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27141798_27144197.pdf"
-# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/male/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr7_27141798_27144197.tsv"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_3"
-# project = "TCGA-LUSC"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "male"
-# cutoff = "cutoff_0"
-# threshold = "threshold_5"
-# DMR = "chr7_27141798_27144197"
-
-# # snakemake inputs:
-# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/metilene_intersect.tsv"
-# meta_table = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-HNSC/metilene/merged_meta_files/cutoff_5/meta_info_druglist_merged_drugs_combined.tsv"
-# annot_file = "/scr/palinca/gabor/TCGA-pipeline_3/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
-# annot_file_2 = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/../shared/resources/annot_from_betafile.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/scripts/create_lifeline_plots.py"
-# # snakemake output:
-# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_20/metilene_intersect_lifeline_plot_chr11_122099576_122101477.pdf"
-# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_20/metilene_intersect_lifeline_plot_chr11_122099576_122101477.tsv"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_3"
-# project = "TCGA-HNSC"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female_male"
-# cutoff = "cutoff_5"
-# threshold = "threshold_20"
-# DMR = "chr11_122099576_122101477"
-
-# # snakemake inputs:
-# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv"
-# meta_table = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-# annot_file = "/scr/palinca/gabor/TCGA-pipeline_3/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
-# annot_file_2 = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/../shared/resources/annot_from_betafile.tsv.gz"
-# script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/tcga_metilene/scripts/create_lifeline_plots.py"
-# # snakemake output:
-# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr2_176150267_176153069_temp.pdf"
-# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline_3/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_5/metilene_intersect_lifeline_plot_chr2_176150267_176153069_temp.tsv"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_3"
-# project = "TCGA-CESC"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female"
-# cutoff = "cutoff_0"
-# threshold = "threshold_5"
-# DMR = "chr2_176150267_176153069"
-
-# snakemake inputs:
-# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv"
-# meta_table = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-# annot_file = "/scr/palinca/gabor/TCGA-pipeline_2/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
-# annot_file_2 = "../shared/resources/annot_from_betafile.tsv.gz"
-# script_file = "../tcga_metilene/scripts/create_lifeline_plots.py"
-# # snakemake output:
-# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr7_83648624_83648822.pdf"
-# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr7_83648624_83648822.tsv"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_2"
-# project = "TCGA-CESC"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female"
-# cutoff = "cutoff_0"
-# threshold = "threshold_0"
-# DMR = "chr7_83648624_83648822"
-
-# # snakemake inputs:
-# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv"
-# meta_table = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-# annot_file = "/scr/palinca/gabor/TCGA-pipeline_2/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
-# annot_file_2 = "../shared/resources/annot_from_betafile.tsv.gz"
-# metilene_out = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_qval.0.05.out"
-# script_file = "../tcga_metilene/scripts/create_lifeline_plots.py"
-# # snakemake output:
-# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr14_85529381_85531409.pdf"
-# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr14_85529381_85531409.tsv"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_2"
-# project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female"
-# cutoff = "cutoff_0"
-# threshold = "threshold_0"
-# DMR = "chr14_85529381_85531409"
-
-
-# # snakemake inputs:
-# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv"
-# meta_table = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-# annot_file = "/scr/palinca/gabor/TCGA-pipeline_2/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
-# annot_file_2 = "../shared/resources/annot_from_betafile.tsv.gz"
-# metilene_out = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_qval.0.05.out"
-# script_file = "../tcga_metilene/scripts/create_lifeline_plots.py"
-# # snakemake output:
-# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr5_66828566_66828775.pdf"
-# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline_2/TCGA-CESC_TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr5_66828566_66828775.tsv"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline_2"
-# project = "TCGA-CESC_TCGA-HNSC"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female"
-# cutoff = "cutoff_0"
-# threshold = "threshold_0"
-# DMR = "chr5_66828566_66828775"
+else:
+    # snakemake inputs:
+    metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/metilene_intersect.tsv"
+    meta_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+    annot_file = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
+    annot_file_2 = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../tcga_metilene/../shared/resources/annot_from_betafile.tsv.gz"
+    script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../tcga_metilene/scripts/create_lifeline_plots.py"
+    # snakemake output:
+    lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr20_58850459_58852155.pdf"
+    lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr20_58850459_58852155.tsv"
+    # snakemake wildcards:
+    output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
+    project = "TCGA-CESC"
+    drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+    gender = "female"
+    cutoff = "cutoff_0"
+    threshold = "threshold_0"
+    DMR = "chr20_58850459_58852155"
 ###############################################################################
 #                                 test_input                                  #
 ###############################################################################
@@ -200,59 +108,6 @@ print('# snakemake wildcards:')
 # :
 # KeyError: 'chr12_132887020_132888306'
 
-# # snakemake inputs:
-# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/metilene_intersect.tsv"
-# meta_table = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-# annot_file = "/scr/palinca/gabor/TCGA-pipeline/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
-# script_file = "../tcga_metilene/scripts/create_lifeline_plots.py"
-# # snakemake output:
-# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr20_58850101_58856248.pdf"
-# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr20_58850101_58856248.tsv"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline"
-# project = "TCGA-CESC"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female_male"
-# cutoff = "cutoff_0"
-# threshold = "threshold_0"
-# DMR = "chr20_58850101_58856248"
-
-# (base) [gabor@palinca shared]$ bedtools intersect -b <(echo "chr11\t115505380\t115505381") -a <(awk 'NR>1{print $3"\t"$4"\t"$5"\t"$0}' /scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/data_files/jhu-usc.edu_CESC.HumanMethylation450.1.lvl-3.TCGA-C5-A1BE-01B-11D-A13
-# Z-05.gdc_hg38.txt | grep -v "*")
-# chr11   115505380       115505381       cg01948062      0.0948425263590688      chr11   115505380       115505381       CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1;CADM1       protein_coding;protein_coding;protein_coding;protein_coding;protein_coding;
-# protein_coding;protein_coding;protein_coding;protein_coding;protein_coding;protein_coding       ENST00000331581.9;ENST00000452722.6;ENST00000536727.4;ENST00000536781.1;ENST00000537058.4;ENST00000537140.4;ENST00000540951.1;ENST00000541434.4;ENST00000542447.5;ENST00000
-# 543249.1;ENST00000545380.4      -814;-964;-964;-964;-964;-856;-964;-985;-856;-422;-990  CGI:chr11:115502856-115505163   S_Shore
-# # snakemake inputs:
-# metilene_intersect = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/metilene_intersect.tsv"
-# meta_table = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/merged_meta_files/cutoff_5/meta_info_druglist_merged_drugs_combined.tsv"
-# annot_file = "/scr/palinca/gabor/TCGA-pipeline/metadata_processed/gencode.v36.annotation.gtf_genes_transcripts.gz"
-# script_file = "../tcga_metilene/scripts/create_lifeline_plots.py"
-# # snakemake output:
-# lifeline_out_pdf = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chr11_115503038_115505464.pdf"
-# lifeline_out_tsv = "/scr/palinca/gabor/TCGA-pipeline/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_5/threshold_5/metilene_intersect_lifeline_plot_chr11_115503038_115505464.tsv"
-# # snakemake wildcards:
-# output_path = "/scr/palinca/gabor/TCGA-pipeline"
-# project = "TCGA-CESC"
-# drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-# gender = "female_male"
-# cutoff = "cutoff_5"
-# threshold = "threshold_5"
-# DMR = "chr11_115503038_115505464"
-# # ->>>
-# > /homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/.snakemake/scripts/tmppd019qrh.create_lifeline_plots.py(192)<module>()
-# -> print(e)
-# (Pdb) e
-# ValueError('Values must be numeric: no strings, datetimes, objects, etc.')
-# DONE with
-# if DF_plot.value_counts().index.nunique() != 2: instead of --> that covers
-# if DF_plot.value_counts().index.nunique() == 1:
-# the cases we have just UP or just DOWN or an emtpy Series
-
-#     results = logrank_test(T[UP_bool], T[DOWN_bool], E[UP_bool], E[DOWN_bool])
-#                            ~^^^^^^^^^
-#     raise ValueError("Cannot index with multidimensional key")
-# ValueError: Cannot index with multidimensional key
-
 
 DF_meta = pd.read_table(meta_table, usecols=['bcr_patient_uuid', 'survivaltime', 'years_to_last_follow_up', 'vital_status'])
 DF_metilene = pd.read_table(metilene_intersect, header=[0, 1, 2, 3, 4], index_col=[0, 1, 2, 3], na_values='.').dropna()
@@ -267,6 +122,7 @@ thresh = float(threshold.split('_')[1])
 # add the mean of medians directly into the metielen DF:
 DF_dead_median = DF_metilene.loc[:, ('dead',slice(None),slice(None),slice(None),slice(None))].median(axis=1)
 DF_alive_median = DF_metilene.loc[:, ('alive',slice(None),slice(None),slice(None),slice(None))].median(axis=1)
+# here for every position a resepective mean of median is set:
 DF_mean_of_median = pd.concat([DF_alive_median, DF_dead_median], axis=1).mean(axis=1)
 DF_mean_of_median.name = 'mean_median'
 new_index = DF_metilene.index.to_frame().join(DF_mean_of_median.to_frame()).set_index('mean_median', append=True).index
@@ -280,6 +136,8 @@ def apply_thresh(row):
     row_thresh = row.apply(lambda x: pd.NA if float(x) < upper_limit and float(x) > lower_limit else x)
     return row_thresh
 
+# applying rowwise, so position wise the threshold with the position specific
+# mean of medians
 DF_metilene = DF_metilene.apply(apply_thresh, axis=1)
 # # throw away positions where after thresh appliance the start positions just hold
 # # NA
@@ -301,7 +159,7 @@ DF_meta['E'] = np.where(DF_meta['vital_status'].values == 'dead', True, False)
 # '/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_2/TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin_paclitaxel/female_male/cutoff_0/metilene_complement_intersect.tsv'
 # on case_id:
                                      # vital_status  survivaltime  years_to_last_follow_up   T      E
-# bcr_patient_uuid
+# bcr_patient_uuid/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0/metilene_intersect_lifeline_plot_chr20_58850459_58852155.pdf
 # 31d8591b-9d80-406c-b61a-7a6544c73466        alive           NaN                      NaN NaN  False
 # 7625a27d-a012-4f4d-b637-5f85d7cdae8c         dead           NaN                      NaN NaN   True
 

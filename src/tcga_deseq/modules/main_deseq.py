@@ -39,17 +39,17 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
 
     Snakefile = os.path.join(os.path.split(SCRIPT_PATH)[0], os.path.pardir, 'shared', 'Snakefile')
 
-    summary_tables_list = create_summary_table.create_summary_table(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs_str)
+    summary_tables_list = create_summary_table.create_summary_table(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs_str)  # ['cutoff_0', 'cutoff_5', 'cutoff_8']
     Snakemake_all_files = summary_tables_list
 
     deseq_output_list = create_deseq_output.create_deseq_output(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs_str)
     Snakemake_all_files = Snakemake_all_files + deseq_output_list
 
-    ###########################################################################
+    # ##########################################################################
     # the DESeq2 results are created now, based on them the lifelineplots
     # created, ENSG is within the filenames
-    ###########################################################################
-    # # TODO uncomment this
+    # ##########################################################################
+    # # # TODO uncomment this
     if not report:
         workflow = snakemake.snakemake(snakefile=Snakefile,
                                     targets=Snakemake_all_files,
@@ -63,9 +63,9 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
         if not workflow:
             print('snakemake execution failed, exiting now')
             os._exit(0)
-    # TODO uncomment this
-    # ###########################################################################
-    # ###########################################################################
+    # # TODO uncomment this
+    ###########################################################################
+    ###########################################################################
 
     deseq_lifeline_list = create_deseq_lifeline_plots.create_lifeline_plots(OUTPUT_PATH, PROJECTS, DRUG_str, cutoffs_str, threshold, count_types)
     Snakemake_all_files = Snakemake_all_files + deseq_lifeline_list
@@ -86,7 +86,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
     ###########################################################################
     #     here the lifelineplots are created, both, base and validation plots #
     ###########################################################################
-    # # ## TODO uncomment this !!!!
+    # ## TODO uncomment this !!!!
     if not report:
         workflow = snakemake.snakemake(snakefile=Snakefile, targets=Snakemake_all_files,
                             workdir=OUTPUT_PATH, cores=cores, forceall=False,
@@ -97,7 +97,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
         if not workflow:
             print('snakemake run failed, exiting now')
             os._exit(0)
-    # ### TODO uncomment this !!!!
+    # ## TODO uncomment this !!!!
     ###############################################################################
     ## the previous snakemake runs must be completed before requesting the next
     # aggregated files. all lifeline base and validation plots must be
@@ -142,7 +142,7 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
     heatmap_merged = []
     for project in PROJECTS:
         for cutoff in cutoffs_str:
-            patients_overview.append(os.path.join(OUTPUT_PATH, project, pipeline, 'merged_meta_files', cutoff, 'meta_info_druglist_merged_drugs_combined_final.pdf'))
+            patients_overview.append(os.path.join(OUTPUT_PATH, project, pipeline, 'merged_meta_files', cutoff, DRUG_str, 'meta_info_druglist_merged_drugs_combined_final.pdf'))
             for gender in ['male', 'female', 'female_male']:
                 heatmap_merged.append(os.path.join(OUTPUT_PATH, project, pipeline, pipeline + '_output', DRUG_str, gender, cutoff, 'DESeq2_heatmap_merged.pdf'))
     Snakemake_report_files = Snakemake_report_files + heatmap_merged + patients_overview
@@ -152,7 +152,6 @@ def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files,
     merged_diffs_list = [i.replace('lifelines_aggregated.tsv.gz', 'plot_aggr+eval_diffs_merged.pdf') for i in aggregate_lifelines_list]
     Snakemake_all_files = Snakemake_all_files + merged_diffs_list
     Snakemake_report_files = Snakemake_report_files + merged_diffs_list
-
     # TODO
     if not report:
         workflow = snakemake.snakemake(snakefile=Snakefile, targets= Snakemake_all_files,

@@ -39,36 +39,36 @@ if 'snakemake' in dir():
     cutoff = snakemake.wildcards.cutoff
     count_type = snakemake.wildcards.count_type
 else:
-    # snakemake inputs:
-    lifelines_evaluated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.tsv.gz"
-    script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff_p_aggr.py"
-    # snakemake output:
-    plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs-beta_vals_p_aggr.pdf"
-    plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs-beta_vals_p_aggr.tsv.gz"
-    # snakemake wildcards:
-    output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
-    project = "TCGA-HNSC"
-    pipeline = "metilene"
-    drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-    gender = "female"
-    cutoff = "cutoff_5"
-    threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
-    count_type = "beta_vals"
     # # snakemake inputs:
-    # lifelines_evaluated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.tsv.gz"
+    # lifelines_evaluated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.tsv.gz"
     # script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff_p_aggr.py"
     # # snakemake output:
-    # plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_base_plot-beta_vals_p_aggr.pdf"
-    # plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_base_plot-beta_vals_p_aggr.tsv.gz"
+    # plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs-beta_vals_p_aggr.pdf"
+    # plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_5/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs-beta_vals_p_aggr.tsv.gz"
     # # snakemake wildcards:
     # output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
-    # project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+    # project = "TCGA-HNSC"
     # pipeline = "metilene"
     # drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-    # gender = "female_male"
-    # cutoff = "cutoff_0"
+    # gender = "female"
+    # cutoff = "cutoff_5"
     # threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
     # count_type = "beta_vals"
+    # snakemake inputs:
+    lifelines_evaluated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_lifelines_evaluated-beta_vals.tsv.gz"
+    script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff_p_aggr.py"
+    # snakemake output:
+    plot_diffs = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_base_plot-beta_vals_p_aggr.pdf"
+    plot_diffs_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/metilene_output/carboplatin_carboplatin,paclitaxel_cisplatin/female_male/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/metilene_plot_eval_diffs_base_plot-beta_vals_p_aggr.tsv.gz"
+    # snakemake wildcards:
+    output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
+    project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
+    pipeline = "metilene"
+    drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+    gender = "female_male"
+    cutoff = "cutoff_0"
+    threshold_str = "threshold_0_threshold_5_threshold_10_threshold_20"
+    count_type = "beta_vals"
     # # snakemake inputs:
     # lifelines_evaluated = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/DESeq2/DESeq2_output/carboplatin_carboplatin,paclitaxel_cisplatin/female/cutoff_0/threshold_0_threshold_5_threshold_10_threshold_20/DESeq2_lifelines_evaluated-norm_count.tsv.gz"
     # script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/plot_thresh_diff.py"
@@ -209,6 +209,7 @@ def plot_dynamical_metilene(DF, out_file, out_file_table):
     fig, ax = plt.subplots(2,1,figsize=figsize)
     fig.suptitle(f'aggregation over base and validation plot, sorted over product of p values, chr-start positions ({count_type})\n{projects}, {gender},\n {drugs}, cutoff={cutoff}\n')
     # just plot the UP plots if there are also UP plots available:
+    purple = sns.cubehelix_palette()[4]
     if 'UP' in base_DF_pval_sort.set_index('plot_type').loc['base_plot']['CMP'].values:
         up_chr_start = base_DF_pval_sort.set_index(['plot_type', 'CMP']).sort_index().loc[('base_plot', 'UP'), :]['chr_start'].values
         temp_UP = base_DF_pval_sort.set_index('chr_start').loc[up_chr_start,:].reset_index()
@@ -221,10 +222,13 @@ def plot_dynamical_metilene(DF, out_file, out_file_table):
         ax[0].grid()
         ax[0].set_yscale('log')
         ax[0].set_xticks(ax[0].get_xticks(),ax[0].get_xticklabels(), rotation=90)
-        ax[0].title.set_text('UP plots')
+        ax[0].title.set_text('UP plot validations')
         ax[0].axhline(y=0.05, color='red')
         trans = transforms.blended_transform_factory(ax[0].get_yticklabels()[0].get_transform(), ax[0].transData)
         ax[0].text(0.01, 0.05, "0.05", color="black", transform=trans, ha="left", va="bottom")
+        ax[0].axhline(y=0.0025, color=purple)
+        trans = transforms.blended_transform_factory(ax[0].get_yticklabels()[0].get_transform(), ax[0].transData)
+        ax[0].text(0.01, 0.0025, "0.0025", color="black", transform=trans, ha="left", va="bottom")
     if 'DOWN' in base_DF_pval_sort.set_index('plot_type').loc['base_plot']['CMP'].values:
         down_chr_start = base_DF_pval_sort.set_index(['plot_type', 'CMP']).sort_index().loc[('base_plot', 'DOWN'), :]['chr_start'].values
         temp_DOWN = base_DF_pval_sort.set_index('chr_start').loc[down_chr_start,:].reset_index()
@@ -235,11 +239,14 @@ def plot_dynamical_metilene(DF, out_file, out_file_table):
         sns.lineplot(ax=ax[1], data=temp_DOWN, x='chr_start', y='p_value_life', marker='.', hue='plot_type', hue_order=['validation, NOT scored', 'DOWN_validation', 'base_plot'], palette=sns.color_palette()[:3])
         sns.lineplot(ax=ax[1], data=temp_DOWN, x='chr_start', y='p_val_life_prod_scored', marker='.', legend='auto', hue='p_prod', palette=[sns.cubehelix_palette()[4]])
         ax[1].grid()
-        ax[1].title.set_text('DOWN plots')
+        ax[1].title.set_text('DOWN plot validations')
         ax[1].axhline(y=0.05, color='red')
         ax[1].set_yscale('log')
         trans = transforms.blended_transform_factory(ax[1].get_yticklabels()[0].get_transform(), ax[1].transData)
         ax[1].text(0.01, 0.05, "0.05", color="black", transform=trans, ha="left", va="bottom")
+        ax[1].axhline(y=0.0025, color=purple)
+        trans = transforms.blended_transform_factory(ax[1].get_yticklabels()[0].get_transform(), ax[1].transData)
+        ax[1].text(0.01, 0.0025, "0.0025", color="black", transform=trans, ha="left", va="bottom")
     plt.xticks(rotation=90)
     plt.xlim(left=-1)
     plt.subplots_adjust(left=0.06, right=0.98, top=0.88, bottom=0.3, hspace=1.2)
@@ -296,10 +303,15 @@ def plot_dynamical_deseq(DF, out_file, out_file_table, count_type):
     ax[0].grid()
     ax[0].set_yscale('log')
     ax[0].set_xticks(ax[0].get_xticks(),ax[0].get_xticklabels(), rotation=90)
-    ax[0].title.set_text('UP plots')
+    ax[0].title.set_text('UP plot validations')
+
     ax[0].axhline(y=0.05, color='red')
     trans = transforms.blended_transform_factory(ax[0].get_yticklabels()[0].get_transform(), ax[0].transData)
     ax[0].text(0.01, 0.05, "0.05", color="black", transform=trans, ha="left", va="bottom")
+    purple = sns.cubehelix_palette()[4]
+    ax[0].axhline(y=0.0025, color=purple)
+    trans = transforms.blended_transform_factory(ax[0].get_yticklabels()[0].get_transform(), ax[0].transData)
+    ax[0].text(0.01, 0.0025, "0.0025", color="black", transform=trans, ha="left", va="bottom")
 
     down_ensg = base_DF_pval_sort.set_index(['plot_type', 'CMP']).sort_index().loc[('base_plot', 'DOWN'), :]['ENSG'].values
     temp_DOWN = base_DF_pval_sort.set_index('ENSG').loc[down_ensg,:].reset_index()
@@ -311,10 +323,13 @@ def plot_dynamical_deseq(DF, out_file, out_file_table, count_type):
     sns.lineplot(ax=ax[1], data=temp_DOWN, x='ENSG', y='p_val_life_prod_scored', marker='.', legend='auto', hue='p_prod', palette=[sns.cubehelix_palette()[4]])
     ax[1].grid()
     ax[1].set_yscale('log')
-    ax[1].title.set_text('DOWN plots')
+    ax[1].title.set_text('DOWN plot validations')
     ax[1].axhline(y=0.05, color='red')
     trans = transforms.blended_transform_factory(ax[1].get_yticklabels()[0].get_transform(), ax[1].transData)
     ax[1].text(0.01, 0.05, "0.05", color="black", transform=trans, ha="left", va="bottom")
+    ax[1].axhline(y=0.0025, color=purple)
+    trans = transforms.blended_transform_factory(ax[1].get_yticklabels()[0].get_transform(), ax[1].transData)
+    ax[1].text(0.01, 0.0025, "0.0025", color="black", transform=trans, ha="left", va="bottom")
     plt.xticks(rotation=90)
     plt.xlim(left=-1)
     plt.subplots_adjust(left=0.06, right=0.98, top=0.88, bottom=0.3, hspace=1.3)
