@@ -88,13 +88,29 @@ rule create_metilene_out:
     script:
         "scripts/create_metilene_out.py"
 
+rule metilene_limit_qval_out:
+    """
+    also limit the DMRs to the best 60 up and down regulated like the DESeq2 genes
+    this limited DMR file is the base for downstream analysises
+    """
+    input:
+        qval_input = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05.out", 
+    output:
+        qval_lim = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05_limited.out", 
+    conda:
+        "envs/pandas2.yaml"
+    log:
+        "{output_path}/{project}/metilene/logs/metilene_limit_qval_out/{drug_combi}_{gender}_{cutoff}.log",
+    script:
+        "scripts/metilene_limit_qval_out.py"
+
 rule metilene_intersect_tables:
     """
     intersecting the qval.0.05.out tables (holding DMRs) with the beta value files with which the are created with
     This intersect file is the base for many following analyses
     """
     input:
-        qval_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05.out", 
+        qval_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05_limited.out", 
         #meta_info = "{output_path}/{project}/metilene/merged_meta_files/meta_info_druglist_merged_drugs_combined.tsv",
         # is this actually needed?
         metilene_input = "{output_path}/{project}/metilene/metilene_input_table/{drug_combi}/{gender}/{cutoff}/summary_for_metilene.tsv",
@@ -132,7 +148,7 @@ rule metilene_plot_DMR_heatmaps:
     """
     input:
         metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
-        metilene_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05.out",
+        metilene_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05_limited.out",
         R_heatmap_script = os.path.join(script_path, "scripts/metilene_heatmap.R"),
         script_file = os.path.join(script_path, "scripts/metilene_heatmap.py"),
     output:
@@ -365,7 +381,7 @@ rule aggregate_lifelines_all_metilene:
         # not using a input fct, we rather expand here the thresholds which should be aggregated explicitly, with that its still possible to get different aggregated results for different threshold combinations through the cli:
         # so the threshold inclusion depends on the interface threshold input in each single run
         lifeline_all = get_lifeline_all, # first lifeline plots with therapy set invoked and validation plot for UP and for DOWN regulated expressions
-        metilene_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05.out", 
+        metilene_out = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_qval.0.05_limited.out",
         # the results are not needed within the aggregate_lifelines_all.py script, but shall be a precondition to run this rule
         #metilene_results = expand("{{output_path}}/{{project}}/metilene/metilene_output/{{drug_combi}}/{{gender}}/{{cutoff}}/metilene_log2f{in_de}CREASE_result.tsv", in_de=['IN', 'DE']),
         #metilene_results = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv"
