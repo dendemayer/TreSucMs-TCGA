@@ -133,8 +133,6 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     print(f'cores:\t\t\t{cores}')
     print(f'cutoff:\t\t\t{cutoffs}')
     print(f'threshold:\t\t{threshold}')
-
-
     shared_scriptdir = os.path.join(
         os.path.split(os.path.split(SCRIPT_PATH)[0])[0], 'shared')
 
