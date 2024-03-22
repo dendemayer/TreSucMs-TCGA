@@ -1,9 +1,11 @@
-Usage: tcga_main [OPTIONS]
+Usage: TreMSuc [OPTIONS]
 
-tcga_main -p TCGA-HNSC -p TCGA-CESC -p TCGA-LUSC -d cisplatin -d carboplatin,paclitaxel -d carboplatin -o /scr/palinca/gabor/TCGA-pipeline -c 40 -e metilene -t 5 -t 10 -C
+```bash
+TreMSuc -p TCGA-HNSC -p TCGA-CESC -p TCGA-LUSC -d cisplatin -d carboplatin,paclitaxel -d carboplatin -o /scr/palinca/gabor/TCGA-pipeline -c 40 -e metilene -t 5 -t 10 -C
  8 -C 5 -e DESeq2
+```
 
-  "tcga_piplines" a tool to choose, harvest and analyse  data of
+  "TreMSuc" a tool to choose, harvest and analyse  data of
   the TCGA-projects with help of the metilene and DESeq2 package to find
   biomarkers which can have impact on treatment success.
 
@@ -15,11 +17,11 @@ tcga_main -p TCGA-HNSC -p TCGA-CESC -p TCGA-LUSC -d cisplatin -d carboplatin,pac
   call the script without any options to enter the interactive mode and set
   each option step by step:
 
-      $ tcga_main
+      $ TreMSuc
 
   print help page:
 
-      $ tcga_main --help
+      $ TreMSuc --help
 
 Options:  
 

@@ -29,64 +29,96 @@ and nationwidechildren are linked through:
     $ python main_metilene.py -p TCGA-CESC -d cisplatin -f 3
 """
 ###########################
-sys.stderr = sys.stdout = open(snakemake.log[0], "w")
+if "snakemake" in dir():
+    sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 
-print('# snakemake inputs:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
+    print('# snakemake inputs:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.input.items()]
 
-print('# snakemake output:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
+    print('# snakemake output:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.output.items()]
 
-print('# snakemake wildcards:')
-[ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
+    print('# snakemake wildcards:')
+    [ print(f'{i[0]} = "{i[1]}"') for i in snakemake.wildcards.items()]
 
-manifest_file = snakemake.input[0]
-print(f'manifest_file = "{manifest_file}"')
-# nationwidechildrens.org_biospecimen_aliquot_cesc.txt:
-aliq_table_path = snakemake.input[1]
-print(f'aliq_table_path = "{aliq_table_path}"')
+    manifest_file = snakemake.input[0]
+    print(f'manifest_file = "{manifest_file}"')
+    # nationwidechildrens.org_biospecimen_aliquot_cesc.txt:
+    aliq_table_path = snakemake.input[1]
+    print(f'aliq_table_path = "{aliq_table_path}"')
 
-# nationwidechildrens.org_clinical_drug_cesc.txt:
-drug_table_path = snakemake.input[2]
-print(f'drug_table_path = "{drug_table_path}"')
+    # nationwidechildrens.org_clinical_drug_cesc.txt:
+    drug_table_path = snakemake.input[2]
+    print(f'drug_table_path = "{drug_table_path}"')
 
-# nationwidechildrens.org_clinical_patient_cesc.txt:
-patient_table_path = snakemake.input[3]
-print(f'patient_table_path = "{patient_table_path}"')
+    # nationwidechildrens.org_clinical_patient_cesc.txt:
+    patient_table_path = snakemake.input[3]
+    print(f'patient_table_path = "{patient_table_path}"')
 
-# nationwidechildrens.org_clinical_follow_up_v4.0_cesc.txt:
-vital_table_path = snakemake.input[4]
-print(f'vital_table_path = "{vital_table_path}"')
-# nationwidechildrens.org_biospecimen_sample_cesc.txt
-sample_table_path = snakemake.input[5]
-print(f'sample_table_path = "{sample_table_path}"')
+    # nationwidechildrens.org_clinical_follow_up_v4.0_cesc.txt:
+    vital_table_path = snakemake.input[4]
+    print(f'vital_table_path = "{vital_table_path}"')
+    # nationwidechildrens.org_biospecimen_sample_cesc.txt
+    sample_table_path = snakemake.input[5]
+    print(f'sample_table_path = "{sample_table_path}"')
 
-# drug_out_path = snakemake.output[0]
-complete_path = snakemake.output[0]
-print(f'complete_path = "{complete_path}"')
+    # drug_out_path = snakemake.output[0]
+    complete_path = snakemake.output[0]
+    print(f'complete_path = "{complete_path}"')
 
-cutoff = snakemake.wildcards.cutoff
+    cutoff = snakemake.wildcards.cutoff
+    print(f'cutoff = "{cutoff}"')
+    PROJECT = [snakemake.wildcards[1]]
+    print(f'PROJECT = "{PROJECT}"')
+    pipeline = snakemake.wildcards[2]
+    print(f'pipeline = "{pipeline}"')
+    project = snakemake.wildcards.project
+else:
+    output_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7"
+    project = "TCGA-PCPG"
+    pipeline = "DESeq2"
+    cutoff = "cutoff_0"
+    manifest_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/resources/GCv36_Manifests/TCGA-PCPG.tsv"
+    aliq_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-PCPG/aux_files/nationwidechildrens.org_biospecimen_aliquot_pcpg.txt"
+    drug_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-PCPG/aux_files/nationwidechildrens.org_clinical_drug_pcpg.txt"
+    patient_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-PCPG/aux_files/nationwidechildrens.org_clinical_patient_pcpg.txt"
+    vital_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-PCPG/aux_files/nationwidechildrens.org_clinical_follow_up_v4.0_pcpg.txt"
+    sample_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-PCPG/aux_files/nationwidechildrens.org_biospecimen_sample_pcpg.txt"
+    complete_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-PCPG/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+    cutoff = "cutoff_0"
+    PROJECT = "['TCGA-PCPG']"
+    pipeline = "DESeq2"
+    # # project with no dead cases at all!!!:
+    # output_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7"
+    # project = "TCGA-PCPG"
+    # pipeline = "metilene"
+    # cutoff = "cutoff_0"
+    # manifest_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/resources/GCv36_Manifests/TCGA-PCPG.tsv"
+    # aliq_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-PCPG/aux_files/nationwidechildrens.org_biospecimen_aliquot_pcpg.txt"
+    # drug_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-PCPG/aux_files/nationwidechildrens.org_clinical_drug_pcpg.txt"
+    # patient_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-PCPG/aux_files/nationwidechildrens.org_clinical_patient_pcpg.txt"
+    # vital_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-PCPG/aux_files/nationwidechildrens.org_clinical_follow_up_v4.0_pcpg.txt"
+    # sample_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-PCPG/aux_files/nationwidechildrens.org_biospecimen_sample_pcpg.txt"
+    # complete_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-PCPG/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+    # cutoff = "cutoff_0"
+    # PROJECT = "['TCGA-PCPG']"
+    # pipeline = "metilene"
+    # output_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7"
+    # project = "TCGA-CHOL"
+    # pipeline = "DESeq2"
+    # cutoff = "cutoff_0"
+    # manifest_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/resources/GCv36_Manifests/TCGA-CHOL.tsv"
+    # aliq_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-CHOL/aux_files/nationwidechildrens.org_biospecimen_aliquot_chol.txt"
+    # drug_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-CHOL/aux_files/nationwidechildrens.org_clinical_drug_chol.txt"
+    # patient_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-CHOL/aux_files/nationwidechildrens.org_clinical_patient_chol.txt"
+    # vital_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-CHOL/aux_files/nationwidechildrens.org_clinical_follow_up_v4.0_chol.txt"
+    # sample_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-CHOL/aux_files/nationwidechildrens.org_biospecimen_sample_chol.txt"
+    # complete_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7/TCGA-CHOL/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+    # PROJECT = ['TCGA-CHOL']
+    # pipeline = "DESeq2"
+
+
 cutoff = float(cutoff.split('_')[1])
-print(f'cutoff = "{cutoff}"')
-
-
-PROJECT = [snakemake.wildcards[1]]
-print(f'PROJECT = "{PROJECT}"')
-pipeline = snakemake.wildcards[2]
-print(f'pipeline = "{pipeline}"')
-# # ##########################
-
-# manifest_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/resources/GCv36_Manifests/TCGA-CESC.tsv"
-# aliq_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/aux_files/nationwidechildrens.org_biospecimen_aliquot_cesc.txt"
-# drug_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/aux_files/nationwidechildrens.org_clinical_drug_cesc.txt"
-# patient_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/aux_files/nationwidechildrens.org_clinical_patient_cesc.txt"
-# vital_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/aux_files/nationwidechildrens.org_clinical_follow_up_v4.0_cesc.txt"
-# sample_table_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/aux_files/nationwidechildrens.org_biospecimen_sample_cesc.txt"
-# complete_path = "/scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_4/TCGA-CESC/DESeq2/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
-# cutoff = 0.0
-# PROJECT = ['TCGA-CESC']
-# pipeline = "DESeq2"
-
 # # we filter the output on the pipeline applied on, if Deseq2, than we filter
 # # the table on htseq files, if metilene, than we use the HumanMethylation450
 file_type = ''
@@ -131,6 +163,26 @@ sample_DF = sample_DF[primary_tumor_filter]
 vital_base = os.path.basename(vital_table_path)
 print(f'\nusing {vital_base} as clinical followup resource\n')
 vital_DF = pd.read_csv(vital_table_path, sep='\t', na_values='[Not Available]').loc[2:, :]
+# ###
+# DF_vital = pd.read_table(vital_table_path, na_values='[Not Available]').loc[2:, :]
+# DF_patient = pd.read_table(patient_table_path, na_values='[Not Available]').loc[2:, :]
+# DF_patient.merge(DF_vital)
+# DF_vital.loc[:, 'vital_status'].value_counts()
+# # Alive    152
+# # Name: vital_status, dtype: int64
+# DF_patient.loc[:, 'vital_status'].value_counts()
+# DF_vital.columns
+# # Alive    173
+# # Dead       6
+# # Name: vital_status, dtype: int64
+# -> still using the DF_vital since it is more up to date
+###
+if len(vital_DF.loc[:, 'vital_status'].value_counts()) == 1:
+    # write empty merge out if there are no 2 vitel states available to do diff
+    # analyses on, example pcpg:
+    pd.DataFrame().to_csv(complete_path, sep='\t')
+    os._exit(0)
+# if the vital_DF has not
 vital_DF['bcr_patient_uuid'] = vital_DF['bcr_patient_uuid'].str.lower()
 vital_DF['vital_status'] = vital_DF['vital_status'].str.lower()
 # it occurs that the value of last_contact_days_to is not set
@@ -142,6 +194,11 @@ vital_DF['vital_status'] = vital_DF['vital_status'].str.lower()
 vital_DF = vital_DF.set_index(['vital_status', 'bcr_patient_uuid']).sort_index(level=['vital_status', 'bcr_patient_uuid'])
 # drop nans in col last_contact_days_to in alive patients (this value needs to
 # be set)
+# for the project CHOL survival cols have different names, rename them here..
+# for some projects, the namings for last_contact_days_to and death_days_to are
+# different, if so, change that, if not nothing is changed:
+vital_DF = vital_DF.rename({'days_to_last_followup': 'last_contact_days_to'}, axis=1)
+vital_DF = vital_DF.rename({'days_to_death': 'death_days_to'}, axis=1)
 bcr_to_drop = vital_DF.loc['alive', 'last_contact_days_to'][vital_DF.loc['alive', 'last_contact_days_to'].isna()].index.tolist()
 # drop nans in col death_days_to in dead patients (this value needs to
 # be set)
@@ -160,6 +217,9 @@ vital_DF = vital_DF.reset_index()
 # # patient_DF contains the gender info
 patient_DF = pd.read_table(patient_table_path).loc[2:, :]
 patient_DF['bcr_patient_uuid'] = patient_DF['bcr_patient_uuid'].str.lower()
+
+patient_DF = patient_DF.rename({'days_to_last_followup': 'last_contact_days_to'}, axis=1)
+patient_DF = patient_DF.rename({'days_to_death': 'death_days_to'}, axis=1)
 # # it occurs that the col naming for age_at_diagnosis varies, check that:
 # # nationwidechildrens.org_clinical_patient_cesc_columns -> age_at_diagnosis
 # # nationwidechildrens.org_clinical_patient_hnsc_columns ->
@@ -337,7 +397,6 @@ def days_to_years(value):
         return year
     except ValueError:
         return pd.NA
-
 
 
 # make years out of last_contact_days_to col:

@@ -136,6 +136,8 @@ rule merge_meta_tables:
     """
     merging meta files to connect case id with the datafiles
     here is also the cutoff applied
+    this rule is just for single projects, the merge of those resulting merged
+    tables is done with rule merge_meta_tables_multiproj
     """
     input:
         expand("{script_path}/resources/GCv36_Manifests/{{project}}.tsv", script_path=script_path),

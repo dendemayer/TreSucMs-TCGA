@@ -61,24 +61,25 @@ HOME = os.getenv('HOME')
 def call_with_options(out_path, project, drugs, cores, execute, cutoff,
                       threshold, dryrun, report):
     '''
-    tcga pipelines a tool to choose, harvest and analyse methylation and rna
+    TreMSuc, a tool to choose, harvest and analyse methylation and rna
     count data of the TCGA-projects with help of the package metilene and
     DEseq2.\n
 
-    # Build and activate the provided conda env:
+    Build and activate the provided conda env:
+    bash
 
-    #     $ conda env create -f metilene_env.yaml
+        $ conda env create -f metilene_env.yaml
 
-    #     $ conda activate metilene_pipeline
+        $ conda activate metilene_pipeline
 
-    # call the script without any options to enter the interactive mode and set
-    # each option step by step:
+    call the script without any options to enter the interactive mode and set
+    each option step by step:
 
-    #     $ python main_metilene.py
+        $ python main_metilene.py
 
-    # print help page:
+    print help page:
 
-    #     $ python main_metilene.py --help
+        $ python main_metilene.py --help
     '''
     OUTPUT_PATH = out_path
     print("\nOUTPUT_PATH:\t\t", OUTPUT_PATH)
@@ -127,9 +128,6 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
 
     thresh_list = [f'threshold_{str(i)}' for i in threshold]
     thresh_str = '_'.join(thresh_list)
-
-    # temp=("-p TCGA-CESC" "-p TCGA-HNSC" "-p TCGA-LUSC" "-p TCGA-ESCA" "-p TCGA-BRCA" "-p TCGA-GBM" "-p TCGA-OV" "-p TCGA-LUAD" "-p TCGA-UCEC" "-p TCGA-KIRC" "-p TCGA-LGG" "-p TCGA-THCA" "-p TCGA-PRAD" "-p TCGA-SKCM" "-p TCGA-COAD" "-p TCGA-STAD" "-p TCGA-BLCA" "-p TCGA-LIHC" "-p TCGA-KIRP" "-p TCGA-SARC" "-p TCGA-PAAD" "-p TCGA-PCPG" "-p TCGA-READ" "-p TCGA-TGCT" "-p TCGA-THYM" "-p TCGA-KICH" "-p TCGA-ACC" "-p TCGA-MESO" "-p TCGA-UVM" "-p TCGA-DLBC" "-p TCGA-UCS" "-p TCGA-CHOL")
-    # temp=("-p TCGA-CESC" "-p TCGA-HNSC")
     print('PROJECT:\t\t', PROJECT)
     print('DRUGS:\t\t\t', DRUGS)
     print(f'cores:\t\t\t{cores}')
@@ -251,6 +249,12 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     ########################################################################
     # TODO uncomment this !!!
     ########################################################################
+
+    # to download every meta table :
+    # run this command and exit here with os._exit(0)
+    # temp=("-p TCGA-CESC" "-p TCGA-HNSC" "-p TCGA-LUSC" "-p TCGA-ESCA" "-p TCGA-BRCA" "-p TCGA-GBM" "-p TCGA-OV" "-p TCGA-LUAD" "-p TCGA-UCEC" "-p TCGA-KIRC" "-p TCGA-LGG" "-p TCGA-THCA" "-p TCGA-PRAD" "-p TCGA-SKCM" "-p TCGA-COAD" "-p TCGA-STAD" "-p TCGA-BLCA" "-p TCGA-LIHC" "-p TCGA-KIRP" "-p TCGA-SARC" "-p TCGA-PAAD" "-p TCGA-PCPG" "-p TCGA-READ" "-p TCGA-TGCT" "-p TCGA-THYM" "-p TCGA-KICH" "-p TCGA-ACC" "-p TCGA-MESO" "-p TCGA-UVM" "-p TCGA-DLBC" "-p TCGA-UCS" "-p TCGA-CHOL")
+    # for i in ${temp[@]}; do echo tcga_pipelines -p $i -d cisplatin -o /scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7 -c 40; done
+    os._exit(0)
 
     # from here the shared modules and Snakemake scripts are getting pipeline
     # specific, hand over all outputfiles requested so far and enter the

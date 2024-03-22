@@ -1,0 +1,335 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "TREMSUC" "1" "Mar 22, 2024" "" "TreMSuc"
+.SH NAME
+tremsuc \- TreMSuc 1.0
+.sp
+\(dqTreMSuc\(dq a tool to choose, harvest and analyse expression and methylation data
+of the TCGA\-projects
+.SH BUILD AND ACTIVATE THE PROVIDED CONDA ENV:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ conda env create \-f deseq_env.yaml
+$ conda activate deseq_pipeline
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+call the script without any options to enter the interactive mode and set
+each option step by step:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ python main_deseq.py
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+print help page:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ python main_deseq.py \-\-help
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH DOCUMENTATION OF MODULES, CLASSES AND FUNCTIONS:
+.SS TreMSuc
+.sp
+TreMSuc, a tool to choose, harvest and analyse methylation and rna
+count data of the TCGA\-projects with help of the package metilene and
+DEseq2.
+.sp
+Build and activate the provided conda env:
+bash
+.INDENT 0.0
+.INDENT 3.5
+$ conda env create \-f metilene_env.yaml
+.sp
+$ conda activate metilene_pipeline
+.UNINDENT
+.UNINDENT
+.sp
+call the script without any options to enter the interactive mode and set
+each option step by step:
+.INDENT 0.0
+.INDENT 3.5
+$ python main_metilene.py
+.UNINDENT
+.UNINDENT
+.sp
+print help page:
+.INDENT 0.0
+.INDENT 3.5
+$ python main_metilene.py \-\-help
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+TreMSuc [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Options
+.INDENT 0.0
+.TP
+.B \-o, \-\-out_path <out_path>
+path to save the result files
+.INDENT 7.0
+.TP
+.B Default
+\fB/homes/biertruck/gabor/TCGA\-pipelines\fP
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-p, \-\-project <project>
+TCGA project to be applied. Any TCGA project can be chosen, like: \-p TCGA\-CESC \-p TCGA\-HNSC ...
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-d, \-\-drugs <drugs>
+drug(s), like: \-d drug1 \-d drug2 or drugcombination(s), like: \-d drug1,drug2
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-c, \-\-cores <cores>
+number of cores provided to snakemake
+.INDENT 7.0
+.TP
+.B Default
+\fB1\fP
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-C, \-\-cutoff <cutoff>
+Cut\-off parameter
+.INDENT 7.0
+.TP
+.B Default
+\fB0\fP
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-t, \-\-threshold <threshold>
+threshold parameter
+.INDENT 7.0
+.TP
+.B Default
+\fB0\fP
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-e, \-\-execute <execute>
+choose which pipeline shall be              executed
+.INDENT 7.0
+.TP
+.B Default
+\fBDESeq2, metilene\fP
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-D, \-\-dryrun
+snakemake dryrun
+.INDENT 7.0
+.TP
+.B Default
+\fBFalse\fP
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-r, \-\-report
+just create a report
+.INDENT 7.0
+.TP
+.B Default
+\fBFalse\fP
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-v, \-\-version
+printing out version information: Version 1.0
+.UNINDENT
+.SH SHORT TUTORIAL:
+.SS Performing an example analysis:
+.sp
+The easiest way of applying a run is entering the interactive mode (it is
+supposed that you cloned the deseq_pipeline git repository and cd into that
+dir):
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ python main_deseq.py
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+With it, every needed parameter is offered for further analyses. First, the
+available projects are presented, based on that selection, available drugs
+or drug combinations can be chosen.
+.sp
+In contrast to that, the parameter needed could be applied via command line.
+An example terminal call for the projects TCGA\-CESC and TCGA\-HNSC together with
+the drug cisplatin and the combination carboplatin,paclitaxel would be:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ python main_deseq.py \-p TCGA\-CESC \-p TCGA\-HNSC
+\-d cisplatin \-d carboplatin,paclitaxel \-o /OUTPUT_path \-D \-A
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+First of all, the needed data for the selected projects is loaded via the
+TCGA API and stored in:
+.INDENT 0.0
+.IP \(bu 2
+/OUTPUT_path/TCGA\-CESC/TCGA\-CESC_data_files/ and
+.IP \(bu 2
+/OUTPUT_path/TCGA\-HNSC/TCGA\-HNSC_data_files/
+.UNINDENT
+.sp
+Intermediate merged tables and additional meta_data tables are stored in the
+project directories:
+.INDENT 0.0
+.IP \(bu 2
+/OUTPUT_path/TCGA\-CESC/
+.IP \(bu 2
+/OUTPUT_path/TCGA\-HNSC/
+.UNINDENT
+.sp
+First, single project analyses are performed. The actual analysis is
+determined by the project, and by the drugs combination. The directory for
+the drugs combination is created out of the applied drugs, so here, the
+DRUGS_title is \(aqcarboplatin,paclitaxel_cisplatin\(aq.
+.sp
+Everything below that drugs directory, is restricted to the chosen drugs
+s.t. the results of both single project analyses are placed in:
+.INDENT 0.0
+.IP \(bu 2
+/OUTPUT_path/TCGA\-CESC/carboplatin,paclitaxel_cisplatin/
+.IP \(bu 2
+/OUTPUT_path/TCGA\-HNSC/carboplatin,paclitaxel_cisplatin/
+.UNINDENT
+.sp
+After the single project analysis, the projects are combined. Those results
+are stored in an additional directory, composed out of the applied projects,
+so here, the PROJECT_title is: \(aqTCGA\-CESC_TCGA\-HNSC\(aq, those results are saved
+in the directory:
+.INDENT 0.0
+.IP \(bu 2
+/OUTPUT_path/TCGA\-CESC_TCGA\-HNSC/carboplatin,paclitaxel_cisplatin/
+.UNINDENT
+.sp
+Since the analysis is determined by the project and drug combination, results
+for 3 different approaches are created, two for the single projects and one
+for the aggregation of the two projects. For all of them, a respective
+REPORT.pdf is created, containing a summarized representation of the most
+important results and plots, along with some explanations to them. They are
+stored at:
+.INDENT 0.0
+.IP \(bu 2
+/OUTPUT_path/TCGA\-CESC/carboplatin,paclitaxel_cisplatin/REPORT.pdf
+.IP \(bu 2
+/OUTPUT_path/TCGA\-HNSC/carboplatin,paclitaxel_cisplatin/REPORT.pdf
+.IP \(bu 2
+/OUTPUT_path/TCGA\-CESC_TCGA\-HNSC/carboplatin,paclitaxel_cisplatin/REPORT.pdf
+.UNINDENT
+.SS Recreate the performed analysis:
+.sp
+To rerun the analysis and reproduce all the outputs and results created with
+it, a single Snakemake configuration file is created. It is stored in the
+cloned repository location under the \(aqSnakes\(aq subdir.
+Since the analysis is determined by the composition of projects and drugs, the
+unique filename of this configuration file is composed out of it. For the
+example with CESC and HNSC, together with cisplatin and carboplatin,paclitaxel,
+that would be:
+.INDENT 0.0
+.IP \(bu 2
+SCRIPT_path/Snakes/snakemake_config_TCGA\-CESC_TCGA\-HNSC_carboplatin,paclitaxel_cisplatin.yaml
+.UNINDENT
+.sp
+The Snakefile needed is also hold available at:
+.INDENT 0.0
+.IP \(bu 2
+SCRIPT_path/Snakes/Snakefile
+.UNINDENT
+.sp
+This file must be edited and the path to the config yaml file, the OUTPUT_path
+and the SCRIPT_path must be inserted.
+.sp
+With that, the Snakefile is configured to run the analyses again. Change the
+directory into the SCRIPT_path/Snakes/ path and run for example:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ snakemake \-\-cores 7
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+This would use 7 cores of your machine if available and make use of
+parallelisation of steps where it is feasible.
+.SH AUTHOR
+Gabor Balogh
+.SH COPYRIGHT
+2024, Gabor Balogh
+.\" Generated by docutils manpage writer.
+.

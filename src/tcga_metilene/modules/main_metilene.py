@@ -17,6 +17,9 @@ src/tcga_metilene/Snakefile
 def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
               threshold, cores, pipeline, config_file_shared, config, dryrun,
               cutoffs_str, report):
+    """
+    test doc string for sphinx
+    """
 
     SCRIPT_PATH = os.path.split(__file__)[0]
 
