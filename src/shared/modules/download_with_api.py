@@ -2,12 +2,16 @@ import os
 import pandas as pd
 from yaml import safe_load
 def download_help_files(OUTPUT_PATH, config_file_shared):
-    """
-    # creating the file names which should be requested through Snakemake
+    """download_help_files.
+
+    :param str OUTPUT_PATH:
+    :param str config_file_shared:
+
+    creating the file names which should be requested through Snakemake
     downloading manifest file and the gtf annotation file from TCGA:
-    # we are using a shared Snakefile, but refere here to the metilene specific
-    # Snakefile, which again refers to the shared Snakefile via include
-    # statement
+    we are using a shared Snakefile, but refere here to the metilene specific
+    Snakefile, which again refers to the shared Snakefile via include
+    statement
     this fct returns the gtf and manifest filenames provided in the shared
     config the must not yet be present yet, the files are downloaded then via
     shared Snakefile: rule download_helpfiles:
@@ -27,18 +31,16 @@ def download_help_files(OUTPUT_PATH, config_file_shared):
 
 
 def download_aux_files(OUTPUT_PATH, PROJECT, config_file_shared):
-    """
+    """download_aux_files.
+
+    :param str OUTPUT_PATH: path for metilene pipeline outputs
+    :param list of str PROJECT: list of projects chosen
+    :param str config_file_shared:
+
     the manifest file is now downloaded vie Snakemake, provide
-    ############
     create the aux filenames which should be requested to the Snakefile
     with help of the previously loaded  manifest file -> this manifest file is
     the input for this rule! and must be already loaded beforehand!
-    ###########
-
-    :param: OUTPUT_PATH: path for metilene pipeline outputs
-    :type: OUTPUT_PATH: str
-    :param: PROJECT: list of projects chosen
-    :type: PROJECT: list of str
 
     with the UUID the clinical tables will be downloaded in the
     OUTPUT_PATH/PROJECT:

@@ -31,82 +31,63 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .SH NAME
 tremsuc \- TreMSuc 1.0
 .sp
-\(dqTreMSuc\(dq a tool to choose, harvest and analyse expression and methylation data
-of the TCGA\-projects
-.SH BUILD AND ACTIVATE THE PROVIDED CONDA ENV:
+\(dqTreSucMs\(dq a tool to choose, harvest and analyse expression and methylation data
+of the TCGA\-projects for revealing Biomarkers which indicate treatment success
+predictions.
+.SH INSTALLING FROM GITHUB.COM:
 .INDENT 0.0
 .INDENT 3.5
 .sp
 .nf
 .ft C
-$ conda env create \-f deseq_env.yaml
-$ conda activate deseq_pipeline
+$ git clone https://github.com/dendemayer/TreSucMs\-TCGA.git
+$ cd TreSucMs\-TCGA
+$ pip install .
 .ft P
 .fi
 .UNINDENT
 .UNINDENT
 .sp
-call the script without any options to enter the interactive mode and set
-each option step by step:
+To start the analysis with help of the interactive mode, call the pipeline
+without any argument:
 .INDENT 0.0
 .INDENT 3.5
 .sp
 .nf
 .ft C
-$ python main_deseq.py
+$ TreSucMs
 .ft P
 .fi
 .UNINDENT
 .UNINDENT
 .sp
-print help page:
+Calling the help or the manual page:
 .INDENT 0.0
 .INDENT 3.5
 .sp
 .nf
 .ft C
-$ python main_deseq.py \-\-help
+$ TreSucMs \-\-help
+$ man TreSucMs
 .ft P
 .fi
 .UNINDENT
 .UNINDENT
-.SH DOCUMENTATION OF MODULES, CLASSES AND FUNCTIONS:
-.SS TreMSuc
+.SH HELP PAGE OF THE PIPELINE:
+.SS TreSucMs
 .sp
-TreMSuc, a tool to choose, harvest and analyse methylation and rna
-count data of the TCGA\-projects with help of the package metilene and
-DEseq2.
+\(dqTreSucMs\(dq a tool to choose, harvest and analyse expression and methylation data
+of the TCGA\-projects for revealing Biomarkers which indicate treatment success
+predictions.
 .sp
-Build and activate the provided conda env:
-bash
-.INDENT 0.0
-.INDENT 3.5
-$ conda env create \-f metilene_env.yaml
-.sp
-$ conda activate metilene_pipeline
-.UNINDENT
-.UNINDENT
-.sp
-call the script without any options to enter the interactive mode and set
-each option step by step:
-.INDENT 0.0
-.INDENT 3.5
-$ python main_metilene.py
-.UNINDENT
-.UNINDENT
-.sp
-print help page:
-.INDENT 0.0
-.INDENT 3.5
-$ python main_metilene.py \-\-help
-.UNINDENT
-.UNINDENT
+Calling the pipeline without any argument starts the interactive mode to
+help setting all needed parameters for the analysis.
 .INDENT 0.0
 .INDENT 3.5
 .sp
 .nf
 .ft C
-TreMSuc [OPTIONS]
+TreSucMs [OPTIONS]
 .ft P
 .fi
 .UNINDENT
@@ -126,7 +107,7 @@ path to save the result files
 .INDENT 0.0
 .TP
 .B \-p, \-\-project <project>
-TCGA project to be applied. Any TCGA project can be chosen, like: \-p TCGA\-CESC \-p TCGA\-HNSC ...
+TCGA project(s) to be applied. Any TCGA project can be chosen, like: \-p TCGA\-CESC \-p TCGA\-HNSC ...
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -166,7 +147,7 @@ threshold parameter
 .INDENT 0.0
 .TP
 .B \-e, \-\-execute <execute>
-choose which pipeline shall be              executed
+choose which pipeline shall be executed
 .INDENT 7.0
 .TP
 .B Default
@@ -175,7 +156,7 @@ choose which pipeline shall be              executed
 .UNINDENT
 .INDENT 0.0
 .TP
-.B \-D, \-\-dryrun
+.B \-N, \-\-dryrun
 snakemake dryrun
 .INDENT 7.0
 .TP
@@ -185,8 +166,10 @@ snakemake dryrun
 .UNINDENT
 .INDENT 0.0
 .TP
-.B \-r, \-\-report
-just create a report
+.B \-D, \-\-download
+if set, just download raw
+and meta data for given projects and analysis types, revise them,
+link them, but do not run any analysis
 .INDENT 7.0
 .TP
 .B Default
@@ -197,6 +180,12 @@ just create a report
 .TP
 .B \-v, \-\-version
 printing out version information: Version 1.0
+.UNINDENT
+.SH DOCUMENTATION OF MODULES, CLASSES AND FUNCTIONS:
+.INDENT 0.0
+.TP
+.B tcga_metilene.modules.main_metilene.entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs, threshold, cores, pipeline, config_file_shared, config, dryrun, cutoffs_str, report)
+test doc string for sphinx
 .UNINDENT
 .SH SHORT TUTORIAL:
 .SS Performing an example analysis:

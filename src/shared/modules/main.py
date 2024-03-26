@@ -6,6 +6,7 @@ from tcga_metilene.modules import main_metilene
 from tcga_deseq.modules import main_deseq
 import snakemake
 from itertools import compress
+import copy
 # import re
 
 SCRIPT_PATH = os.path.split(__file__)[0]
@@ -26,11 +27,11 @@ HOME = os.getenv('HOME')
 
 
 @click.command()
-@click.option('--out_path', '-o', default=os.path.join(HOME, 'TCGA-pipelines'),
+@click.option('--out_path', '-o', default=os.path.join(HOME, 'TreSucMs'),
               show_default=True,
               help='path to save the result files')
 @click.option('--project', '-p', default=[], multiple=True,
-              help='TCGA project to be applied. Any TCGA project can be' +
+              help='TCGA project(s) to be applied. Any TCGA project can be' +
               ' chosen, like: ' +
               '-p TCGA-CESC -p TCGA-HNSC ...')
 @click.option('--drugs', '-d', default=[], multiple=True, show_default=False,
@@ -46,40 +47,32 @@ HOME = os.getenv('HOME')
               type=float, help='threshold parameter',
               required=False)
 @click.option('--execute', '-e', default=pipeline_list, multiple=True,
-              show_default=True, help='choose which pipeline shall be\
-              executed')
-@click.option('--dryrun', '-D', default=False, multiple=False,
+              show_default=True, help='choose which pipeline shall be executed')
+@click.option('--dryrun', '-N', default=False, multiple=False,
               show_default=True, is_flag=True, help='snakemake dryrun',
               required=False)
+@click.option('--download', '-D', default=False, multiple=False,
+              show_default=True, is_flag=True, help='''if set, just download raw
+              and meta data for given projects and analysis types, revise them,
+              link them, but do not run any analysis''',
+              required=False)
+#this one is hidden, debug purposes
 @click.option('--report', '-r', default=False, multiple=False,
               show_default=True, is_flag=True, help='just create a report',
-              required=False)
+              required=False, hidden=True)
 @click.option('--version', '-v',
               help='printing out version information: {}'.format(version),
               is_flag=True, callback=print_version,
               expose_value=False, is_eager=True)
 def call_with_options(out_path, project, drugs, cores, execute, cutoff,
-                      threshold, dryrun, report):
+                      threshold, dryrun, report, download):
     '''
-    TreMSuc, a tool to choose, harvest and analyse methylation and rna
-    count data of the TCGA-projects with help of the package metilene and
-    DEseq2.\n
+    "TreSucMs" a tool to choose, harvest and analyse expression and methylation data
+    of the TCGA-projects for revealing Biomarkers which indicate treatment success
+    predictions.
 
-    Build and activate the provided conda env:
-    bash
-
-        $ conda env create -f metilene_env.yaml
-
-        $ conda activate metilene_pipeline
-
-    call the script without any options to enter the interactive mode and set
-    each option step by step:
-
-        $ python main_metilene.py
-
-    print help page:
-
-        $ python main_metilene.py --help
+    Calling the pipeline without any argument starts the interactive mode to
+    help setting all needed parameters for the analysis.
     '''
     OUTPUT_PATH = out_path
     print("\nOUTPUT_PATH:\t\t", OUTPUT_PATH)
@@ -97,18 +90,35 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
         print('exiting now')
         os._exit(0)
     execute = sorted(list(execute))
-    print("PIPELINES executed:\t", execute)
     project = [i.strip() for i in project]
+    interacitve_proj = False
+    interacitve_drugs = False
     if len(project) == 0:
         PROJECT = choose_therapy.Choose_project()
-        PROJECT = sorted(map(str.upper, PROJECT))
+        interacitve_proj = True
     else:
         PROJECT = sorted(map(str.upper, project))
     if len(drugs) == 0:
-        DRUGS = choose_therapy.Choose_drugs(SCRIPT_PATH, PROJECT)
-        DRUGS = sorted(map(str.lower, DRUGS))
+        DRUGS = choose_therapy.Choose_drugs(PROJECT)
+        interacitve_drugs = True
     else:
         DRUGS = sorted(map(str.lower, drugs))
+    # in case PROJECT and DRUGS are set via interactive mode, also ask every
+    # other parameter and if the default value is ok:
+    # set all parameters in interactive mode, also ask for Cutoff, threshold,
+    # cores, output path, pipelines to execute
+    if interacitve_proj and interacitve_drugs == True:
+        # just ask those parameters wich deviate from the default value:
+        if OUTPUT_PATH == os.path.join(HOME, 'TreSucMs'):
+            OUTPUT_PATH = choose_therapy.update_parameters(OUTPUT_PATH, 'OUTPUT_PATH')
+        if cores == 1:
+            cores = choose_therapy.update_parameters(cores, 'cores')
+        if execute == ['DESeq2', 'metilene']:
+            execute = choose_therapy.update_parameters(execute, 'pipelines')
+        if cutoff == (0.0,):
+            cutoff = choose_therapy.update_parameters(cutoff, 'cutoff')
+        if threshold == (0.0,):
+            threshold = choose_therapy.update_parameters(threshold, 'threshold')
 
     cutoffs = list(cutoff)
     for index, cutoff in enumerate(cutoffs):
@@ -128,11 +138,27 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
 
     thresh_list = [f'threshold_{str(i)}' for i in threshold]
     thresh_str = '_'.join(thresh_list)
+    print('OUTPUT_PATH:\t\t', OUTPUT_PATH)
     print('PROJECT:\t\t', PROJECT)
     print('DRUGS:\t\t\t', DRUGS)
+    print('pipelines executed:\t', execute)
     print(f'cores:\t\t\t{cores}')
     print(f'cutoff:\t\t\t{cutoffs}')
     print(f'threshold:\t\t{threshold}')
+
+    # if the parameters were set by interactive mode, ask here one last time if
+    # the analysis shall be started:
+    if interacitve_proj and interacitve_drugs == True:
+        while True:
+            print('press ENTER to start or q to quit:')
+            start_or_not = input()
+            if start_or_not == 'q':
+                os._exit(0)
+            if start_or_not == '':
+                break
+            else:
+                continue
+
     shared_scriptdir = os.path.join(
         os.path.split(os.path.split(SCRIPT_PATH)[0])[0], 'shared')
 
@@ -160,7 +186,10 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     count_type = {'metilene': ['beta_vals'], 'DESeq2': ['norm_count']}
     # metilene main module, must be defined here already since it is also set in
     # the shared Snakefile
-    config={'thresh': thresh_str, 'thresh_list': thresh_list, 'pipelines': execute, 'projects_str': projects, 'cutoffs': cutoffs, 'types': types, 'OUTPUT_PATH': OUTPUT_PATH, 'drug_str': drug_str, 'count_type': count_type}
+    config={'thresh': thresh_str, 'thresh_list': thresh_list, 'pipelines':
+            execute, 'projects_str': projects, 'cutoffs': cutoffs, 'types':
+            types, 'OUTPUT_PATH': OUTPUT_PATH, 'drug_str': drug_str,
+            'count_type': count_type}
     # once we have to call snakemake in prior, s.t. the manifest file is
     # present on which all the following selections are done on, make sure that
     # here the dryrun flag is not set to True
@@ -188,8 +217,10 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
 
     def map_execute(pipeline):
         """
-        translate here the applied pipeline which shall be executet:
-        Datafiles: OUTPUT_PATH/PROJECT/Diffexpression/PROJECT_data_files/...
+        translate here the applied pipeline  which shall be executet to its datatype:
+        Datafiles: OUTPUT_PATH/PROJECT/analyse_type/data_files/...
+
+        :param str pipeline: either "DESeq2" or "metilene"
         """
         if pipeline == 'DESeq2':
             return 'htseq'
@@ -252,7 +283,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # run this command and exit here with os._exit(0)
     # temp=("-p TCGA-CESC" "-p TCGA-HNSC" "-p TCGA-LUSC" "-p TCGA-ESCA" "-p TCGA-BRCA" "-p TCGA-GBM" "-p TCGA-OV" "-p TCGA-LUAD" "-p TCGA-UCEC" "-p TCGA-KIRC" "-p TCGA-LGG" "-p TCGA-THCA" "-p TCGA-PRAD" "-p TCGA-SKCM" "-p TCGA-COAD" "-p TCGA-STAD" "-p TCGA-BLCA" "-p TCGA-LIHC" "-p TCGA-KIRP" "-p TCGA-SARC" "-p TCGA-PAAD" "-p TCGA-PCPG" "-p TCGA-READ" "-p TCGA-TGCT" "-p TCGA-THYM" "-p TCGA-KICH" "-p TCGA-ACC" "-p TCGA-MESO" "-p TCGA-UVM" "-p TCGA-DLBC" "-p TCGA-UCS" "-p TCGA-CHOL")
     # for i in ${temp[@]}; do echo tcga_pipelines -p $i -d cisplatin -o /scr/dings/PEVO/NEW_downloads_3/TCGA-pipelines_7 -c 40; done
-    os._exit(0)
+    # if the -D option is set, we can quit right here:
+    if download:
+        os._exit(0)
 
     # from here the shared modules and Snakemake scripts are getting pipeline
     # specific, hand over all outputfiles requested so far and enter the

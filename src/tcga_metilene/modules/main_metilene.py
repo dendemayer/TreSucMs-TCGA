@@ -14,11 +14,22 @@ src/tcga_metilene/Snakefile
 """
 
 
-def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs,
-              threshold, cores, pipeline, config_file_shared, config, dryrun,
-              cutoffs_str, report):
-    """
-    test doc string for sphinx
+def entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs, threshold, cores, pipeline, config_file_shared, config, dryrun, cutoffs_str, report):
+    """ entry_fct of metilene part.
+
+    :param str OUTPUT_PATH: description of the obvious
+    :param list of str PROJECT:
+    :param list of str DRUGS:
+    :param list of str Snakemake_all_files:
+    :param list of str cutoffs:
+    :param list of str threshold:
+    :param int cores:
+    :param str pipeline:
+    :param str config_file_shared:
+    :param str config:
+    :param boolean dryrun:
+    :param str cutoffs_str:
+    :param str report:
     """
 
     SCRIPT_PATH = os.path.split(__file__)[0]

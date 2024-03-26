@@ -5,8 +5,9 @@ import subprocess       # to clear the console after choose steps
 
 def Choose_project():
     '''
-    interactively requesting the Projects that shall be applied to the deseq
-    approach
+    Choose_project.
+
+    interactively requesting the Projects that shall be applied to the approach
     '''
     # print("Choose your project out of the list:")
     all_projects_list = {'TCGA-CESC': 'Cervical Squamous Cell Carcinoma and' +
@@ -68,20 +69,21 @@ def Choose_project():
     # make a set, in case a project was selected twice:
     project_list = set(project_list)
     project_list = list(project_list)
+    project_list = sorted(map(str.upper, project_list))
     print('\nyou choose:')
     print('PROJECTS:\t', project_list)
     return(project_list)
 
 
-def Choose_drugs(SCRIPT_PATH, PROJECTS):
-    '''
-    :param: SCRIPT_PATH: path to the DESeq2_pipeline repo
-    :type: SCRIPT_PATH: str
-    :param: PROJECTS: list of projects chosen
-    :type: PROJECTS: list of str
+def Choose_drugs(PROJECTS):
+    """Choose_drugs.
+
+    :param str SCRIPT_PATH: path to the DESeq2_pipeline repo
+    :param list of str PROJECTS: list of projects chosen
 
     interactively requesting the drugs which shall be applied to the deseq
     approach
+    """
     '''
     DF_drug_table = pd.read_csv(os.path.join(
         SCRIPT_PATH, os.path.pardir, 'resources/DRUG_combi_frequency_all.tsv'),
@@ -95,6 +97,8 @@ def Choose_drugs(SCRIPT_PATH, PROJECTS):
     DF_drug_table = DF_drug_table[filt]
     DF_drug_table.fillna(0, inplace=True)
     DF_drug_table = DF_drug_table.astype(int)
+    DESeq2_treatment_heatmap_table.tsv
+    '''
     '''
                             TCGA-HNSC   TCGA-LUSC  ...
     cisplatin               65.0        1.0  ...
@@ -104,6 +108,14 @@ def Choose_drugs(SCRIPT_PATH, PROJECTS):
     '''
     {0: 'cisplatin', 1: 'carboplatin,paclitaxel',...
     '''
+    table_path = os.path.join(os.path.dirname(__file__), os.path.pardir, 'resources', 'DESeq2_treatment_heatmap_table.tsv')
+    DF_drug_table = pd.read_table(table_path, index_col=0).loc[:, PROJECTS].dropna(how='all')
+    filt = DF_drug_table.max(axis=1) > 1
+    DF_drug_table = DF_drug_table[filt]
+    DF_drug_table.fillna(0, inplace=True)
+    DF_drug_table = DF_drug_table.astype(int)
+    # the drugtable can be limited to the projects chosen and dropping complete
+    # nan rows, and convert remaining nans to 0:
     for i in range(0, len(DF_drug_table.index)):
         if DF_drug_table.index[
                 i] == '[not available]' or DF_drug_table.index[
@@ -161,132 +173,92 @@ def Choose_drugs(SCRIPT_PATH, PROJECTS):
         # deseq run:
         drug_list.append(drug_hash[int(i)])
 
+    drug_list = sorted(map(str.lower, drug_list))
     return(drug_list)
 
 
-def Choose_path_and_option(OUTPUT_PATH, PROJECTS, DRUGS, function,
-                           SCRIPT_PATH, analyse_data, download_data,
-                           threshold):
-    '''
-    :param: OUTPUT_PATH: path for DESeq2 pipeline outputs
-    :type: OUTPUT_PATH: str
-    :param: PROJECTS: list of projects chosen
-    :type: PROJECTS: list of str
-    :param: DRUGS: applied drug(s)
-    :type: DRUGS: list of str
-    :param: function: applied functions
-    :type: function: int
-    :param: SCRIPT_PATH: path to the DESeq2_pipeline repo
-    :type: SCRIPT_PATH: str
+def update_parameters(parameter, parameter_str):
+    """update_parameters.
 
-    interactively requesting whether download steps, analysis or both should be
-    performed
-    '''
-    while True:
-        print('\nyou did not choose a analyse or download option,' +
-              ' you can choose now out of:\n')
-        print('0:\t download count data for {}'.format(str(PROJECTS)))
-        print('1:\t perform DESeq2 run on {} with {}'.format(
-            str(PROJECTS), str(DRUGS)) +
-            '\n\tcount data must be already be downloaded in your output' +
-            ' path')
-        print('2:\t perform download and DESeq2 run')
-        input_choice_analyse = input()
-        if input_choice_analyse == '0':
-            function = (1, 2, 3, 4, 5, 6)
-            download_data = True
-            while True:
-                print('\npress enter if the default path:\n' +
-                      '\n{}\n\nshall be set as OUTPUT_PATH path'.format(
-                          OUTPUT_PATH) +
-                      '\nor type in the OUTPUT_PATH:')
-                input_choice = input()
-                if input_choice == '':
-                    break
-                else:
-                    OUTPUT_PATH = input_choice
-                    print(
-                        'the OUTPUT_PATH is set to: \
-                        \n{}'.format(OUTPUT_PATH))
-                    break
-            break
-        if input_choice_analyse == '1':
-            function = (7, 8, 9, 10, 11, 12, 13, 14, 15)
-            analyse_data = True
-            while True:
-                print('\npress enter if the default path:\n' +
-                      '\n{}\n\nshall be set as OUTPUT_PATH path'.format(
-                          OUTPUT_PATH) +
-                      '\nor type in the OUTPUT_PATH:')
-                input_choice = input()
-                if input_choice == '':
-                    break
-                else:
-                    OUTPUT_PATH = input_choice
-                    print(
-                        'the OUTPUT_PATH is set to \n{}'.format(OUTPUT_PATH))
-                    break
-            break
-        if input_choice_analyse == '2':
-            function = (100,)
-            analyse_data = True
-            download_data = True
-            while True:
-                print('press enter if the default path:\n' +
-                      ' \n{}\n\nshall be set as OUTPUT_PATH path'.format(
-                          OUTPUT_PATH) +
-                      '\nor type in the OUTPUT_PATH')
-                input_choice = input()
-                if input_choice == '':
-                    break
-                else:
-                    OUTPUT_PATH = input_choice
-                    print(
-                        'the OUTPUT_PATH is set to \n{}'.format(OUTPUT_PATH))
-                    break
-            break
-        else:
-            print('please provide your choice with the numbers' +
-                  ' 0 or 1 or 2')
-            continue
-    first = True
-    print(
-        'do you want to keep the threshold with {}'.format(str(threshold))
-        + ', then press enter, if not\n')
-    while True:
-        input_choice = input(
-            'enter your choices one by one,' +
-            ' if you are finnished, just type "Enter": ')
-        if input_choice == '':
-            break
-        else:
-            if first:
-                threshold = (int(input_choice),)
-            else:
-                # threshold_old = threshold
-                threshold = tuple(set(threshold + (int(input_choice),)))
-            first = False
-            continue
+    :param str or tuple or list of strs parameter: depending on the datatype, the parameter which shall be assign is requested in interactive mode
+    :param str parameter: default OUTPUT_PATH can be confirmed or changed in interactive mode
+    :param int parameter: cores can be changed in interactive mode
+    :param str parameter_str: description of the given parameter
 
-    while True:
-        subprocess.check_call('clear')
-        print('your analysis will start with:\n')
-        print('PROJECTS:\t', PROJECTS)
-        print('DRUGS:\t\t', DRUGS)
-        print('OUTPUT_PATH:\t', OUTPUT_PATH)
-        print('threshold\t', threshold)
-        # print('SCRIPT_PATH:\t', SCRIPT_PATH)
-        if input_choice_analyse == '0':
-            print('\n- download count data for the selected projects -\n')
-        elif input_choice_analyse == '1':
-            print('\n- perform just DESeq2 analysis, the count data is' +
-                  ' already downloaded -\n')
+    """
+    # setting OUTPUT_PATH:
+    if isinstance(parameter, str):
+        print(f'do you want to keep the default OUTPUT_PATH of:\n{parameter}')
+        print('if so, press ENTER, if not, enter your custom output path:')
+        output_input = input()
+        if output_input == '':
+            return  parameter
         else:
-            print('\n- perform download of count data and DESeq2 run -\n')
-        print('press Enter to start the analysis')
-        input_choice = input()
-        if input_choice == '':
-            break
+            return  output_input
+    # setting cores:
+    if isinstance(parameter, int):
+        print(f'do you want to keep the default number of cores invoked of 1?')
+        print('if so, press ENTER, if not, enter the number of cores:')
+        new_cores = input()
+        if new_cores == '':
+            return parameter
         else:
-            continue
-    return((OUTPUT_PATH, function, analyse_data, download_data, threshold))
+            return new_cores
+    # setting pipelines:
+    if isinstance(parameter, list):
+        if parameter_str == 'pipelines':
+            while True:
+                print('which pipeline do you want to include into your analysis')
+                print('press ENTER if DESeq2 and metilene (default) or\n1 for DESeq2 or \n2 for metilene')
+                pipelines = input()
+                if pipelines == '':
+                    return parameter
+                if pipelines == "1":
+                    return ['DESeq2']
+                if pipelines == "2":
+                    return ['metilene']
+                else:
+                    print('just press ENTER or apply\n1 for DESeq2 or \n2 for metilene')
+                    continue
+    # setting cutoff:
+    if isinstance(parameter, tuple):
+        if parameter_str == 'cutoff':
+            print('do you want to add one or multiple cutoffs?')
+            print('it is recommend to choose cutoff values between 5 and 10 years')
+            print('if not, just press ENTER, if so enter the coutoffs one by one:')
+            while True:
+                cutoff = input()
+                if cutoff == '':
+                    return parameter
+                # sanity check, the intput value must be casteable into into
+                # float:
+                try:
+                    float(cutoff)
+                except ValueError:
+                    print('the cutoff value must be number, starting over')
+                    print('do you want to add one or multiple cutoffs?')
+                    print('it is recommend to choose cutoff values between 5 and 10 years')
+                    print('if not, just press ENTER, if so enter the coutoffs one by one:')
+                    continue
+                parameter = parameter + (float(cutoff), )
+    # setting threshold:
+    if isinstance(parameter, tuple):
+        if parameter_str == 'threshold':
+            print('do you want to add one or multiple thresholds?')
+            print('it is recommend to choose threshold values which do not exceed a value of 50')
+            print('if not, just press ENTER, if so enter the thresholds one by one:')
+            while True:
+                threshold = input()
+                if threshold == '':
+                    return parameter
+                # sanity check, the intput value must be casteable into into
+                # float:
+                try:
+                    float(threshold)
+                except ValueError:
+                    print('the threshold value must be number, starting over')
+                    print('do you want to add one or multiple thresholds?')
+                    print('it is recommend to choose threshold values between 5 and 10 years')
+                    print('if not, just press ENTER, if so enter the coutoffs one by one:')
+                    continue
+                parameter = parameter + (float(threshold), )
