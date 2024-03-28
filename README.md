@@ -27,7 +27,8 @@ $ man TreSucMs
 TreSucMs -p TCGA-HNSC -p TCGA-CESC -p TCGA-LUSC -d cisplatin -d carboplatin,paclitaxel -d carboplatin -o TreSucM -c 40 -e metilene -t 5 -t 10 -C 8 -C 5 -e DESeq2
 ```
 - content of help page:  
-    
+
+```
 Usage: TreSucMs [OPTIONS]  
   
   "TreSucMs" a tool to choose, harvest and analyse expression and methylation  
@@ -55,3 +56,4 @@ Options:
                          but do not run any analysis  
   -v, --version          printing out version information: Version 1.0  
   --help                 Show this message and exit.  
+```
