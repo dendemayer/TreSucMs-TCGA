@@ -68,8 +68,8 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
                       threshold, dryrun, report, download):
     '''
     "TreSucMs" a tool to choose, harvest and analyse expression and methylation data
-    of the TCGA-projects for revealing Biomarkers which indicate treatment success
-    predictions.
+    of the TCGA-projects for revealing Biomarkers which indicate threapy
+    specific treatment success predictions.
 
     Calling the pipeline without any argument starts the interactive mode to
     help setting all needed parameters for the analysis.
@@ -145,6 +145,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     print(f'cores:\t\t\t{cores}')
     print(f'cutoff:\t\t\t{cutoffs}')
     print(f'threshold:\t\t{threshold}')
+    print(f'the command to issue this analysis would be:\n')
+    print(f'TreSucMs {"-p " + " -p ".join(PROJECT)} {"-d " + " -d ".join(DRUGS)} {"-C " + "-C ".join([str(i) + " " for i in cutoffs])}{"-t " + "-t ".join([str(i) + " " for i in threshold])}-o {OUTPUT_PATH} -c {cores}\n')
+
 
     # if the parameters were set by interactive mode, ask here one last time if
     # the analysis shall be started:

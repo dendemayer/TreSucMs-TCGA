@@ -21,7 +21,7 @@ sys.path.append(os.path.join(os.path.pardir))
 
 # -- Project information -----------------------------------------------------
 
-project = 'TreMSuc'
+project = 'TreSucMs'
 copyright = '2024, Gabor Balogh'
 author = 'Gabor Balogh'
 
