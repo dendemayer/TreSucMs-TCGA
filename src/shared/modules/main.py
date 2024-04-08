@@ -6,7 +6,6 @@ from tcga_metilene.modules import main_metilene
 from tcga_deseq.modules import main_deseq
 import snakemake
 from itertools import compress
-import copy
 # import re
 
 SCRIPT_PATH = os.path.split(__file__)[0]
