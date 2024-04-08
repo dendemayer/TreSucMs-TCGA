@@ -203,7 +203,7 @@ def update_parameters(parameter, parameter_str):
         if new_cores == '':
             return parameter
         else:
-            return new_cores
+            return int(new_cores)
     # setting pipelines:
     if isinstance(parameter, list):
         if parameter_str == 'pipelines':

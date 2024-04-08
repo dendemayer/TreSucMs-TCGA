@@ -148,7 +148,6 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     print(f'the command to issue this analysis would be:\n')
     print(f'TreSucMs {"-p " + " -p ".join(PROJECT)} {"-d " + " -d ".join(DRUGS)} {"-C " + "-C ".join([str(i) + " " for i in cutoffs])}{"-t " + "-t ".join([str(i) + " " for i in threshold])}-o {OUTPUT_PATH} -c {cores}\n')
 
-
     # if the parameters were set by interactive mode, ask here one last time if
     # the analysis shall be started:
     if interacitve_proj and interacitve_drugs == True:

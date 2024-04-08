@@ -1,4 +1,5 @@
 import os
+from matplotlib.patches import bbox_artist
 import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
@@ -41,50 +42,57 @@ if "snakemake" in dir():
     pipeline = snakemake.wildcards.pipeline
 
 else:
-    ###############################################################################
-    #                               test input set                                #
-    ###############################################################################
+    ################################################################################
+    #                            3 projects test input                             #
+    ################################################################################
     # snakemake inputs:
-    meta_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+    meta_table = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
     script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/create_patient_plots.py"
     # snakemake output:
-    final_pdf = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_final.pdf"
-    plot_file_age = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_age.pdf"
-    plot_file_age_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_age_in_therapy.pdf"
-    plot_file_age_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_age_not_in_therapy.pdf"
-    plot_file_survival = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_survival.pdf"
-    plot_file_survival_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_survival_in_therapy.pdf"
-    plot_file_survival_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_survival_not_in_therapy.pdf"
-    out_md_vital = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_vital.md"
-    out_pdf_vital = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine/meta_info_druglist_merged_drugs_combined_vital.pdf"
+    final_pdf = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_final.pdf"
+    plot_file_age = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_age.pdf"
+    plot_file_age_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_age_in_therapy.pdf"
+    plot_file_age_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_age_not_in_therapy.pdf"
+    plot_file_survival = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_survival.pdf"
+    plot_file_survival_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_survival_in_therapy.pdf"
+    plot_file_survival_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_survival_not_in_therapy.pdf"
+    out_md_vital = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_vital.md"
+    out_pdf_vital = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-CESC_TCGA-HNSC_TCGA-LUSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_vital.pdf"
     # snakemake wildcards:
-    output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
-    project = "TCGA-HNSC"
+    output_path = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod"
+    project = "TCGA-CESC_TCGA-HNSC_TCGA-LUSC"
     pipeline = "metilene"
     cutoff = "cutoff_0"
-    drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin_cisplatin,gemcitabine"
+    drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
+    ################################################################################
+    #                            3 projects test input                             #
+    ################################################################################
+
+    # ###########################################################################
+    # #                        test input single project                        #
+    # ###########################################################################
     # # snakemake inputs:
-    # meta_table = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
+    # meta_table = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/meta_info_druglist_merged_drugs_combined.tsv"
     # script_file = "/homes/biertruck/gabor/phd/test_git_doc/tcga_piplines/src/shared/../shared/scripts/create_patient_plots.py"
     # # snakemake output:
-    # final_pdf = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_final.pdf"
-    # plot_file_age = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_age.pdf"
-    # plot_file_age_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_age_in_therapy.pdf"
-    # plot_file_age_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_age_not_in_therapy.pdf"
-    # plot_file_survival = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_survival.pdf"
-    # plot_file_survival_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_survival_in_therapy.pdf"
-    # plot_file_survival_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_survival_not_in_therapy.pdf"
-    # out_md_vital = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_vital.md"
-    # out_pdf_vital = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod/TCGA-CESC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_vital.pdf"
+    # final_pdf = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_final.pdf"
+    # plot_file_age = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_age.pdf"
+    # plot_file_age_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_age_in_therapy.pdf"
+    # plot_file_age_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_age_not_in_therapy.pdf"
+    # plot_file_survival = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_survival.pdf"
+    # plot_file_survival_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_survival_in_therapy.pdf"
+    # plot_file_survival_not_in_therapy = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_survival_not_in_therapy.pdf"
+    # out_md_vital = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_vital.md"
+    # out_pdf_vital = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod/TCGA-HNSC/metilene/merged_meta_files/cutoff_0/carboplatin_carboplatin,paclitaxel_cisplatin/meta_info_druglist_merged_drugs_combined_vital.pdf"
     # # snakemake wildcards:
-    # output_path = "/scr/palinca/gabor/TCGA-pipeline_7_pval_prod"
-    # project = "TCGA-CESC"
+    # output_path = "/scr/palinca/gabor/TCGA-pipeline_10_pval_prod"
+    # project = "TCGA-HNSC"
     # pipeline = "metilene"
     # cutoff = "cutoff_0"
     # drug_combi = "carboplatin_carboplatin,paclitaxel_cisplatin"
-    ###############################################################################
-    #                               test input set                                #
-    ###############################################################################
+    # ###########################################################################
+    # #                        test input single project                        #
+    # ###########################################################################
 
 project_str = ' + '.join(project.split('_'))
 drugs = drug_combi.split('_')
@@ -114,14 +122,21 @@ meta_add_proj_gen['sex'] = 'female + male'
 meta_add_proj_gen = pd.concat([meta_add_proj, meta_add_proj_gen])
 
 # sns.set(rc={'figure.figsize':(3,4)})
+nr_projects = len(meta_DF['project_id'].value_counts())
+# 3 projectes: -> setting aspect to 1
+# 1 project: -> setting aspect to 1.5
+aspect = -0.25 * nr_projects + 1.75
+# 3 projectes: -> setting adjust to 0.9
+# 1 project: -> setting adjust to 0.8
+adjust = 0.05 * nr_projects + 0.75
 sns.set_style("whitegrid")
 g = sns.displot(meta_add_proj_gen[meta_add_proj_gen['in_therapy']],
                 x="age_at_diagnosis", col="project_id", row="sex",
                 binwidth=len(meta_DF['sex'].value_counts()),
-                height=len(meta_DF['project_id'].value_counts()) + 0.7,
+                height=nr_projects + 0.7,
                 facet_kws=dict(margin_titles=True), hue='vital_status',
-                kde=True)
-plt.subplots_adjust(top=0.9)
+                kde=True, aspect=aspect)
+plt.subplots_adjust(top=adjust)
 g.fig.suptitle(f"Age at therapy start, patients in therapy\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
 plt.savefig(plot_file_age_in_therapy)
 plt.close('all')
@@ -130,21 +145,22 @@ sns.set_style("whitegrid")
 g = sns.displot(meta_add_proj_gen[~meta_add_proj_gen['in_therapy']],
                 x="age_at_diagnosis", col="project_id", row="sex",
                 binwidth=len(meta_DF['sex'].value_counts()),
-                height=len(meta_DF['project_id'].value_counts()) + 0.7,
+                height=nr_projects + 0.7,
                 facet_kws=dict(margin_titles=True), hue='vital_status',
-                kde=True)
-plt.subplots_adjust(top=0.9)
-g.fig.suptitle(f"Age at therapy start, patients not in therapy\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
+                kde=True, aspect=aspect)
+plt.subplots_adjust(top=adjust)
+g.fig.suptitle(f"Age at therapy start,\npatients not in therapy,\n{project_str},\nCutoff={cutoff}, {pipeline}", y=0.99)
 plt.savefig(plot_file_age_not_in_therapy)
 plt.close('all')
+
 sns.set_style("whitegrid")
 g = sns.displot(meta_add_proj_gen,
                 x="age_at_diagnosis", col="project_id", row="sex",
                 binwidth=len(meta_DF['sex'].value_counts()),
-                height=len(meta_DF['project_id'].value_counts()) + 0.4,
+                height=nr_projects + 0.7,
                 facet_kws=dict(margin_titles=True), hue='vital_status',
-                kde=True)
-plt.subplots_adjust(top=0.9)
+                kde=True, aspect=aspect)
+plt.subplots_adjust(top=adjust)
 g.fig.suptitle(f"Age at therapy start, all patients\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
 plt.savefig(plot_file_age)
 plt.close('all')
@@ -153,10 +169,10 @@ sns.set_style("whitegrid")
 g = sns.displot(meta_add_proj_gen[meta_add_proj_gen['in_therapy']],
                 x="Survivaltime", col="project_id", row="sex",
                 binwidth=len(meta_DF['sex'].value_counts()),
-                height=len(meta_DF['project_id'].value_counts()) + 0.7,
+                height=nr_projects + 0.7,
                 facet_kws=dict(margin_titles=True), hue='vital_status',
-                kde=True)
-plt.subplots_adjust(top=0.9)
+                kde=True, aspect=aspect)
+plt.subplots_adjust(top=adjust)
 g.fig.suptitle(f"Survivaltime, patients in therapy\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
 plt.savefig(plot_file_survival_in_therapy)
 plt.close('all')
@@ -165,10 +181,10 @@ sns.set_style("whitegrid")
 g = sns.displot(meta_add_proj_gen[~meta_add_proj_gen['in_therapy']],
                 x="Survivaltime", col="project_id", row="sex",
                 binwidth=len(meta_DF['sex'].value_counts()),
-                height=len(meta_DF['project_id'].value_counts()) + 0.7,
+                height=nr_projects + 0.7,
                 facet_kws=dict(margin_titles=True), hue='vital_status',
-                kde=True)
-plt.subplots_adjust(top=0.9)
+                kde=True, aspect=aspect)
+plt.subplots_adjust(top=adjust)
 g.fig.suptitle(f"Survivaltime, patients not in therapy\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
 plt.savefig(plot_file_survival_not_in_therapy)
 plt.close('all')
@@ -177,10 +193,10 @@ sns.set_style("whitegrid")
 g = sns.displot(meta_add_proj_gen,
                 x="Survivaltime", col="project_id", row="sex",
                 binwidth=len(meta_DF['sex'].value_counts()),
-                height=len(meta_DF['project_id'].value_counts()) + 0.7,
+                height=nr_projects + 0.7,
                 facet_kws=dict(margin_titles=True), hue='vital_status',
-                kde=True)
-plt.subplots_adjust(top=0.9)
+                kde=True, aspect=aspect)
+plt.subplots_adjust(top=adjust)
 g.fig.suptitle(f"Survivaltime, all patients\n{project_str}\nCutoff={cutoff}, {pipeline}", y=0.99)
 plt.savefig(plot_file_survival)
 plt.close('all')
