@@ -221,7 +221,8 @@ def get_lifeline_all(wildcards):
     # the glob is still necessary but just include applied thresholds within the dynamic/thresholds.txt file.
     search_result = []
     for thresh in threshold_list:
-        search_result = search_result + glob.glob(os.path.join(output_path, project, "DESeq2/DESeq2_output", drug_combi, gender, cutoff, f'{thresh}/DESeq2_log2f_*norm*lifeline*.tsv.gz' ))
+        search_result = search_result + glob.glob(os.path.join(output_path, project, "DESeq2/DESeq2_output", drug_combi, gender, cutoff, thresh, 'DESeq2_log2f_*norm*lifeline*.tsv.gz'))
+        #search_result = search_result + glob.glob(os.path.join(output_path, project, "DESeq2/DESeq2_output", drug_combi, gender, cutoff, f'{thresh}/DESeq2_log2f_*norm*lifeline*.tsv.gz' ))
     return search_result
 
 rule aggregate_lifelines_all_deseq:

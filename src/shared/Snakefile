@@ -115,9 +115,9 @@ def get_aliquot_table(wildcards):
     OUTPUT_PATH = wildcards[0]
     project = wildcards[1]
     #pipeline = wildcards[2] # not needed in input
-    suppl_2 = f'{OUTPUT_PATH}/{project}/aux_files/nationwidechildrens.org_biospecimen_aliquot_{proj_suffix}.txt'
-    suppl_3 = f'{OUTPUT_PATH}/{project}/aux_files/nationwidechildrens.org_clinical_drug_{proj_suffix}.txt'
-    suppl_4 = f'{OUTPUT_PATH}/{project}/aux_files/nationwidechildrens.org_clinical_patient_{proj_suffix}.txt'
+    suppl_2 = os.path.join(OUTPUT_PATH, project, 'aux_files/nationwidechildrens.org_biospecimen_aliquot_' + proj_suffix + '.txt')
+    suppl_3 = os.path.join(OUTPUT_PATH, project, 'aux_files/nationwidechildrens.org_clinical_drug_' + proj_suffix + '.txt')
+    suppl_4 = os.path.join(OUTPUT_PATH, project, 'aux_files/nationwidechildrens.org_clinical_patient_' + proj_suffix + '.txt')
     # IMPORTANT they are not working clinical tables in the repo, (just
     # concerning CESC) ,the right ones are those:
     # nationwidechildrens.org_clinical_patient_cesc.txt_1
@@ -125,10 +125,10 @@ def get_aliquot_table(wildcards):
     # overwrite the first loaded file with the new one (that are those where 2
     # diff filenames are given for one specific uuid
     DF_temp = pd.read_table(os.path.join(OUTPUT_PATH, 'metadata', config['manifest_file'][0]))
-    DF_temp = DF_temp[DF_temp['filename'].str.contains(f'nationwidechildrens.org_clinical_follow_up_v.*_{proj_suffix}.txt')]['filename']
+    DF_temp = DF_temp[DF_temp['filename'].str.contains('nationwidechildrens.org_clinical_follow_up_v.*_' + proj_suffix + '.txt')]['filename']
     follow_up_table = DF_temp[~DF_temp.str.contains('nte')].sort_values(ascending=False).iloc[0]
-    suppl_5 = f'{OUTPUT_PATH}/{project}/aux_files/{follow_up_table}'
-    suppl_6 = f'{OUTPUT_PATH}/{project}/aux_files/nationwidechildrens.org_biospecimen_sample_{proj_suffix}.txt'
+    suppl_5 = os.path.join(OUTPUT_PATH, project, 'aux_files', follow_up_table)
+    suppl_6 = os.path.join(OUTPUT_PATH, project, 'aux_files', 'nationwidechildrens.org_biospecimen_sample_' + proj_suffix + '.txt')
     final_list = [suppl_2, suppl_3, suppl_4, suppl_5, suppl_6]
     return final_list
 
@@ -369,13 +369,15 @@ def get_eval_input(wildcards):
         for project in PROJECTS:
             for gender in ['female', 'male', 'female_male']:
                 for cutoff in cutoff_strs:
-                    evaluated_tables.append(os.path.join(output_path, project, 'metilene', 'metilene_output', drug_str, gender, cutoff, threshold_str, f'metilene_lifelines_evaluated-beta_vals.tsv.gz' ))
+                    evaluated_tables.append(os.path.join(output_path, project, 'metilene', 'metilene_output', drug_str, gender, cutoff, threshold_str, 'metilene_lifelines_evaluated-beta_vals.tsv.gz'))
+                    #evaluated_tables.append(os.path.join(output_path, project, 'metilene', 'metilene_output', drug_str, gender, cutoff, threshold_str, f'metilene_lifelines_evaluated-beta_vals.tsv.gz' ))
     if 'DESeq2' in pipelines:
         for count in count_types['DESeq2']:
             for project in PROJECTS:
                 for gender in ['female', 'male', 'female_male']:
                     for cutoff in cutoff_strs:
-                        evaluated_tables.append(os.path.join(output_path, project, 'DESeq2', 'DESeq2_output', drug_str, gender, cutoff, threshold_str, f'DESeq2_lifelines_evaluated-{count}.tsv.gz' ))
+                        evaluated_tables.append(os.path.join(output_path, project, 'DESeq2', 'DESeq2_output', drug_str, gender, cutoff, threshold_str, 'DESeq2_lifelines_evaluated-' + count + '.tsv.gz'))
+                        #evaluated_tables.append(os.path.join(output_path, project, 'DESeq2', 'DESeq2_output', drug_str, gender, cutoff, threshold_str, f'DESeq2_lifelines_evaluated-{count}.tsv.gz' ))
     #[i for i  in evaluated_tables if re.search('.*metilene_lifelines_evaluated-norm_count.*', i) ]
     return evaluated_tables
 

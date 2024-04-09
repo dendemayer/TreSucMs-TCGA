@@ -369,7 +369,8 @@ def get_lifeline_all(wildcards):
     # the glob is still necessary but just include applied thresholds within the dynamic/thresholds.txt file.
     search_result = []
     for thresh in threshold_list:
-        search_result = search_result + glob.glob(os.path.join(output_path, project, "metilene/metilene_output", drug_combi, gender, cutoff, f'{thresh}/metilene_intersect_lifeline*.tsv' ))
+        search_result = search_result + glob.glob(os.path.join(output_path, project, "metilene/metilene_output", drug_combi, gender, cutoff, thresh, 'metilene_intersect_lifeline*.tsv' ))
+        #search_result = search_result + glob.glob(os.path.join(output_path, project, "metilene/metilene_output", drug_combi, gender, cutoff, f'{thresh}/metilene_intersect_lifeline*.tsv' ))
     return search_result
 
 rule aggregate_lifelines_all_metilene:
