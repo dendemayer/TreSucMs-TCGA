@@ -1,0 +1,6 @@
+recursive-include src/shared/resources *
+recursive-include src/shared *
+recursive-include src/tcga_deseq/resources *
+recursive-include src/tcga_deseq *
+recursive-include src/tcga_metilene/resources *
+recursive-include src/tcga_metilene *
