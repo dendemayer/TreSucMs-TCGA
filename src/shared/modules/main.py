@@ -9,7 +9,8 @@ from itertools import compress
 # import re
 
 SCRIPT_PATH = os.path.split(__file__)[0]
-with open(os.path.join(SCRIPT_PATH, 'version.txt'), 'r') as f:
+print(SCRIPT_PATH)
+with open(os.path.join(SCRIPT_PATH, 'version.py'), 'r') as f:
     version = f.readline().strip()
 
 pipeline_list = ['DESeq2', 'metilene']
