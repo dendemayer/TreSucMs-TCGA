@@ -27,11 +27,11 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "TREMSUC" "1" "Mar 22, 2024" "" "TreMSuc"
+.TH "TRESUCMS" "1" "Apr 10, 2024" "" "TreSucMs"
 .SH NAME
-tremsuc \- TreMSuc 1.0
+tresucms \- TreSucMs 1.0
 .sp
-\(dqTreSucMs\(dq a tool to choose, harvest and analyse expression and methylation data
+“TreSucMs” a tool to choose, harvest and analyse expression and methylation data
 of the TCGA\-projects for revealing Biomarkers which indicate treatment success
 predictions.
 .SH INSTALLING FROM GITHUB.COM:
@@ -76,9 +76,9 @@ $ man TreSucMs
 .SH HELP PAGE OF THE PIPELINE:
 .SS TreSucMs
 .sp
-\(dqTreSucMs\(dq a tool to choose, harvest and analyse expression and methylation data
-of the TCGA\-projects for revealing Biomarkers which indicate treatment success
-predictions.
+“TreSucMs” a tool to choose, harvest and analyse expression and methylation data
+of the TCGA\-projects for revealing Biomarkers which indicate threapy
+specific treatment success predictions.
 .sp
 Calling the pipeline without any argument starts the interactive mode to
 help setting all needed parameters for the analysis.
@@ -101,13 +101,13 @@ path to save the result files
 .INDENT 7.0
 .TP
 .B Default
-\fB/homes/biertruck/gabor/TCGA\-pipelines\fP
+\fB/homes/biertruck/gabor/TreSucMs\fP
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
 .B \-p, \-\-project <project>
-TCGA project(s) to be applied. Any TCGA project can be chosen, like: \-p TCGA\-CESC \-p TCGA\-HNSC ...
+TCGA project(s) to be applied. Any TCGA project can be chosen, like: \-p TCGA\-CESC \-p TCGA\-HNSC …
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -178,144 +178,427 @@ link them, but do not run any analysis
 .UNINDENT
 .INDENT 0.0
 .TP
+.B \-u, \-\-unlock
+in case the analysis
+crashs, snakemake locks the output directory, run with \-u to
+unlock, then repeat the analysis
+.INDENT 7.0
+.TP
+.B Default
+\fBFalse\fP
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
 .B \-v, \-\-version
 printing out version information: Version 1.0
 .UNINDENT
+.SH SHORT TUTORIAL:
+.SS Usage of the interactive mode:
+.sp
+The following example composition of projects, drugs and parameters creates the
+example configuration given in TODO.
+.sp
+The same configuration can be applied by issuing the following command (the
+number of cores hereby can be adjusted and would also give the same results):
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ TreSucMs \-p TCGA\-CESC \-p TCGA\-HNSC \-p TCGA\-LUSC \-d cisplatin \-d carboplatin,paclitaxel \e
+\-d carboplatin \-o /scr/TreSucMs_out \-c 40 \-t 5 \-t 10 \-t 20 \-C 5 \-C 8
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Calling the pipeline without any argument starts the interactive mode:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ TreSucMs
+
+ OUTPUT_PATH:             /homes/biertruck/gabor/TreSucMs
+ SCRIPT_PATH:             /homes/biertruck/gabor/phd/test_git_doc/TreSucMs/src/shared/modules
+ PIPELINES executed:      [\(aqDESeq2\(aq, \(aqmetilene\(aq]
+
+ which projects do you want to include in your analysis:
+
+  0:     TCGA\-CESC           Cervical Squamous Cell Carcinoma and Endocervical Adenocarcinoma
+  1:     TCGA\-HNSC           Head and Neck Squamous Cell Carcinoma
+  2:     TCGA\-LUSC           Lung Squamous Cell Carcinoma
+  3:     TCGA\-ESCA           Esophageal Carcinoma
+  4:     TCGA\-BRCA           Breast Invasive Carcinoma
+  5:     TCGA\-GBM            Glioblastoma Multiforme
+  6:     TCGA\-OV             Ovarian Serous Cystadenocarcinaoma
+  7:     TCGA\-LUAD           Lung Adenocarcinoma
+  8:     TCGA\-UCEC           Uterine Corpus Endometrial Carinoma
+  9:     TCGA\-KIRC           kindney renal clear cell carcinoma
+ 10:     TCGA\-LGG            brain lower grade glioma
+ 11:     TCGA\-THCA           thyroid carcinoma
+ 12:     TCGA\-PRAD           prostate adenocarcinoma
+ 13:     TCGA\-SKCM           skin cutaneous melanoma
+ 14:     TCGA\-COAD           colon adenocarcinoma
+ 15:     TCGA\-STAD           stomach adenocarcinoma
+ 16:     TCGA\-BLCA           bladder urothelial carcinoma
+ 17:     TCGA\-LIHC           liver hepatocellular carcinoma
+ 18:     TCGA\-KIRP           kidney renal papillary cell carcinoma
+ 19:     TCGA\-SARC           sarcoma
+ 20:     TCGA\-PAAD           pancreatic adenocarcinoma
+ 21:     TCGA\-PCPG           pheochromocytoma and paraganglioma
+ 22:     TCGA\-READ           rectum adenocarcinoma
+ 23:     TCGA\-TGCT           testicular germcelltumors
+ 24:     TCGA\-THYM           thymoma
+ 25:     TCGA\-KICH           kidney chromophobe
+ 26:     TCGA\-ACC            adrenochordical carcinoma
+ 27:     TCGA\-MESO           mesothelioma
+ 28:     TCGA\-UVM            uveal melanoma
+ 29:     TCGA\-DLBC           lymphoid neoplasm diffuse large b\-cell lymphoma
+ 30:     TCGA\-UCS            uterine carcinoma
+ 31:     TCGA\-CHOL           cholangiocarcinoma
+ enter your choices one by one, when you are done, simply press \(dqEnter\(dq:
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+As suggested, you can now, one by one include the projects you are interested in.
+A default OUTPUT_PATH is also already given together with the default analysis
+types “DESeq” and “metilene”. Those defaults can also be adjusted in next steps
+with help of the interactive mode.
+.sp
+To recreate the example set, the first three projects have to be selected,
+afterwards the following prompt is given:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+you choose:
+PROJECTS:        [\(aqTCGA\-CESC\(aq, \(aqTCGA\-HNSC\(aq, \(aqTCGA\-LUSC\(aq]
+
+which therapy approach do you want to include in your analysis:
+
+ 0: cisplatin                                TCGA\-CESC: 103 TCGA\-HNSC: 64 TCGA\-LUSC: 1
+ 1: carboplatin,paclitaxel                   TCGA\-CESC: 5 TCGA\-HNSC: 26 TCGA\-LUSC: 14
+ 2: 5\-fluorouracil,cisplatin                 TCGA\-CESC: 5 TCGA\-HNSC: 2 TCGA\-LUSC: 0
+ 3: carboplatin                              TCGA\-CESC: 3 TCGA\-HNSC: 6 TCGA\-LUSC: 3
+ 4: carboplatin,cisplatin,paclitaxel         TCGA\-CESC: 3 TCGA\-HNSC: 0 TCGA\-LUSC: 1
+ 5: cisplatin,gemcitabine                    TCGA\-CESC: 3 TCGA\-HNSC: 0 TCGA\-LUSC: 9
+ 6: paclitaxel                               TCGA\-CESC: 2 TCGA\-HNSC: 1 TCGA\-LUSC: 0
+ 7: erbitux                                  TCGA\-CESC: 1 TCGA\-HNSC: 9 TCGA\-LUSC: 0
+ 8: cisplatin,vectibix                       TCGA\-CESC: 0 TCGA\-HNSC: 5 TCGA\-LUSC: 0
+ 9: carboplatin,erbitux,paclitaxel           TCGA\-CESC: 0 TCGA\-HNSC: 4 TCGA\-LUSC: 0
+10: cisplatin,erbitux                        TCGA\-CESC: 0 TCGA\-HNSC: 3 TCGA\-LUSC: 0
+11: carboplatin,cisplatin,erbitux,paclitaxel TCGA\-CESC: 0 TCGA\-HNSC: 3 TCGA\-LUSC: 0
+12: carboplatin,cisplatin                    TCGA\-CESC: 0 TCGA\-HNSC: 2 TCGA\-LUSC: 0
+13: docetaxel,erbitux                        TCGA\-CESC: 0 TCGA\-HNSC: 2 TCGA\-LUSC: 0
+14: cisplatin,docetaxel                      TCGA\-CESC: 0 TCGA\-HNSC: 1 TCGA\-LUSC: 10
+15: carboplatin,docetaxel                    TCGA\-CESC: 0 TCGA\-HNSC: 1 TCGA\-LUSC: 3
+16: cisplatin,vinorelbine                    TCGA\-CESC: 0 TCGA\-HNSC: 0 TCGA\-LUSC: 21
+17: carboplatin,vinorelbine                  TCGA\-CESC: 0 TCGA\-HNSC: 0 TCGA\-LUSC: 8
+18: cisplatin,etoposide                      TCGA\-CESC: 0 TCGA\-HNSC: 0 TCGA\-LUSC: 7
+19: carboplatin,gemcitabine                  TCGA\-CESC: 0 TCGA\-HNSC: 0 TCGA\-LUSC: 5
+20: cisplatin,pemetrexed                     TCGA\-CESC: 0 TCGA\-HNSC: 0 TCGA\-LUSC: 3
+21: cisplatin,docetaxel,gemcitabine          TCGA\-CESC: 0 TCGA\-HNSC: 0 TCGA\-LUSC: 2
+22: carboplatin,gemcitabine,paclitaxel       TCGA\-CESC: 0 TCGA\-HNSC: 0 TCGA\-LUSC: 2
+23: carboplatin,cisplatin,vinorelbine        TCGA\-CESC: 0 TCGA\-HNSC: 0 TCGA\-LUSC: 2
+24: carboplatin,docetaxel,gemcitabine        TCGA\-CESC: 0 TCGA\-HNSC: 0 TCGA\-LUSC: 2
+25: carboplatin,docetaxel,paclitaxel         TCGA\-CESC: 0 TCGA\-HNSC: 0 TCGA\-LUSC: 2
+26: gemcitabine                              TCGA\-CESC: 0 TCGA\-HNSC: 0 TCGA\-LUSC: 2
+
+enter your choices one by one, when you are done, simply press \(dqEnter\(dq:
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Here are therapies listed where the maximum of a row is greater than 1. We
+apply row 0, 1 and 3 to include cisplatin, the combination of carboplatin and
+paclitaxel and cases which got solely treated with carboplatin. In the
+following, every other parameter is requested. With the next prompt, the
+default OUTPUT_PATH can be confirmed or replaced:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+do you want to keep the default OUTPUT_PATH of:
+/homes/biertruck/gabor/TreSucMs
+if so, press ENTER, if not, enter your custom output path:
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B In this example, we confirm the suggested OUTPUT_PATH and are asked to confirm
+or set the number of cores which shall be invoked into the analyses:
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+do you want to keep the default number of cores invoked of 1?
+if so, press ENTER, if not, enter the number of cores:
+40
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+We set the cores to 40 and then can decide which analysis approaches shall be
+triggered, per default, DESeq2 and metilene based biomarker predictions are
+produced:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+which pipeline do you want to include into your analysis
+press ENTER if DESeq2 and metilene (default) or
+1 for DESeq2 or
+2 for metilene
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+We confirm the default of those two analyses and can set the cutoff values, if
+we want to add those at all:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+do you want to add one or multiple cutoffs?
+it is recommend to choose cutoff values between 5 and 10 years
+if not, just press ENTER, if so enter the coutoffs one by one:
+5
+8
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Like the example set, we add here a cutoff of 5 and 8. Then the thresholds are
+requested:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+do you want to add one or multiple thresholds?
+it is recommend to choose threshold values which do not exceed a value of 50
+if not, just press ENTER, if so enter the thresholds one by one:
+5
+10
+20
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+We apply thresholds of 5, 10 and 20. All mandatory and optional parameters are
+set with that and are finally listed before the whole approach is started:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+OUTPUT_PATH:             /homes/biertruck/gabor/TreSucMs
+PROJECT:                 [\(aqTCGA\-CESC\(aq, \(aqTCGA\-HNSC\(aq, \(aqTCGA\-LUSC\(aq]
+DRUGS:                   [\(aqcarboplatin\(aq, \(aqcarboplatin,paclitaxel\(aq, \(aqcisplatin\(aq]
+pipelines executed:      [\(aqDESeq2\(aq, \(aqmetilene\(aq]
+cores:                  40
+cutoff:                 [0, 5, 8]
+threshold:              [0, 5, 10, 20]
+press ENTER to start or q to quit:
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+If something went wrong, you can quit now and start over, or of course start the analysis.
 .SH DOCUMENTATION OF MODULES, CLASSES AND FUNCTIONS:
 .INDENT 0.0
 .TP
+.B shared.modules.choose_therapy.Choose_drugs(PROJECTS)
+Choose_drugs.
+.INDENT 7.0
+.TP
+.B Parameters
+.INDENT 7.0
+.IP \(bu 2
+\fBSCRIPT_PATH\fP (\fIstr\fP) – path to the DESeq2_pipeline repo
+.IP \(bu 2
+\fBPROJECTS\fP (\fIlist\fP\fI of \fP\fIstr\fP) – list of projects chosen
+.UNINDENT
+.UNINDENT
+.sp
+interactively requesting the drugs which shall be applied to the deseq
+approach
+.UNINDENT
+.INDENT 0.0
+.TP
+.B shared.modules.choose_therapy.Choose_project()
+Choose_project.
+.sp
+interactively requesting the Projects that shall be applied to the approach
+.UNINDENT
+.INDENT 0.0
+.TP
+.B shared.modules.choose_therapy.update_parameters(parameter, parameter_str)
+update_parameters.
+.INDENT 7.0
+.TP
+.B Parameters
+.INDENT 7.0
+.IP \(bu 2
+\fBparameter\fP (\fIint\fP) – depending on the datatype, the parameter which shall be assign is requested in interactive mode
+.IP \(bu 2
+\fBparameter\fP – default OUTPUT_PATH can be confirmed or changed in interactive mode
+.IP \(bu 2
+\fBparameter\fP – cores can be changed in interactive mode
+.IP \(bu 2
+\fBparameter_str\fP (\fIstr\fP) – description of the given parameter
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B shared.modules.download_with_api.download_aux_files(OUTPUT_PATH, PROJECT, config_file_shared)
+download_aux_files.
+.INDENT 7.0
+.TP
+.B Parameters
+.INDENT 7.0
+.IP \(bu 2
+\fBOUTPUT_PATH\fP (\fIstr\fP) – path for metilene pipeline outputs
+.IP \(bu 2
+\fBPROJECT\fP (\fIlist\fP\fI of \fP\fIstr\fP) – list of projects chosen
+.IP \(bu 2
+\fBconfig_file_shared\fP (\fIstr\fP) – 
+.UNINDENT
+.UNINDENT
+.sp
+the manifest file is now downloaded vie Snakemake, provide
+create the aux filenames which should be requested to the Snakefile
+with help of the previously loaded  manifest file \-> this manifest file is
+the input for this rule! and must be already loaded beforehand!
+.sp
+with the UUID the clinical tables will be downloaded in the
+OUTPUT_PATH/PROJECT:
+.INDENT 7.0
+.INDENT 3.5
+.INDENT 0.0
+.IP \(bu 2
+nationwidechildrens.org_clinical_patient_****.txt
+.IP \(bu 2
+nationwidechildrens.org_clinical_drug_****.txt
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B shared.modules.download_with_api.download_data_files(OUTPUT_PATH, PROJECT, config_file_shared, file_type)
+create the data filenames which should be requested to the Snakefile
+with help of the previously loaded  manifest file \-> this manifest file is
+the input for this rule! and must be already loaded beforehand!
+.INDENT 7.0
+.TP
+.B Param
+OUTPUT_PATH: path for metilene pipeline outputs
+.TP
+.B Type
+OUTPUT_PATH: str
+.TP
+.B Param
+PROJECT: list of projects chosen
+.TP
+.B Type
+PROJECT: list of str
+.UNINDENT
+.sp
+with the UUID the clinical tables will be downloaded in the
+OUTPUT_PATH/PROJECT:
+.INDENT 7.0
+.INDENT 3.5
+.INDENT 0.0
+.IP \(bu 2
+nationwidechildrens.org_clinical_patient_****.txt
+.IP \(bu 2
+nationwidechildrens.org_clinical_drug_****.txt
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B shared.modules.download_with_api.download_help_files(OUTPUT_PATH, config_file_shared)
+download_help_files.
+.INDENT 7.0
+.TP
+.B Parameters
+.INDENT 7.0
+.IP \(bu 2
+\fBOUTPUT_PATH\fP (\fIstr\fP) – 
+.IP \(bu 2
+\fBconfig_file_shared\fP (\fIstr\fP) – 
+.UNINDENT
+.UNINDENT
+.sp
+creating the file names which should be requested through Snakemake
+downloading manifest file and the gtf annotation file from TCGA:
+we are using a shared Snakefile, but refere here to the metilene specific
+Snakefile, which again refers to the shared Snakefile via include
+statement
+this fct returns the gtf and manifest filenames provided in the shared
+config the must not yet be present yet, the files are downloaded then via
+shared Snakefile: rule download_helpfiles:
+.UNINDENT
+.INDENT 0.0
+.TP
 .B tcga_metilene.modules.main_metilene.entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs, threshold, cores, pipeline, config_file_shared, config, dryrun, cutoffs_str, report)
-test doc string for sphinx
-.UNINDENT
-.SH SHORT TUTORIAL:
-.SS Performing an example analysis:
-.sp
-The easiest way of applying a run is entering the interactive mode (it is
-supposed that you cloned the deseq_pipeline git repository and cd into that
-dir):
-.INDENT 0.0
-.INDENT 3.5
-.sp
-.nf
-.ft C
-$ python main_deseq.py
-.ft P
-.fi
-.UNINDENT
-.UNINDENT
-.sp
-With it, every needed parameter is offered for further analyses. First, the
-available projects are presented, based on that selection, available drugs
-or drug combinations can be chosen.
-.sp
-In contrast to that, the parameter needed could be applied via command line.
-An example terminal call for the projects TCGA\-CESC and TCGA\-HNSC together with
-the drug cisplatin and the combination carboplatin,paclitaxel would be:
-.INDENT 0.0
-.INDENT 3.5
-.sp
-.nf
-.ft C
-$ python main_deseq.py \-p TCGA\-CESC \-p TCGA\-HNSC
-\-d cisplatin \-d carboplatin,paclitaxel \-o /OUTPUT_path \-D \-A
-.ft P
-.fi
-.UNINDENT
-.UNINDENT
-.sp
-First of all, the needed data for the selected projects is loaded via the
-TCGA API and stored in:
-.INDENT 0.0
+entry_fct of metilene part.
+.INDENT 7.0
+.TP
+.B Parameters
+.INDENT 7.0
 .IP \(bu 2
-/OUTPUT_path/TCGA\-CESC/TCGA\-CESC_data_files/ and
+\fBOUTPUT_PATH\fP (\fIstr\fP) – description of the obvious
 .IP \(bu 2
-/OUTPUT_path/TCGA\-HNSC/TCGA\-HNSC_data_files/
-.UNINDENT
-.sp
-Intermediate merged tables and additional meta_data tables are stored in the
-project directories:
-.INDENT 0.0
+\fBPROJECT\fP (\fIlist\fP\fI of \fP\fIstr\fP) – 
 .IP \(bu 2
-/OUTPUT_path/TCGA\-CESC/
+\fBDRUGS\fP (\fIlist\fP\fI of \fP\fIstr\fP) – 
 .IP \(bu 2
-/OUTPUT_path/TCGA\-HNSC/
-.UNINDENT
-.sp
-First, single project analyses are performed. The actual analysis is
-determined by the project, and by the drugs combination. The directory for
-the drugs combination is created out of the applied drugs, so here, the
-DRUGS_title is \(aqcarboplatin,paclitaxel_cisplatin\(aq.
-.sp
-Everything below that drugs directory, is restricted to the chosen drugs
-s.t. the results of both single project analyses are placed in:
-.INDENT 0.0
+\fBSnakemake_all_files\fP (\fIlist\fP\fI of \fP\fIstr\fP) – 
 .IP \(bu 2
-/OUTPUT_path/TCGA\-CESC/carboplatin,paclitaxel_cisplatin/
+\fBcutoffs\fP (\fIlist\fP\fI of \fP\fIstr\fP) – 
 .IP \(bu 2
-/OUTPUT_path/TCGA\-HNSC/carboplatin,paclitaxel_cisplatin/
-.UNINDENT
-.sp
-After the single project analysis, the projects are combined. Those results
-are stored in an additional directory, composed out of the applied projects,
-so here, the PROJECT_title is: \(aqTCGA\-CESC_TCGA\-HNSC\(aq, those results are saved
-in the directory:
-.INDENT 0.0
+\fBthreshold\fP (\fIlist\fP\fI of \fP\fIstr\fP) – 
 .IP \(bu 2
-/OUTPUT_path/TCGA\-CESC_TCGA\-HNSC/carboplatin,paclitaxel_cisplatin/
-.UNINDENT
-.sp
-Since the analysis is determined by the project and drug combination, results
-for 3 different approaches are created, two for the single projects and one
-for the aggregation of the two projects. For all of them, a respective
-REPORT.pdf is created, containing a summarized representation of the most
-important results and plots, along with some explanations to them. They are
-stored at:
-.INDENT 0.0
+\fBcores\fP (\fIint\fP) – 
 .IP \(bu 2
-/OUTPUT_path/TCGA\-CESC/carboplatin,paclitaxel_cisplatin/REPORT.pdf
+\fBpipeline\fP (\fIstr\fP) – 
 .IP \(bu 2
-/OUTPUT_path/TCGA\-HNSC/carboplatin,paclitaxel_cisplatin/REPORT.pdf
+\fBconfig_file_shared\fP (\fIstr\fP) – 
 .IP \(bu 2
-/OUTPUT_path/TCGA\-CESC_TCGA\-HNSC/carboplatin,paclitaxel_cisplatin/REPORT.pdf
-.UNINDENT
-.SS Recreate the performed analysis:
-.sp
-To rerun the analysis and reproduce all the outputs and results created with
-it, a single Snakemake configuration file is created. It is stored in the
-cloned repository location under the \(aqSnakes\(aq subdir.
-Since the analysis is determined by the composition of projects and drugs, the
-unique filename of this configuration file is composed out of it. For the
-example with CESC and HNSC, together with cisplatin and carboplatin,paclitaxel,
-that would be:
-.INDENT 0.0
+\fBconfig\fP (\fIstr\fP) – 
 .IP \(bu 2
-SCRIPT_path/Snakes/snakemake_config_TCGA\-CESC_TCGA\-HNSC_carboplatin,paclitaxel_cisplatin.yaml
-.UNINDENT
-.sp
-The Snakefile needed is also hold available at:
-.INDENT 0.0
+\fBdryrun\fP (\fIboolean\fP) – 
 .IP \(bu 2
-SCRIPT_path/Snakes/Snakefile
-.UNINDENT
-.sp
-This file must be edited and the path to the config yaml file, the OUTPUT_path
-and the SCRIPT_path must be inserted.
-.sp
-With that, the Snakefile is configured to run the analyses again. Change the
-directory into the SCRIPT_path/Snakes/ path and run for example:
-.INDENT 0.0
-.INDENT 3.5
-.sp
-.nf
-.ft C
-$ snakemake \-\-cores 7
-.ft P
-.fi
+\fBcutoffs_str\fP (\fIstr\fP) – 
+.IP \(bu 2
+\fBreport\fP (\fIstr\fP) – 
 .UNINDENT
 .UNINDENT
-.sp
-This would use 7 cores of your machine if available and make use of
-parallelisation of steps where it is feasible.
+.UNINDENT
 .SH AUTHOR
 Gabor Balogh
 .SH COPYRIGHT

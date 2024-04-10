@@ -56,6 +56,11 @@ HOME = os.getenv('HOME')
               and meta data for given projects and analysis types, revise them,
               link them, but do not run any analysis''',
               required=False)
+@click.option('--unlock', '-u', default=False, multiple=False,
+              show_default=True, is_flag=True, help='''in case the analysis
+              crashs, snakemake locks the output directory, run with -u to
+              unlock, then repeat the analysis''',
+              required=False)
 #this one is hidden, debug purposes
 @click.option('--report', '-r', default=False, multiple=False,
               show_default=True, is_flag=True, help='just create a report',
@@ -65,7 +70,7 @@ HOME = os.getenv('HOME')
               is_flag=True, callback=print_version,
               expose_value=False, is_eager=True)
 def call_with_options(out_path, project, drugs, cores, execute, cutoff,
-                      threshold, dryrun, report, download):
+                      threshold, dryrun, report, download, unlock):
     '''
     "TreSucMs" a tool to choose, harvest and analyse expression and methylation data
     of the TCGA-projects for revealing Biomarkers which indicate threapy
@@ -204,7 +209,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
                                         forceall=False, force_incomplete=True,
                                         dryrun=dryrun, use_conda=True,
                                         configfiles=[config_file_shared],
-                                        config=config)
+                                        config=config, unlock=unlock)
+        if unlock:
+            print(f'The output dir: OUTPUT_PATH is unlocked now')
         if not workflow:
             print('snakemake execution failed, exiting now')
             os._exit(0)
