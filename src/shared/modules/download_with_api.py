@@ -75,7 +75,7 @@ def download_data_files(OUTPUT_PATH, PROJECT, config_file_shared, file_type):
     """
     create the data filenames which should be requested to the Snakefile
     with help of the previously loaded  manifest file -> this manifest file is
-    the input for this rule! and must be already loaded beforehand!
+    the input for this rule and must be already loaded beforehand!
 
     :param: OUTPUT_PATH: path for metilene pipeline outputs
     :type: OUTPUT_PATH: str

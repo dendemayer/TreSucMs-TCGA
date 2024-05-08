@@ -6,9 +6,9 @@ Documentation: TreSucMs for TCGA
 ***************************************
 
 "TreSucMs" a tool to choose, harvest and analyse expression and methylation data
-of the TCGA-projects for revealing Biomarkers which indicate treatment success
-predictions.
+of the TCGA-projects for revealing Biomarkers which indicate treatment success.
 
+A final example report file can be inspected here :download:`example report <_static/report.html>`
 
 Installing from github.com:
 ------------------------------------------
@@ -223,16 +223,3 @@ set with that and are finally listed before the whole approach is started:
     press ENTER to start or q to quit:                                               
 
 If something went wrong, you can quit now and start over, or of course start the analysis.
-
-Documentation of modules, classes and functions:
-------------------------------------------------
-
-.. automodule:: shared.modules.choose_therapy
-    :members: 
-
-.. automodule:: shared.modules.download_with_api
-    :members: 
-
-.. automodule:: tcga_metilene.modules.main_metilene
-    :members: 
-

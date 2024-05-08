@@ -22,9 +22,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">TreSucMs 1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Documentation: TreSucMs for TCGA</a></li> 
       </ul>
@@ -40,8 +37,8 @@
 <section id="documentation-tresucms-for-tcga">
 <h1>Documentation: TreSucMs for TCGA<a class="headerlink" href="#documentation-tresucms-for-tcga" title="Link to this heading">¶</a></h1>
 <p>“TreSucMs” a tool to choose, harvest and analyse expression and methylation data
-of the TCGA-projects for revealing Biomarkers which indicate treatment success
-predictions.</p>
+of the TCGA-projects for revealing Biomarkers which indicate treatment success.</p>
+<p>A final example report file can be inspected here <a class="reference download internal" download="" href="_downloads/a594682e6442254b8aa364675f6a5d7d/report.html"><code class="xref download docutils literal notranslate"><span class="pre">example</span> <span class="pre">report</span></code></a></p>
 <section id="installing-from-github-com">
 <h2>Installing from github.com:<a class="headerlink" href="#installing-from-github-com" title="Link to this heading">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dendemayer/TreSucMs-TCGA.git
@@ -345,152 +342,6 @@ press ENTER to start or q to quit:
 <p>If something went wrong, you can quit now and start over, or of course start the analysis.</p>
 </section>
 </section>
-<section id="module-shared.modules.choose_therapy">
-<span id="documentation-of-modules-classes-and-functions"></span><h2>Documentation of modules, classes and functions:<a class="headerlink" href="#module-shared.modules.choose_therapy" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="shared.modules.choose_therapy.Choose_drugs">
-<span class="sig-prename descclassname"><span class="pre">shared.modules.choose_therapy.</span></span><span class="sig-name descname"><span class="pre">Choose_drugs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PROJECTS</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.modules.choose_therapy.Choose_drugs" title="Link to this definition">¶</a></dt>
-<dd><p>Choose_drugs.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>SCRIPT_PATH</strong> (<em>str</em>) – path to the DESeq2_pipeline repo</p></li>
-<li><p><strong>PROJECTS</strong> (<em>list</em><em> of </em><em>str</em>) – list of projects chosen</p></li>
-</ul>
-</dd>
-</dl>
-<p>interactively requesting the drugs which shall be applied to the deseq
-approach</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="shared.modules.choose_therapy.Choose_project">
-<span class="sig-prename descclassname"><span class="pre">shared.modules.choose_therapy.</span></span><span class="sig-name descname"><span class="pre">Choose_project</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#shared.modules.choose_therapy.Choose_project" title="Link to this definition">¶</a></dt>
-<dd><p>Choose_project.</p>
-<p>interactively requesting the Projects that shall be applied to the approach</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="shared.modules.choose_therapy.update_parameters">
-<span class="sig-prename descclassname"><span class="pre">shared.modules.choose_therapy.</span></span><span class="sig-name descname"><span class="pre">update_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.modules.choose_therapy.update_parameters" title="Link to this definition">¶</a></dt>
-<dd><p>update_parameters.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>parameter</strong> (<em>int</em>) – depending on the datatype, the parameter which shall be assign is requested in interactive mode</p></li>
-<li><p><strong>parameter</strong> – default OUTPUT_PATH can be confirmed or changed in interactive mode</p></li>
-<li><p><strong>parameter</strong> – cores can be changed in interactive mode</p></li>
-<li><p><strong>parameter_str</strong> (<em>str</em>) – description of the given parameter</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function" id="module-shared.modules.download_with_api">
-<dt class="sig sig-object py" id="shared.modules.download_with_api.download_aux_files">
-<span class="sig-prename descclassname"><span class="pre">shared.modules.download_with_api.</span></span><span class="sig-name descname"><span class="pre">download_aux_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OUTPUT_PATH</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PROJECT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_file_shared</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.modules.download_with_api.download_aux_files" title="Link to this definition">¶</a></dt>
-<dd><p>download_aux_files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>OUTPUT_PATH</strong> (<em>str</em>) – path for metilene pipeline outputs</p></li>
-<li><p><strong>PROJECT</strong> (<em>list</em><em> of </em><em>str</em>) – list of projects chosen</p></li>
-<li><p><strong>config_file_shared</strong> (<em>str</em>) – </p></li>
-</ul>
-</dd>
-</dl>
-<p>the manifest file is now downloaded vie Snakemake, provide
-create the aux filenames which should be requested to the Snakefile
-with help of the previously loaded  manifest file -&gt; this manifest file is
-the input for this rule! and must be already loaded beforehand!</p>
-<p>with the UUID the clinical tables will be downloaded in the
-OUTPUT_PATH/PROJECT:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>nationwidechildrens.org_clinical_patient_****.txt</p></li>
-<li><p>nationwidechildrens.org_clinical_drug_****.txt</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="shared.modules.download_with_api.download_data_files">
-<span class="sig-prename descclassname"><span class="pre">shared.modules.download_with_api.</span></span><span class="sig-name descname"><span class="pre">download_data_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OUTPUT_PATH</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PROJECT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_file_shared</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.modules.download_with_api.download_data_files" title="Link to this definition">¶</a></dt>
-<dd><p>create the data filenames which should be requested to the Snakefile
-with help of the previously loaded  manifest file -&gt; this manifest file is
-the input for this rule! and must be already loaded beforehand!</p>
-<dl class="field-list simple">
-<dt class="field-odd">Param<span class="colon">:</span></dt>
-<dd class="field-odd"><p>OUTPUT_PATH: path for metilene pipeline outputs</p>
-</dd>
-<dt class="field-even">Type<span class="colon">:</span></dt>
-<dd class="field-even"><p>OUTPUT_PATH: str</p>
-</dd>
-<dt class="field-odd">Param<span class="colon">:</span></dt>
-<dd class="field-odd"><p>PROJECT: list of projects chosen</p>
-</dd>
-<dt class="field-even">Type<span class="colon">:</span></dt>
-<dd class="field-even"><p>PROJECT: list of str</p>
-</dd>
-</dl>
-<p>with the UUID the clinical tables will be downloaded in the
-OUTPUT_PATH/PROJECT:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>nationwidechildrens.org_clinical_patient_****.txt</p></li>
-<li><p>nationwidechildrens.org_clinical_drug_****.txt</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="shared.modules.download_with_api.download_help_files">
-<span class="sig-prename descclassname"><span class="pre">shared.modules.download_with_api.</span></span><span class="sig-name descname"><span class="pre">download_help_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OUTPUT_PATH</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_file_shared</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.modules.download_with_api.download_help_files" title="Link to this definition">¶</a></dt>
-<dd><p>download_help_files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>OUTPUT_PATH</strong> (<em>str</em>) – </p></li>
-<li><p><strong>config_file_shared</strong> (<em>str</em>) – </p></li>
-</ul>
-</dd>
-</dl>
-<p>creating the file names which should be requested through Snakemake
-downloading manifest file and the gtf annotation file from TCGA:
-we are using a shared Snakefile, but refere here to the metilene specific
-Snakefile, which again refers to the shared Snakefile via include
-statement
-this fct returns the gtf and manifest filenames provided in the shared
-config the must not yet be present yet, the files are downloaded then via
-shared Snakefile: rule download_helpfiles:</p>
-</dd></dl>
-
-<dl class="py function" id="module-tcga_metilene.modules.main_metilene">
-<dt class="sig sig-object py" id="tcga_metilene.modules.main_metilene.entry_fct">
-<span class="sig-prename descclassname"><span class="pre">tcga_metilene.modules.main_metilene.</span></span><span class="sig-name descname"><span class="pre">entry_fct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OUTPUT_PATH</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PROJECT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DRUGS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Snakemake_all_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoffs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipeline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_file_shared</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dryrun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoffs_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tcga_metilene.modules.main_metilene.entry_fct" title="Link to this definition">¶</a></dt>
-<dd><p>entry_fct of metilene part.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>OUTPUT_PATH</strong> (<em>str</em>) – description of the obvious</p></li>
-<li><p><strong>PROJECT</strong> (<em>list</em><em> of </em><em>str</em>) – </p></li>
-<li><p><strong>DRUGS</strong> (<em>list</em><em> of </em><em>str</em>) – </p></li>
-<li><p><strong>Snakemake_all_files</strong> (<em>list</em><em> of </em><em>str</em>) – </p></li>
-<li><p><strong>cutoffs</strong> (<em>list</em><em> of </em><em>str</em>) – </p></li>
-<li><p><strong>threshold</strong> (<em>list</em><em> of </em><em>str</em>) – </p></li>
-<li><p><strong>cores</strong> (<em>int</em>) – </p></li>
-<li><p><strong>pipeline</strong> (<em>str</em>) – </p></li>
-<li><p><strong>config_file_shared</strong> (<em>str</em>) – </p></li>
-<li><p><strong>config</strong> (<em>str</em>) – </p></li>
-<li><p><strong>dryrun</strong> (<em>boolean</em>) – </p></li>
-<li><p><strong>cutoffs_str</strong> (<em>str</em>) – </p></li>
-<li><p><strong>report</strong> (<em>str</em>) – </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
 </section>
 
 
@@ -511,16 +362,6 @@ shared Snakefile: rule download_helpfiles:</p>
 </li>
 <li><a class="reference internal" href="#short-tutorial">Short tutorial:</a><ul>
 <li><a class="reference internal" href="#usage-of-the-interactive-mode">Usage of the interactive mode:</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-shared.modules.choose_therapy">Documentation of modules, classes and functions:</a><ul>
-<li><a class="reference internal" href="#shared.modules.choose_therapy.Choose_drugs"><code class="docutils literal notranslate"><span class="pre">Choose_drugs()</span></code></a></li>
-<li><a class="reference internal" href="#shared.modules.choose_therapy.Choose_project"><code class="docutils literal notranslate"><span class="pre">Choose_project()</span></code></a></li>
-<li><a class="reference internal" href="#shared.modules.choose_therapy.update_parameters"><code class="docutils literal notranslate"><span class="pre">update_parameters()</span></code></a></li>
-<li><a class="reference internal" href="#shared.modules.download_with_api.download_aux_files"><code class="docutils literal notranslate"><span class="pre">download_aux_files()</span></code></a></li>
-<li><a class="reference internal" href="#shared.modules.download_with_api.download_data_files"><code class="docutils literal notranslate"><span class="pre">download_data_files()</span></code></a></li>
-<li><a class="reference internal" href="#shared.modules.download_with_api.download_help_files"><code class="docutils literal notranslate"><span class="pre">download_help_files()</span></code></a></li>
-<li><a class="reference internal" href="#tcga_metilene.modules.main_metilene.entry_fct"><code class="docutils literal notranslate"><span class="pre">entry_fct()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -555,9 +396,6 @@ shared Snakefile: rule download_helpfiles:</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">TreSucMs 1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Documentation: TreSucMs for TCGA</a></li> 
       </ul>

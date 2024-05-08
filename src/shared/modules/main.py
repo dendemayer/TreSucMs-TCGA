@@ -213,6 +213,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
                                        config=config, unlock=unlock)
         if unlock:
             print(f'The output dir:\n{OUTPUT_PATH}\nis unlocked now')
+            os._exit(0)
         if not workflow:
             print('snakemake execution failed, exiting now')
             os._exit(0)
@@ -367,6 +368,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
 
     # also with dryrun set, the report file would be created, catch that
     # beforehand:
+    # TODO adjust the
+    # /homes/biertruck/gabor/phd/test_git_doc/TreSucMs/src/shared/report_src/workflow.rst
+    # s.t. the pipeline call is included there:
     if not dryrun:
         workflow = snakemake.snakemake(snakefile=Snakefile,
                                        targets=Snakemake_report_files,
