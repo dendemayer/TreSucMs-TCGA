@@ -179,6 +179,7 @@ rule merge_metilene_heatmaps:
     """
     input:
         heatmaps = return_heatmaps,  # input can also be empty, no heatmaps available then...
+        metilene_intersect = "{output_path}/{project}/metilene/metilene_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect.tsv",
         script_file = os.path.join(shared_path, "scripts/merge_heatmaps.py")
     output:
         heatmaps_merged = report("{output_path}/{project}/{pipeline}/{pipeline}_output/{drug_combi}/{gender}/{cutoff}/metilene_intersect_beta_value_merged.pdf", category="metilene", subcategory = "{project}", labels={"Category": "DMR-plots", "sex": "{gender}", "cutoff": "{cutoff}", "type": "pdf"}),

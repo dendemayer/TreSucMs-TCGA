@@ -9,7 +9,6 @@ from itertools import compress
 # import re
 
 SCRIPT_PATH = os.path.split(__file__)[0]
-print(SCRIPT_PATH)
 with open(os.path.join(SCRIPT_PATH, 'version.py'), 'r') as f:
     version = f.readline().strip()
 
@@ -80,10 +79,10 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     help setting all needed parameters for the analysis.
     '''
     OUTPUT_PATH = out_path
-    print("\nOUTPUT_PATH:\t\t", OUTPUT_PATH)
+    # print("\nOUTPUT_PATH:\t\t", OUTPUT_PATH)
     # SCRIPT_PATH = script_path
     SCRIPT_PATH = os.path.split(__file__)[0]
-    print("SCRIPT_PATH:\t\t", SCRIPT_PATH)
+    # print("SCRIPT_PATH:\t\t", SCRIPT_PATH)
     # make sure that the pipelines to execute also exist, every entry must be
     # present in : ['DESeq2', 'metilene']
     temp_check = [True if i not in pipeline_list else False for i in execute]
@@ -143,6 +142,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
 
     thresh_list = [f'threshold_{str(i)}' for i in threshold]
     thresh_str = '_'.join(thresh_list)
+    print("SCRIPT_PATH:\t\t", SCRIPT_PATH)
     print('OUTPUT_PATH:\t\t', OUTPUT_PATH)
     print('PROJECT:\t\t', PROJECT)
     print('DRUGS:\t\t\t', DRUGS)
@@ -304,7 +304,6 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     Snakemake_report_met = []
     Snakemake_report_des = []
     if 'metilene' in execute:
-        print('entering metilene entry fct')
         Snakemake_report_met = main_metilene.entry_fct(OUTPUT_PATH, PROJECT,
                                                        DRUGS,
                                                        Snakemake_all_files,
@@ -314,7 +313,6 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
                                                        config, dryrun,
                                                        cutoffs_str, report)
     if 'DESeq2' in execute:
-        print('entering deseq entry fct')
         Snakemake_report_des = main_deseq.entry_fct(OUTPUT_PATH, PROJECT, DRUGS,
                                                     Snakemake_all_files,
                                                     threshold, cores, 'DESeq2',
@@ -376,9 +374,9 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # within the shared Snakefile
     rst_file = os.path.join(os.path.dirname(__file__), os.path.pardir, 'report_src', 'workflow.rst' )
     with open(rst_file, 'w') as f:
-        f.write('TreSucMs TCGA final report\n\n')
-        f.write('The CLI command was:\n\n')
-        temp_str = f'TreSucMs {"-p " + " -p ".join(PROJECT)}\n{"-d " + " -d ".join(DRUGS)}\n{"-C " + "-C ".join([str(i) + " " for i in cutoffs])}\n{"-t" + "-t ".join([str(i) + " " for i in threshold])}\n-o {OUTPUT_PATH}\n-c {cores}'
+        f.write('| TreSucMs TCGA final report\n')
+        f.write('| Issued CLI call:\n\n')
+        temp_str = f'| TreSucMs {"-p " + " -p ".join(PROJECT)}\n| {"-d " + " -d ".join(DRUGS)}\n| {"-C " + "-C ".join([str(i) + " " for i in cutoffs])}\n| {"-t " + "-t ".join([str(i) + " " for i in threshold])}\n| -o {OUTPUT_PATH}\n| -c {cores}'
         f.write(temp_str)
 
     if not dryrun:
