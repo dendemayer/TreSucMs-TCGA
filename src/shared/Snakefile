@@ -402,13 +402,13 @@ rule majority_vote_all:
         HM450_annot = os.path.join(script_path, os.path.pardir,'tcga_metilene', 'resources', 'HM450.hg38.manifest.gencode.v36.tsv.gz'),
         script_file = os.path.join(script_path, "scripts/majority_vote_all.py")
     output:
-        major_table =  report('{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote.tsv.gz', category="{pipeline_str}", subcategory="final_majority_vote", labels={"Pipelines:": "{pipeline_str}", "type": "table"}),
-        venn_project = '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_venn_projects.pdf',
-        venn_pipeline = '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_venn_pipeline.pdf',
-        venn_pipeline_project = '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_venn_pipeline_project.pdf',
-        md_aggr =  '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project.md',
-        pdf_aggr =  '{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project.pdf',
-        pdf_final =  report('{output_path}/{project}/{pipeline_str}/{drug_str}/final_majority_vote_pipeline_project_final.pdf', category="{pipeline_str}", subcategory="final_majority_vote", labels={"Pipelines:": "{pipeline_str}", "type": "pdf"}),
+        major_table =  report('{output_path}/{project}/{pipeline_str}/{drug_str}/{threshold_str}/final_majority_vote.tsv.gz', category="{pipeline_str}", subcategory="final_majority_vote", labels={"Pipelines:": "{pipeline_str}", "type": "table"}),
+        venn_project = '{output_path}/{project}/{pipeline_str}/{drug_str}/{threshold_str}/final_majority_vote_venn_projects.pdf',
+        venn_pipeline = '{output_path}/{project}/{pipeline_str}/{drug_str}/{threshold_str}/final_majority_vote_venn_pipeline.pdf',
+        venn_pipeline_project = '{output_path}/{project}/{pipeline_str}/{drug_str}/{threshold_str}/final_majority_vote_venn_pipeline_project.pdf',
+        md_aggr =  '{output_path}/{project}/{pipeline_str}/{drug_str}/{threshold_str}/final_majority_vote_pipeline_project.md',
+        pdf_aggr =  '{output_path}/{project}/{pipeline_str}/{drug_str}/{threshold_str}/final_majority_vote_pipeline_project.pdf',
+        pdf_final =  report('{output_path}/{project}/{pipeline_str}/{drug_str}/{threshold_str}/final_majority_vote_pipeline_project_final.pdf', category="{pipeline_str}", subcategory="final_majority_vote", labels={"Pipelines:": "{pipeline_str}", "type": "pdf"}),
         #major_table =  expand('{{output_path}}/{{project}}/{{pipeline_str}}/{{drug_str}}/final_majority_vote.tsv.gz', output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str),
         #venn_project = expand('{{output_path}}/{{project}}/{{pipeline_str}}/{{drug_str}}/final_majority_vote_venn_projects.pdf', output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str),
         #venn_pipeline = expand('{{output_path}}/{{project}}/{{pipeline_str}}/{{drug_str}}/final_majority_vote_venn_pipeline.pdf', output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str),
@@ -420,7 +420,7 @@ rule majority_vote_all:
     threads:
         1
     log:
-        "{output_path}/{project}/{pipeline_str}/logs/majority_vote_all/{drug_str}.log",
+        "{output_path}/{project}/{pipeline_str}/logs/majority_vote_all/{drug_str}/{threshold_str}.log",
         #expand("{{output_path}}/{{project}}/{{pipeline_str}}/logs/majority_vote_all/{{drug_str}}.log",output_path=OUTPUT_PATH, project=PROJECTS[-1], pipeline_str=pipeline_str, drug_str=drug_str)
     script:
         "scripts/majority_vote_all.py"

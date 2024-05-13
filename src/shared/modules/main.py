@@ -329,12 +329,13 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # the final majority vote file, aggregated over all pipelines:
     # depending on the pipeline chosen:
 
+    # TODO also include threshold into majortiy vote!!
     major_file = os.path.join(
         OUTPUT_PATH, projects, '_'.join(execute),
-        '_'.join(DRUGS), 'final_majority_vote.tsv.gz')
+        '_'.join(DRUGS),'_'.join([f'threshold_{str(i)}' for i in threshold]), 'final_majority_vote.tsv.gz')
     major_file_pdf = os.path.join(
         OUTPUT_PATH, projects, '_'.join(execute),
-        '_'.join(DRUGS), 'final_majority_vote_pipeline_project_final.pdf')
+        '_'.join(DRUGS), '_'.join([f'threshold_{str(i)}' for i in threshold]), 'final_majority_vote_pipeline_project_final.pdf')
 
     p_val_prod_sum = []
     if 'DESeq2' in execute:
@@ -359,7 +360,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
             os._exit(0)
 
     report_file = os.path.join(OUTPUT_PATH, projects, '_'.join(execute),
-                               '_'.join(DRUGS), 'report.html')
+                               '_'.join(DRUGS), '_'.join([f'threshold_{str(i)}' for i in threshold]), 'report.html')
 
     ###########################################################################
     #                            final REPORT creation                        #
@@ -371,6 +372,15 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # TODO adjust the
     # /homes/biertruck/gabor/phd/test_git_doc/TreSucMs/src/shared/report_src/workflow.rst
     # s.t. the pipeline call is included there:
+    # before creating the report, adjust the rst file, path is directly given
+    # within the shared Snakefile
+    rst_file = os.path.join(os.path.dirname(__file__), os.path.pardir, 'report_src', 'workflow.rst' )
+    with open(rst_file, 'w') as f:
+        f.write('TreSucMs TCGA final report\n\n')
+        f.write('The CLI command was:\n\n')
+        temp_str = f'TreSucMs {"-p " + " -p ".join(PROJECT)}\n{"-d " + " -d ".join(DRUGS)}\n{"-C " + "-C ".join([str(i) + " " for i in cutoffs])}\n{"-t" + "-t ".join([str(i) + " " for i in threshold])}\n-o {OUTPUT_PATH}\n-c {cores}'
+        f.write(temp_str)
+
     if not dryrun:
         workflow = snakemake.snakemake(snakefile=Snakefile,
                                        targets=Snakemake_report_files,
