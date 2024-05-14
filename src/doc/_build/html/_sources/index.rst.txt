@@ -12,6 +12,7 @@ Example report:
 ---------------
 
 An example report can be downloaded here_.
+Be aware that this report has a size of about 300 MB.
 
 .. _here: https://media.githubusercontent.com/media/dendemayer/TreSucMs-TCGA/main/suppl/report.html?download=true
 
