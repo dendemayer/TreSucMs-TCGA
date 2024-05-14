@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Documentation: TreMSuc for TCGA &#8212; TreMSuc 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=514cf933" />
+    
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">TreMSuc 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Documentation: TreMSuc for TCGA</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="toctree-wrapper compound">
+</div>
+<section id="documentation-tremsuc-for-tcga">
+<h1>Documentation: TreMSuc for TCGA<a class="headerlink" href="#documentation-tremsuc-for-tcga" title="Link to this heading">¶</a></h1>
+<p>“TreMSuc” a tool to choose, harvest and analyse expression data of
+the TCGA-projects with help of the DESeq2 R package</p>
+<section id="build-and-activate-the-provided-conda-env">
+<h2>Build and activate the provided conda env:<a class="headerlink" href="#build-and-activate-the-provided-conda-env" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>deseq_env.yaml
+$<span class="w"> </span>conda<span class="w"> </span>activate<span class="w"> </span>deseq_pipeline
+</pre></div>
+</div>
+<p>call the script without any options to enter the interactive mode and set
+each option step by step:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>main_deseq.py
+</pre></div>
+</div>
+<p>print help page:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>main_deseq.py<span class="w"> </span>--help
+</pre></div>
+</div>
+<p>Usage: main_deseq.py [OPTIONS]</p>
+<dl>
+<dt>Options:</dt><dd><dl class="option-list">
+<dt><kbd><span class="option">-D</span>, <span class="option">--download_data</span></kbd></dt>
+<dd><p>perform download and merging steps, without the
+DESeq2 analysis</p>
+</dd>
+<dt><kbd><span class="option">-A</span>, <span class="option">--analyse_data</span></kbd></dt>
+<dd><p>perform the DESeq2 analysis (the download step must
+be completed in prior for your chosen projects)</p>
+</dd>
+<dt><kbd><span class="option">-o</span>, <span class="option">--out_path <var>TEXT</var></span></kbd></dt>
+<dd><p>The Path, where all results are saved to.</p>
+</dd>
+<dt><kbd><span class="option">-p</span>, <span class="option">--project <var>TEXT</var></span></kbd></dt>
+<dd><p>TCGA project to be applied. Any TCGA project can be
+choosen, like: -p TCGA-CESC -p TCGA-HNSC …</p>
+</dd>
+<dt><kbd><span class="option">-d</span>, <span class="option">--drugs <var>TEXT</var></span></kbd></dt>
+<dd><p>drug(s), like: -d drug1 -d drug2 or
+drugcombination(s), like: -d drug1,drug2</p>
+</dd>
+<dt><kbd><span class="option">-f</span>, <span class="option">--function <var>INTEGER</var></span></kbd></dt>
+<dd><p>running functions separately, important for the
+snakemake functionality. Look up the documentation
+or the man page for detailed description  of each
+function</p>
+</dd>
+<dt><kbd><span class="option">-t</span>, <span class="option">--threshold <var>INTEGER</var></span></kbd></dt>
+<dd><p>threshold for a higher division of the kaplan meier
+plots  [default: 0]</p>
+</dd>
+<dt><kbd><span class="option">-s</span>, <span class="option">--snakerun</span></kbd></dt>
+<dd><p>needed for the snakemake functionality, NOT to be
+set manually by the user</p>
+</dd>
+<dt><kbd><span class="option">-c</span>, <span class="option">--cutoff <var>FLOAT</var></span></kbd></dt>
+<dd><p>cutoff parameter: convert dead cases to alive cases
+if they outlive the cutoff parameter (in years) no
+conversion performed if default (or no) value
+applied  [default: 0]</p>
+</dd>
+<dt><kbd><span class="option">-v</span>, <span class="option">--version</span></kbd></dt>
+<dd><p>printing out version information: Version 1.0</p>
+</dd>
+<dt><kbd><span class="option">--help</span></kbd></dt>
+<dd><p>Show this message and exit.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="short-tutorial">
+<h2>Short tutorial:<a class="headerlink" href="#short-tutorial" title="Link to this heading">¶</a></h2>
+<section id="performing-an-example-analysis">
+<h3>Performing an example analysis:<a class="headerlink" href="#performing-an-example-analysis" title="Link to this heading">¶</a></h3>
+<p>The easiest way of applying a run is entering the interactive mode (it is
+supposed that you cloned the deseq_pipeline git repository and cd into that
+dir):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>main_deseq.py
+</pre></div>
+</div>
+<p>With it, every needed parameter is offered for further analyses. First, the
+available projects are presented, based on that selection, available drugs
+or drug combinations can be chosen.</p>
+<p>In contrast to that, the parameter needed could be applied via command line.
+An example terminal call for the projects TCGA-CESC and TCGA-HNSC together with
+the drug cisplatin and the combination carboplatin,paclitaxel would be:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>main_deseq.py<span class="w"> </span>-p<span class="w"> </span>TCGA-CESC<span class="w"> </span>-p<span class="w"> </span>TCGA-HNSC
+-d<span class="w"> </span>cisplatin<span class="w"> </span>-d<span class="w"> </span>carboplatin,paclitaxel<span class="w"> </span>-o<span class="w"> </span>/OUTPUT_path<span class="w"> </span>-D<span class="w"> </span>-A
+</pre></div>
+</div>
+<p>First of all, the needed data for the selected projects is loaded via the
+TCGA API and stored in:</p>
+<ul class="simple">
+<li><p>/OUTPUT_path/TCGA-CESC/TCGA-CESC_data_files/ and</p></li>
+<li><p>/OUTPUT_path/TCGA-HNSC/TCGA-HNSC_data_files/</p></li>
+</ul>
+<p>Intermediate merged tables and additional meta_data tables are stored in the
+project directories:</p>
+<ul class="simple">
+<li><p>/OUTPUT_path/TCGA-CESC/</p></li>
+<li><p>/OUTPUT_path/TCGA-HNSC/</p></li>
+</ul>
+<p>First, single project analyses are performed. The actual analysis is
+determined by the project, and by the drugs combination. The directory for
+the drugs combination is created out of the applied drugs, so here, the
+DRUGS_title is ‘carboplatin,paclitaxel_cisplatin’.</p>
+<p>Everything below that drugs directory, is restricted to the chosen drugs
+s.t. the results of both single project analyses are placed in:</p>
+<ul class="simple">
+<li><p>/OUTPUT_path/TCGA-CESC/carboplatin,paclitaxel_cisplatin/</p></li>
+<li><p>/OUTPUT_path/TCGA-HNSC/carboplatin,paclitaxel_cisplatin/</p></li>
+</ul>
+<p>After the single project analysis, the projects are combined. Those results
+are stored in an additional directory, composed out of the applied projects,
+so here, the PROJECT_title is: ‘TCGA-CESC_TCGA-HNSC’, those results are saved
+in the directory:</p>
+<ul class="simple">
+<li><p>/OUTPUT_path/TCGA-CESC_TCGA-HNSC/carboplatin,paclitaxel_cisplatin/</p></li>
+</ul>
+<p>Since the analysis is determined by the project and drug combination, results
+for 3 different approaches are created, two for the single projects and one
+for the aggregation of the two projects. For all of them, a respective
+REPORT.pdf is created, containing a summarized representation of the most
+important results and plots, along with some explanations to them. They are
+stored at:</p>
+<ul class="simple">
+<li><p>/OUTPUT_path/TCGA-CESC/carboplatin,paclitaxel_cisplatin/REPORT.pdf</p></li>
+<li><p>/OUTPUT_path/TCGA-HNSC/carboplatin,paclitaxel_cisplatin/REPORT.pdf</p></li>
+<li><p>/OUTPUT_path/TCGA-CESC_TCGA-HNSC/carboplatin,paclitaxel_cisplatin/REPORT.pdf</p></li>
+</ul>
+</section>
+<section id="recreate-the-performed-analysis">
+<h3>Recreate the performed analysis:<a class="headerlink" href="#recreate-the-performed-analysis" title="Link to this heading">¶</a></h3>
+<p>To rerun the analysis and reproduce all the outputs and results created with
+it, a single Snakemake configuration file is created. It is stored in the
+cloned repository location under the ‘Snakes’ subdir.
+Since the analysis is determined by the composition of projects and drugs, the
+unique filename of this configuration file is composed out of it. For the
+example with CESC and HNSC, together with cisplatin and carboplatin,paclitaxel,
+that would be:</p>
+<ul class="simple">
+<li><p>SCRIPT_path/Snakes/snakemake_config_TCGA-CESC_TCGA-HNSC_carboplatin,paclitaxel_cisplatin.yaml</p></li>
+</ul>
+<p>The Snakefile needed is also hold available at:</p>
+<ul class="simple">
+<li><p>SCRIPT_path/Snakes/Snakefile</p></li>
+</ul>
+<p>This file must be edited and the path to the config yaml file, the OUTPUT_path
+and the SCRIPT_path must be inserted.</p>
+<p>With that, the Snakefile is configured to run the analyses again. Change the
+directory into the SCRIPT_path/Snakes/ path and run for example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>snakemake<span class="w"> </span>--cores<span class="w"> </span><span class="m">7</span>
+</pre></div>
+</div>
+<p>This would use 7 cores of your machine if available and make use of
+parallelisation of steps where it is feasible.</p>
+</section>
+</section>
+<section id="direct-function-calling-via-terminal-call">
+<h2>Direct function calling via terminal call:<a class="headerlink" href="#direct-function-calling-via-terminal-call" title="Link to this heading">¶</a></h2>
+<p>The possibility to call some functions directly through the terminal is
+necessary for the Snakemake functionality, but not an actual use case, besides
+of function 11.</p>
+<p>The -D option is an alias to call function 1 to 6, the -A option is an alias to
+call function 7 to 15.</p>
+<p>If you want to add a new threshold for your Kaplan Meier plots, this could be
+done with function 11. The config yaml file is updated automatically, s.t. this
+would be included to your fixed workflow.</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">-f 1 meta_filter()</span></p></li>
+<li><p><span class="xref std std-ref">-f 2 download_clinical_tables()</span></p></li>
+<li><p><span class="xref std std-ref">-f 3 download_data_files()</span></p></li>
+<li><p><span class="xref std std-ref">-f 4 merging_meta_infos()</span></p></li>
+<li><p><span class="xref std std-ref">-f 5 create_summary_table()</span></p></li>
+<li><p><span class="xref std std-ref">-f 6 correct_drugs()</span></p></li>
+<li><p><span class="xref std std-ref">-f 7 provide_DESeq2_table()</span></p></li>
+<li><p><span class="xref std std-ref">-f 8 create_statistics_from_DESeq2_tables()</span></p></li>
+<li><p><span class="xref std std-ref">-f 9 provide_DESeq2_table()</span></p></li>
+<li><p><span class="xref std std-ref">-f 10 create_statistics_from_DESeq2_tables()</span></p></li>
+<li><p><span class="xref std std-ref">-f 11 lifelines_ENSG()</span></p></li>
+<li><p><span class="xref std std-ref">-f 12 drug_frequency()</span></p></li>
+<li><p><span class="xref std std-ref">-f 13 create_report_pdf()</span></p></li>
+<li><p><span class="xref std std-ref">-f 14 drug_frequency_all_single_projects()</span></p></li>
+<li><p><span class="xref std std-ref">-f 15 create_snake_config()</span></p></li>
+</ul>
+<p>..The DESeq2 pipeline specific threshold parameter:
+..————————————————-
+..With the -T parameter the gene specific Kaplan-Meyer plots can be
+..adjusted. The plots are created for both, the 10 most differentially expressed
+..genes in the alive cases and in the dead cases. Based on the normalized
+..countmatrix given by DESeq2, the median of the count values serve as pivot
+..element for the division of cases in the groups UP and DOWN and are plotted
+..accordingly to those groupings.
+..It was desired to achieve a better separation of the graphs, with help
+..of the threshold parameter. Therefore, counts from cases lying to close to the
+..median shall be omitted. The threshold determines the percentage
+..depending on the pivot element, in what range around of it counts of respective
+..cases shall be omitted, invoking cases to the plot which show a more clear
+..expression level either above or below the median.</p>
+</section>
+<section id="documentation-of-modules-classes-and-functions">
+<h2>Documentation of modules, classes and functions:<a class="headerlink" href="#documentation-of-modules-classes-and-functions" title="Link to this heading">¶</a></h2>
+</section>
+<section id="tables">
+<h2>Tables<a class="headerlink" href="#tables" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="xref std std-ref">summary_DF_example</span></p></li>
+<li><p><span class="xref std std-ref">multiindex_table</span></p></li>
+<li><p><span class="xref std std-ref">ENSG_table</span></p></li>
+<li><p><span class="xref std std-ref">lifeline_table</span></p></li>
+</ul>
+</section>
+<section id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Documentation: TreMSuc for TCGA</a><ul>
+<li><a class="reference internal" href="#build-and-activate-the-provided-conda-env">Build and activate the provided conda env:</a></li>
+<li><a class="reference internal" href="#short-tutorial">Short tutorial:</a><ul>
+<li><a class="reference internal" href="#performing-an-example-analysis">Performing an example analysis:</a></li>
+<li><a class="reference internal" href="#recreate-the-performed-analysis">Recreate the performed analysis:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#direct-function-calling-via-terminal-call">Direct function calling via terminal call:</a></li>
+<li><a class="reference internal" href="#documentation-of-modules-classes-and-functions">Documentation of modules, classes and functions:</a></li>
+<li><a class="reference internal" href="#tables">Tables</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index_back.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">TreMSuc 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Documentation: TreMSuc for TCGA</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Gabor Balogh.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

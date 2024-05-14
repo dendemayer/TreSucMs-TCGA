@@ -1,0 +1,99 @@
+Documentation: TreMSuc for TCGA
+***************************************
+
+"TreMSuc" a tool to choose, harvest and analyse expression data of
+the TCGA-projects with help of the DESeq2 R package
+
+
+Build and activate the provided conda env:
+------------------------------------------
+
+.. code-block:: bash
+
+    $ conda env create -f deseq_env.yaml
+    $ conda activate deseq_pipeline
+
+call the script without any options to enter the interactive mode and set
+each option step by step:
+
+.. code-block:: bash
+
+    $ python main_deseq.py
+
+print help page:
+
+.. code-block:: bash
+
+    $ python main_deseq.py --help
+
+Usage: main_deseq.py [OPTIONS]
+
+Options:
+  -D, --download_data      perform download and merging steps, without the
+                           DESeq2 analysis
+
+  -A, --analyse_data       perform the DESeq2 analysis (the download step must
+                           be completed in prior for your chosen projects)
+
+  -o, --out_path TEXT      The Path, where all results are saved to.
+
+  -p, --project TEXT       TCGA project to be applied. Any TCGA project can be
+                           choosen, like: -p TCGA-CESC -p TCGA-HNSC ...
+
+  -d, --drugs TEXT         drug(s), like: -d drug1 -d drug2 or
+                           drugcombination(s), like: -d drug1,drug2
+
+  -f, --function INTEGER   running functions separately, important for the
+                           snakemake functionality. Look up the documentation
+                           or the man page for detailed description  of each
+                           function
+  -t, --threshold INTEGER  threshold for a higher division of the kaplan meier
+                           plots  [default: 0]
+  -s, --snakerun           needed for the snakemake functionality, NOT to be
+                           set manually by the user
+  -c, --cutoff FLOAT       cutoff parameter: convert dead cases to alive cases
+                           if they outlive the cutoff parameter (in years) no
+                           conversion performed if default (or no) value
+                           applied  [default: 0]
+
+  -v, --version            printing out version information: Version 1.0
+  --help                   Show this message and exit.
+
+
+Documentation of modules, classes and functions:
+------------------------------------------------
+
+.. automodule:: main_metilene
+    :members: call_with_options
+
+    .. automodule:: create_matrix_new
+    :members:
+
+    .. automodule:: choose_therapy
+    :members:
+
+
+    .. automodule:: lifeline_summary_test_2
+    :members:
+
+    .. automodule:: walk_all_drug_frequency
+    :members:
+
+    .. automodule:: create_report
+    :members:
+
+..Tables
+..------
+
+..* :ref:`summary_DF_example`
+..* :ref:`multiindex_table`
+..* :ref:`ENSG_table`
+..* :ref:`lifeline_table`
+
+..Indices and tables
+..------------------
+
+..* :ref:`genindex`
+..* :ref:`modindex`
+..* :ref:`search`
+
