@@ -1,0 +1,2 @@
+suppl/report.html filter=lfs diff=lfs merge=lfs -text
+suppl/suppl_with_report.tar.gz filter=lfs diff=lfs merge=lfs -text
