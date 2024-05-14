@@ -11,9 +11,9 @@ of the TCGA-projects for revealing Biomarkers which indicate treatment success.
 Example report:
 ---------------
 
-An example report can be inspected here_.
+An example report can be downloaded here_.
 
-.. _here: report.html
+.. _here: https://media.githubusercontent.com/media/dendemayer/TreSucMs-TCGA/main/suppl/report.html?download=true
 
 Installing from github.com:
 ------------------------------------------
@@ -50,7 +50,7 @@ Usage of the interactive mode:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following example composition of projects, drugs and parameters creates the
-example configuration given in TODO.
+configuration given in the example report here_.
 
 The same configuration can be applied by issuing the following command (the
 number of cores hereby can be adjusted and would also give the same results):

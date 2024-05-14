@@ -1,8 +1,9 @@
 # TreSucMs README:  
 ## got to the documentation:  
 [Documentation](https://dendemayer.github.io/TreSucMs-TCGA/#)  
-## see an example Report html file:  
-[example Report](suppl/report.html)
+## an example Report html file can be downloaded here:  
+[example Report download link](https://media.githubusercontent.com/media/dendemayer/TreSucMs-TCGA/main/suppl/report.html?download=true).  
+This report file has a size of about 300 MB.
 
 # installing from github.com:
 ```bash
