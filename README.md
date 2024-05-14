@@ -1,3 +1,9 @@
+# TreSucMs README:  
+## got to the documentation:  
+[Documentation](https://dendemayer.github.io/TreSucMs-TCGA/#)  
+## see an example Report html file:  
+[example Report](suppl/report.html)
+
 # installing from github.com:
 ```bash
 $ git clone https://github.com/dendemayer/TreSucMs-TCGA.git
