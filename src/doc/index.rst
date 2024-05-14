@@ -8,6 +8,12 @@ Documentation: TreSucMs for TCGA
 "TreSucMs" a tool to choose, harvest and analyse expression and methylation data
 of the TCGA-projects for revealing Biomarkers which indicate treatment success.
 
+Example report:
+---------------
+
+An example report can be inspected here_.
+
+.. _here: report.html
 
 Installing from github.com:
 ------------------------------------------
