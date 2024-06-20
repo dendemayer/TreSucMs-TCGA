@@ -26,7 +26,7 @@ HOME = os.getenv('HOME')
 
 
 @click.command()
-@click.option('--out_path', '-o', default=os.path.join(HOME, 'TreSucMs'),
+@click.option('--out_path', '-o', default=os.path.join(HOME, 'TREMSUCS'),
               show_default=True,
               help='path to save the result files')
 @click.option('--project', '-p', default=[], multiple=True,
@@ -71,7 +71,7 @@ HOME = os.getenv('HOME')
 def call_with_options(out_path, project, drugs, cores, execute, cutoff,
                       threshold, dryrun, report, download, unlock):
     '''
-    "TreSucMs" a tool to choose, harvest and analyse expression and methylation data
+    "TREMSUCS" a tool to choose, harvest and analyse expression and methylation data
     of the TCGA-projects for revealing Biomarkers which indicate threapy
     specific treatment success predictions.
 
@@ -113,7 +113,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # cores, output path, pipelines to execute
     if interacitve_proj and interacitve_drugs:
         # just ask those parameters wich deviate from the default value:
-        if OUTPUT_PATH == os.path.join(HOME, 'TreSucMs'):
+        if OUTPUT_PATH == os.path.join(HOME, 'TREMSUCS'):
             OUTPUT_PATH = choose_therapy.update_parameters(OUTPUT_PATH, 'OUTPUT_PATH')
         if cores == 1:
             cores = choose_therapy.update_parameters(cores, 'cores')
@@ -151,7 +151,7 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     print(f'cutoff:\t\t\t{cutoffs}')
     print(f'threshold:\t\t{threshold}')
     print('the command to issue this analysis would be:\n')
-    print(f'TreSucMs {"-p " + " -p ".join(PROJECT)} {"-d " + " -d ".join(DRUGS)} {"-C " + "-C ".join([str(i) + " " for i in cutoffs])}{"-t " + "-t ".join([str(i) + " " for i in threshold])}-o {OUTPUT_PATH} -c {cores}\n')
+    print(f'TREMSUCS {"-p " + " -p ".join(PROJECT)} {"-d " + " -d ".join(DRUGS)} {"-C " + "-C ".join([str(i) + " " for i in cutoffs])}{"-t " + "-t ".join([str(i) + " " for i in threshold])}-o {OUTPUT_PATH} -c {cores}\n')
 
     # if the parameters were set by interactive mode, ask here one last time if
     # the analysis shall be started:
@@ -368,15 +368,15 @@ def call_with_options(out_path, project, drugs, cores, execute, cutoff,
     # also with dryrun set, the report file would be created, catch that
     # beforehand:
     # TODO adjust the
-    # /homes/biertruck/gabor/phd/test_git_doc/TreSucMs/src/shared/report_src/workflow.rst
+    # /homes/biertruck/gabor/phd/test_git_doc/TREMSUCS/src/shared/report_src/workflow.rst
     # s.t. the pipeline call is included there:
     # before creating the report, adjust the rst file, path is directly given
     # within the shared Snakefile
     rst_file = os.path.join(os.path.dirname(__file__), os.path.pardir, 'report_src', 'workflow.rst' )
     with open(rst_file, 'w') as f:
-        f.write('| TreSucMs TCGA final report\n')
+        f.write('| TREMSUCS TCGA final report\n')
         f.write('| Issued CLI call:\n\n')
-        temp_str = f'| TreSucMs {"-p " + " -p ".join(PROJECT)}\n| {"-d " + " -d ".join(DRUGS)}\n| {"-C " + "-C ".join([str(i) + " " for i in cutoffs])}\n| {"-t " + "-t ".join([str(i) + " " for i in threshold])}\n| -o {OUTPUT_PATH}\n| -c {cores}'
+        temp_str = f'| TREMSUCS {"-p " + " -p ".join(PROJECT)}\n| {"-d " + " -d ".join(DRUGS)}\n| {"-C " + "-C ".join([str(i) + " " for i in cutoffs])}\n| {"-t " + "-t ".join([str(i) + " " for i in threshold])}\n| -o {OUTPUT_PATH}\n| -c {cores}'
         f.write(temp_str)
 
     if not dryrun:

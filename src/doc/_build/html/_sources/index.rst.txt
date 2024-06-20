@@ -2,10 +2,10 @@
    :maxdepth: 2
    :caption: Contents:
 
-Documentation: TreSucMs for TCGA
+Documentation: TREMSUCS for TCGA
 ***************************************
 
-"TreSucMs" a tool to choose, harvest and analyse expression and methylation data
+"TREMSUCS" a tool to choose, harvest and analyse expression and methylation data
 of the TCGA-projects for revealing Biomarkers which indicate treatment success.
 
 Example report:
@@ -14,15 +14,15 @@ Example report:
 An example report can be downloaded here_.
 Be aware that this report has a size of about 300 MB.
 
-.. _here: https://media.githubusercontent.com/media/dendemayer/TreSucMs-TCGA/main/suppl/report.html?download=true
+.. _here: https://media.githubusercontent.com/media/dendemayer/TREMSUCS-TCGA/main/suppl/report.html?download=true
 
 Installing from github.com:
 ------------------------------------------
 
 .. code-block:: bash
 
-    $ git clone https://github.com/dendemayer/TreSucMs-TCGA.git
-    $ cd TreSucMs-TCGA
+    $ git clone https://github.com/dendemayer/TREMSUCS-TCGA.git
+    $ cd TREMSUCS-TCGA
     $ pip install .
 
 To start the analysis with help of the interactive mode, call the pipeline
@@ -30,20 +30,20 @@ without any argument:
 
 .. code-block:: bash
 
-   $ TreSucMs
+   $ TREMSUCS
 
 Calling the help or the manual page: 
 
 .. code-block:: bash
 
-   $ TreSucMs --help
-   $ man TreSucMs
+   $ TREMSUCS --help
+   $ man TREMSUCS
 
 Help Page of the pipeline:
 --------------------------
 
 .. click:: shared.modules.main:call_with_options
-   :prog: TreSucMs
+   :prog: TREMSUCS
 
 Short tutorial:
 ---------------
@@ -58,18 +58,18 @@ number of cores hereby can be adjusted and would also give the same results):
 
 .. code-block:: bash
 
-   $ TreSucMs -p TCGA-CESC -p TCGA-HNSC -p TCGA-LUSC -d cisplatin -d carboplatin,paclitaxel \
-   -d carboplatin -o /scr/TreSucMs_out -c 40 -t 5 -t 10 -t 20 -C 5 -C 8
+   $ TREMSUCS -p TCGA-CESC -p TCGA-HNSC -p TCGA-LUSC -d cisplatin -d carboplatin,paclitaxel \
+   -d carboplatin -o /scr/TREMSUCS_out -c 40 -t 5 -t 10 -t 20 -C 5 -C 8
 
 Calling the pipeline without any argument starts the interactive mode:
 
 .. code-block:: text
 
 
-   $ TreSucMs
+   $ TREMSUCS
 
-    OUTPUT_PATH:             /homes/biertruck/gabor/TreSucMs
-    SCRIPT_PATH:             /homes/biertruck/gabor/phd/test_git_doc/TreSucMs/src/shared/modules
+    OUTPUT_PATH:             /homes/biertruck/gabor/TREMSUCS
+    SCRIPT_PATH:             /homes/biertruck/gabor/phd/test_git_doc/TREMSUCS/src/shared/modules
     PIPELINES executed:      ['DESeq2', 'metilene']
 
     which projects do you want to include in your analysis:
@@ -163,7 +163,7 @@ default OUTPUT_PATH can be confirmed or replaced:
 .. code-block:: text
     
     do you want to keep the default OUTPUT_PATH of:                                  
-    /homes/biertruck/gabor/TreSucMs                                                  
+    /homes/biertruck/gabor/TREMSUCS                                                  
     if so, press ENTER, if not, enter your custom output path:                       
                                                                                  
 In this example, we confirm the suggested OUTPUT_PATH and are asked to confirm
@@ -219,7 +219,7 @@ set with that and are finally listed before the whole approach is started:
 .. code-block:: text
                                                                                  
 
-    OUTPUT_PATH:             /homes/biertruck/gabor/TreSucMs                         
+    OUTPUT_PATH:             /homes/biertruck/gabor/TREMSUCS                         
     PROJECT:                 ['TCGA-CESC', 'TCGA-HNSC', 'TCGA-LUSC']                 
     DRUGS:                   ['carboplatin', 'carboplatin,paclitaxel', 'cisplatin']  
     pipelines executed:      ['DESeq2', 'metilene']                                  

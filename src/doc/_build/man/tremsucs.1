@@ -27,24 +27,25 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "TRESUCMS" "1" "Apr 10, 2024" "" "TreSucMs"
+.TH "TREMSUCS" "1" "Jun 20, 2024" "" "TREMSUCS"
 .SH NAME
-tresucms \- TreSucMs 1.0
+tremsucs \- TREMSUCS 1.0
 .sp
-“TreSucMs” a tool to choose, harvest and analyse expression and methylation data
-of the TCGA\-projects for revealing Biomarkers which indicate treatment success
-predictions.
+“TREMSUCS” a tool to choose, harvest and analyse expression and methylation data
+of the TCGA\-projects for revealing Biomarkers which indicate treatment success.
+.SH EXAMPLE REPORT:
+.sp
+An example report can be downloaded \X'tty: link https://media.githubusercontent.com/media/dendemayer/TREMSUCS-TCGA/main/suppl/report.html?download=true'\fI\%here\fP\X'tty: link'\&.
+Be aware that this report has a size of about 300 MB.
 .SH INSTALLING FROM GITHUB.COM:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
-$ git clone https://github.com/dendemayer/TreSucMs\-TCGA.git
-$ cd TreSucMs\-TCGA
+.EX
+$ git clone https://github.com/dendemayer/TREMSUCS\-TCGA.git
+$ cd TREMSUCS\-TCGA
 $ pip install .
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -53,11 +54,9 @@ without any argument:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
-$ TreSucMs
-.ft P
-.fi
+.EX
+$ TREMSUCS
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -65,18 +64,16 @@ Calling the help or the manual page:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
-$ TreSucMs \-\-help
-$ man TreSucMs
-.ft P
-.fi
+.EX
+$ TREMSUCS \-\-help
+$ man TREMSUCS
+.EE
 .UNINDENT
 .UNINDENT
 .SH HELP PAGE OF THE PIPELINE:
-.SS TreSucMs
+.SS TREMSUCS
 .sp
-“TreSucMs” a tool to choose, harvest and analyse expression and methylation data
+“TREMSUCS” a tool to choose, harvest and analyse expression and methylation data
 of the TCGA\-projects for revealing Biomarkers which indicate threapy
 specific treatment success predictions.
 .sp
@@ -85,11 +82,9 @@ help setting all needed parameters for the analysis.
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
-TreSucMs [OPTIONS]
-.ft P
-.fi
+.EX
+TREMSUCS [OPTIONS]
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -101,7 +96,7 @@ path to save the result files
 .INDENT 7.0
 .TP
 .B Default
-\fB/homes/biertruck/gabor/TreSucMs\fP
+\fB\(aq/home/dende/TREMSUCS\(aq\fP
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -151,7 +146,7 @@ choose which pipeline shall be executed
 .INDENT 7.0
 .TP
 .B Default
-\fBDESeq2, metilene\fP
+\fB\(aqDESeq2\(aq, \(aqmetilene\(aq\fP
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -197,19 +192,17 @@ printing out version information: Version 1.0
 .SS Usage of the interactive mode:
 .sp
 The following example composition of projects, drugs and parameters creates the
-example configuration given in TODO.
+configuration given in the example report \X'tty: link https://media.githubusercontent.com/media/dendemayer/TREMSUCS-TCGA/main/suppl/report.html?download=true'\fI\%here\fP\X'tty: link'\&.
 .sp
 The same configuration can be applied by issuing the following command (the
 number of cores hereby can be adjusted and would also give the same results):
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
-$ TreSucMs \-p TCGA\-CESC \-p TCGA\-HNSC \-p TCGA\-LUSC \-d cisplatin \-d carboplatin,paclitaxel \e
-\-d carboplatin \-o /scr/TreSucMs_out \-c 40 \-t 5 \-t 10 \-t 20 \-C 5 \-C 8
-.ft P
-.fi
+.EX
+$ TREMSUCS \-p TCGA\-CESC \-p TCGA\-HNSC \-p TCGA\-LUSC \-d cisplatin \-d carboplatin,paclitaxel \e
+\-d carboplatin \-o /scr/TREMSUCS_out \-c 40 \-t 5 \-t 10 \-t 20 \-C 5 \-C 8
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -217,12 +210,11 @@ Calling the pipeline without any argument starts the interactive mode:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
-$ TreSucMs
+.EX
+$ TREMSUCS
 
- OUTPUT_PATH:             /homes/biertruck/gabor/TreSucMs
- SCRIPT_PATH:             /homes/biertruck/gabor/phd/test_git_doc/TreSucMs/src/shared/modules
+ OUTPUT_PATH:             /homes/biertruck/gabor/TREMSUCS
+ SCRIPT_PATH:             /homes/biertruck/gabor/phd/test_git_doc/TREMSUCS/src/shared/modules
  PIPELINES executed:      [\(aqDESeq2\(aq, \(aqmetilene\(aq]
 
  which projects do you want to include in your analysis:
@@ -260,8 +252,7 @@ $ TreSucMs
  30:     TCGA\-UCS            uterine carcinoma
  31:     TCGA\-CHOL           cholangiocarcinoma
  enter your choices one by one, when you are done, simply press \(dqEnter\(dq:
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -275,8 +266,7 @@ afterwards the following prompt is given:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 you choose:
 PROJECTS:        [\(aqTCGA\-CESC\(aq, \(aqTCGA\-HNSC\(aq, \(aqTCGA\-LUSC\(aq]
 
@@ -311,8 +301,7 @@ which therapy approach do you want to include in your analysis:
 26: gemcitabine                              TCGA\-CESC: 0 TCGA\-HNSC: 0 TCGA\-LUSC: 2
 
 enter your choices one by one, when you are done, simply press \(dqEnter\(dq:
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -324,13 +313,11 @@ default OUTPUT_PATH can be confirmed or replaced:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 do you want to keep the default OUTPUT_PATH of:
-/homes/biertruck/gabor/TreSucMs
+/homes/biertruck/gabor/TREMSUCS
 if so, press ENTER, if not, enter your custom output path:
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -341,13 +328,11 @@ or set the number of cores which shall be invoked into the analyses:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 do you want to keep the default number of cores invoked of 1?
 if so, press ENTER, if not, enter the number of cores:
 40
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -357,14 +342,12 @@ produced:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 which pipeline do you want to include into your analysis
 press ENTER if DESeq2 and metilene (default) or
 1 for DESeq2 or
 2 for metilene
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -373,15 +356,13 @@ we want to add those at all:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 do you want to add one or multiple cutoffs?
 it is recommend to choose cutoff values between 5 and 10 years
 if not, just press ENTER, if so enter the coutoffs one by one:
 5
 8
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -390,16 +371,14 @@ requested:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 do you want to add one or multiple thresholds?
 it is recommend to choose threshold values which do not exceed a value of 50
 if not, just press ENTER, if so enter the thresholds one by one:
 5
 10
 20
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -408,9 +387,8 @@ set with that and are finally listed before the whole approach is started:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
-OUTPUT_PATH:             /homes/biertruck/gabor/TreSucMs
+.EX
+OUTPUT_PATH:             /homes/biertruck/gabor/TREMSUCS
 PROJECT:                 [\(aqTCGA\-CESC\(aq, \(aqTCGA\-HNSC\(aq, \(aqTCGA\-LUSC\(aq]
 DRUGS:                   [\(aqcarboplatin\(aq, \(aqcarboplatin,paclitaxel\(aq, \(aqcisplatin\(aq]
 pipelines executed:      [\(aqDESeq2\(aq, \(aqmetilene\(aq]
@@ -418,187 +396,11 @@ cores:                  40
 cutoff:                 [0, 5, 8]
 threshold:              [0, 5, 10, 20]
 press ENTER to start or q to quit:
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
 If something went wrong, you can quit now and start over, or of course start the analysis.
-.SH DOCUMENTATION OF MODULES, CLASSES AND FUNCTIONS:
-.INDENT 0.0
-.TP
-.B shared.modules.choose_therapy.Choose_drugs(PROJECTS)
-Choose_drugs.
-.INDENT 7.0
-.TP
-.B Parameters
-.INDENT 7.0
-.IP \(bu 2
-\fBSCRIPT_PATH\fP (\fIstr\fP) – path to the DESeq2_pipeline repo
-.IP \(bu 2
-\fBPROJECTS\fP (\fIlist\fP\fI of \fP\fIstr\fP) – list of projects chosen
-.UNINDENT
-.UNINDENT
-.sp
-interactively requesting the drugs which shall be applied to the deseq
-approach
-.UNINDENT
-.INDENT 0.0
-.TP
-.B shared.modules.choose_therapy.Choose_project()
-Choose_project.
-.sp
-interactively requesting the Projects that shall be applied to the approach
-.UNINDENT
-.INDENT 0.0
-.TP
-.B shared.modules.choose_therapy.update_parameters(parameter, parameter_str)
-update_parameters.
-.INDENT 7.0
-.TP
-.B Parameters
-.INDENT 7.0
-.IP \(bu 2
-\fBparameter\fP (\fIint\fP) – depending on the datatype, the parameter which shall be assign is requested in interactive mode
-.IP \(bu 2
-\fBparameter\fP – default OUTPUT_PATH can be confirmed or changed in interactive mode
-.IP \(bu 2
-\fBparameter\fP – cores can be changed in interactive mode
-.IP \(bu 2
-\fBparameter_str\fP (\fIstr\fP) – description of the given parameter
-.UNINDENT
-.UNINDENT
-.UNINDENT
-.INDENT 0.0
-.TP
-.B shared.modules.download_with_api.download_aux_files(OUTPUT_PATH, PROJECT, config_file_shared)
-download_aux_files.
-.INDENT 7.0
-.TP
-.B Parameters
-.INDENT 7.0
-.IP \(bu 2
-\fBOUTPUT_PATH\fP (\fIstr\fP) – path for metilene pipeline outputs
-.IP \(bu 2
-\fBPROJECT\fP (\fIlist\fP\fI of \fP\fIstr\fP) – list of projects chosen
-.IP \(bu 2
-\fBconfig_file_shared\fP (\fIstr\fP) – 
-.UNINDENT
-.UNINDENT
-.sp
-the manifest file is now downloaded vie Snakemake, provide
-create the aux filenames which should be requested to the Snakefile
-with help of the previously loaded  manifest file \-> this manifest file is
-the input for this rule! and must be already loaded beforehand!
-.sp
-with the UUID the clinical tables will be downloaded in the
-OUTPUT_PATH/PROJECT:
-.INDENT 7.0
-.INDENT 3.5
-.INDENT 0.0
-.IP \(bu 2
-nationwidechildrens.org_clinical_patient_****.txt
-.IP \(bu 2
-nationwidechildrens.org_clinical_drug_****.txt
-.UNINDENT
-.UNINDENT
-.UNINDENT
-.UNINDENT
-.INDENT 0.0
-.TP
-.B shared.modules.download_with_api.download_data_files(OUTPUT_PATH, PROJECT, config_file_shared, file_type)
-create the data filenames which should be requested to the Snakefile
-with help of the previously loaded  manifest file \-> this manifest file is
-the input for this rule! and must be already loaded beforehand!
-.INDENT 7.0
-.TP
-.B Param
-OUTPUT_PATH: path for metilene pipeline outputs
-.TP
-.B Type
-OUTPUT_PATH: str
-.TP
-.B Param
-PROJECT: list of projects chosen
-.TP
-.B Type
-PROJECT: list of str
-.UNINDENT
-.sp
-with the UUID the clinical tables will be downloaded in the
-OUTPUT_PATH/PROJECT:
-.INDENT 7.0
-.INDENT 3.5
-.INDENT 0.0
-.IP \(bu 2
-nationwidechildrens.org_clinical_patient_****.txt
-.IP \(bu 2
-nationwidechildrens.org_clinical_drug_****.txt
-.UNINDENT
-.UNINDENT
-.UNINDENT
-.UNINDENT
-.INDENT 0.0
-.TP
-.B shared.modules.download_with_api.download_help_files(OUTPUT_PATH, config_file_shared)
-download_help_files.
-.INDENT 7.0
-.TP
-.B Parameters
-.INDENT 7.0
-.IP \(bu 2
-\fBOUTPUT_PATH\fP (\fIstr\fP) – 
-.IP \(bu 2
-\fBconfig_file_shared\fP (\fIstr\fP) – 
-.UNINDENT
-.UNINDENT
-.sp
-creating the file names which should be requested through Snakemake
-downloading manifest file and the gtf annotation file from TCGA:
-we are using a shared Snakefile, but refere here to the metilene specific
-Snakefile, which again refers to the shared Snakefile via include
-statement
-this fct returns the gtf and manifest filenames provided in the shared
-config the must not yet be present yet, the files are downloaded then via
-shared Snakefile: rule download_helpfiles:
-.UNINDENT
-.INDENT 0.0
-.TP
-.B tcga_metilene.modules.main_metilene.entry_fct(OUTPUT_PATH, PROJECT, DRUGS, Snakemake_all_files, cutoffs, threshold, cores, pipeline, config_file_shared, config, dryrun, cutoffs_str, report)
-entry_fct of metilene part.
-.INDENT 7.0
-.TP
-.B Parameters
-.INDENT 7.0
-.IP \(bu 2
-\fBOUTPUT_PATH\fP (\fIstr\fP) – description of the obvious
-.IP \(bu 2
-\fBPROJECT\fP (\fIlist\fP\fI of \fP\fIstr\fP) – 
-.IP \(bu 2
-\fBDRUGS\fP (\fIlist\fP\fI of \fP\fIstr\fP) – 
-.IP \(bu 2
-\fBSnakemake_all_files\fP (\fIlist\fP\fI of \fP\fIstr\fP) – 
-.IP \(bu 2
-\fBcutoffs\fP (\fIlist\fP\fI of \fP\fIstr\fP) – 
-.IP \(bu 2
-\fBthreshold\fP (\fIlist\fP\fI of \fP\fIstr\fP) – 
-.IP \(bu 2
-\fBcores\fP (\fIint\fP) – 
-.IP \(bu 2
-\fBpipeline\fP (\fIstr\fP) – 
-.IP \(bu 2
-\fBconfig_file_shared\fP (\fIstr\fP) – 
-.IP \(bu 2
-\fBconfig\fP (\fIstr\fP) – 
-.IP \(bu 2
-\fBdryrun\fP (\fIboolean\fP) – 
-.IP \(bu 2
-\fBcutoffs_str\fP (\fIstr\fP) – 
-.IP \(bu 2
-\fBreport\fP (\fIstr\fP) – 
-.UNINDENT
-.UNINDENT
-.UNINDENT
 .SH AUTHOR
 Gabor Balogh
 .SH COPYRIGHT

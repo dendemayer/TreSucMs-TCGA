@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Documentation: TreSucMs for TCGA &#8212; TreSucMs 1.0 documentation</title>
+    <title>Documentation: TREMSUCS for TCGA &#8212; TREMSUCS 1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
     
@@ -22,8 +22,8 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="#">TreSucMs 1.0 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Documentation: TreSucMs for TCGA</a></li> 
+        <li class="nav-item nav-item-0"><a href="#">TREMSUCS 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Documentation: TREMSUCS for TCGA</a></li> 
       </ul>
     </div>  
 
@@ -34,72 +34,72 @@
             
   <div class="toctree-wrapper compound">
 </div>
-<section id="documentation-tresucms-for-tcga">
-<h1>Documentation: TreSucMs for TCGA<a class="headerlink" href="#documentation-tresucms-for-tcga" title="Link to this heading">¶</a></h1>
-<p>“TreSucMs” a tool to choose, harvest and analyse expression and methylation data
+<section id="documentation-tremsucs-for-tcga">
+<h1>Documentation: TREMSUCS for TCGA<a class="headerlink" href="#documentation-tremsucs-for-tcga" title="Link to this heading">¶</a></h1>
+<p>“TREMSUCS” a tool to choose, harvest and analyse expression and methylation data
 of the TCGA-projects for revealing Biomarkers which indicate treatment success.</p>
 <section id="example-report">
 <h2>Example report:<a class="headerlink" href="#example-report" title="Link to this heading">¶</a></h2>
-<p>An example report can be downloaded <a class="reference external" href="https://media.githubusercontent.com/media/dendemayer/TreSucMs-TCGA/main/suppl/report.html?download=true">here</a>.
+<p>An example report can be downloaded <a class="reference external" href="https://media.githubusercontent.com/media/dendemayer/TREMSUCS-TCGA/main/suppl/report.html?download=true">here</a>.
 Be aware that this report has a size of about 300 MB.</p>
 </section>
 <section id="installing-from-github-com">
 <h2>Installing from github.com:<a class="headerlink" href="#installing-from-github-com" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dendemayer/TreSucMs-TCGA.git
-$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>TreSucMs-TCGA
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dendemayer/TREMSUCS-TCGA.git
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>TREMSUCS-TCGA
 $<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
 </div>
 <p>To start the analysis with help of the interactive mode, call the pipeline
 without any argument:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>TreSucMs
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>TREMSUCS
 </pre></div>
 </div>
 <p>Calling the help or the manual page:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>TreSucMs<span class="w"> </span>--help
-$<span class="w"> </span>man<span class="w"> </span>TreSucMs
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>TREMSUCS<span class="w"> </span>--help
+$<span class="w"> </span>man<span class="w"> </span>TREMSUCS
 </pre></div>
 </div>
 </section>
 <section id="help-page-of-the-pipeline">
 <h2>Help Page of the pipeline:<a class="headerlink" href="#help-page-of-the-pipeline" title="Link to this heading">¶</a></h2>
-<section id="tresucms">
-<h3>TreSucMs<a class="headerlink" href="#tresucms" title="Link to this heading">¶</a></h3>
-<p>“TreSucMs” a tool to choose, harvest and analyse expression and methylation data
+<section id="tremsucs">
+<h3>TREMSUCS<a class="headerlink" href="#tremsucs" title="Link to this heading">¶</a></h3>
+<p>“TREMSUCS” a tool to choose, harvest and analyse expression and methylation data
 of the TCGA-projects for revealing Biomarkers which indicate threapy
 specific treatment success predictions.</p>
 <p>Calling the pipeline without any argument starts the interactive mode to
 help setting all needed parameters for the analysis.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>TreSucMs<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>TREMSUCS<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </pre></div>
 </div>
 <p class="rubric">Options</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-TreSucMs-o">
-<span id="cmdoption-TreSucMs-out_path"></span><span class="sig-name descname"><span class="pre">-o</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--out_path</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;out_path&gt;</span></span><a class="headerlink" href="#cmdoption-TreSucMs-o" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-TREMSUCS-o">
+<span id="cmdoption-TREMSUCS-out_path"></span><span class="sig-name descname"><span class="pre">-o</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--out_path</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;out_path&gt;</span></span><a class="headerlink" href="#cmdoption-TREMSUCS-o" title="Link to this definition">¶</a></dt>
 <dd><p>path to save the result files</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">/home/dende/TreSucMs</span></code></p>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">'/home/dende/TREMSUCS'</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-TreSucMs-p">
-<span id="cmdoption-TreSucMs-project"></span><span class="sig-name descname"><span class="pre">-p</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--project</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;project&gt;</span></span><a class="headerlink" href="#cmdoption-TreSucMs-p" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-TREMSUCS-p">
+<span id="cmdoption-TREMSUCS-project"></span><span class="sig-name descname"><span class="pre">-p</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--project</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;project&gt;</span></span><a class="headerlink" href="#cmdoption-TREMSUCS-p" title="Link to this definition">¶</a></dt>
 <dd><p>TCGA project(s) to be applied. Any TCGA project can be chosen, like: -p TCGA-CESC -p TCGA-HNSC …</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-TreSucMs-d">
-<span id="cmdoption-TreSucMs-drugs"></span><span class="sig-name descname"><span class="pre">-d</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--drugs</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;drugs&gt;</span></span><a class="headerlink" href="#cmdoption-TreSucMs-d" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-TREMSUCS-d">
+<span id="cmdoption-TREMSUCS-drugs"></span><span class="sig-name descname"><span class="pre">-d</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--drugs</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;drugs&gt;</span></span><a class="headerlink" href="#cmdoption-TREMSUCS-d" title="Link to this definition">¶</a></dt>
 <dd><p>drug(s), like: -d drug1 -d drug2 or drugcombination(s), like: -d drug1,drug2</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-TreSucMs-c">
-<span id="cmdoption-TreSucMs-cores"></span><span class="sig-name descname"><span class="pre">-c</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--cores</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;cores&gt;</span></span><a class="headerlink" href="#cmdoption-TreSucMs-c" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-TREMSUCS-c">
+<span id="cmdoption-TREMSUCS-cores"></span><span class="sig-name descname"><span class="pre">-c</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--cores</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;cores&gt;</span></span><a class="headerlink" href="#cmdoption-TREMSUCS-c" title="Link to this definition">¶</a></dt>
 <dd><p>number of cores provided to snakemake</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
@@ -109,8 +109,8 @@ help setting all needed parameters for the analysis.</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-TreSucMs-C">
-<span id="cmdoption-TreSucMs-cutoff"></span><span class="sig-name descname"><span class="pre">-C</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--cutoff</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;cutoff&gt;</span></span><a class="headerlink" href="#cmdoption-TreSucMs-C" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-TREMSUCS-C">
+<span id="cmdoption-TREMSUCS-cutoff"></span><span class="sig-name descname"><span class="pre">-C</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--cutoff</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;cutoff&gt;</span></span><a class="headerlink" href="#cmdoption-TREMSUCS-C" title="Link to this definition">¶</a></dt>
 <dd><p>Cut-off parameter</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
@@ -120,8 +120,8 @@ help setting all needed parameters for the analysis.</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-TreSucMs-t">
-<span id="cmdoption-TreSucMs-threshold"></span><span class="sig-name descname"><span class="pre">-t</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--threshold</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;threshold&gt;</span></span><a class="headerlink" href="#cmdoption-TreSucMs-t" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-TREMSUCS-t">
+<span id="cmdoption-TREMSUCS-threshold"></span><span class="sig-name descname"><span class="pre">-t</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--threshold</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;threshold&gt;</span></span><a class="headerlink" href="#cmdoption-TREMSUCS-t" title="Link to this definition">¶</a></dt>
 <dd><p>threshold parameter</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
@@ -131,19 +131,19 @@ help setting all needed parameters for the analysis.</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-TreSucMs-e">
-<span id="cmdoption-TreSucMs-execute"></span><span class="sig-name descname"><span class="pre">-e</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--execute</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;execute&gt;</span></span><a class="headerlink" href="#cmdoption-TreSucMs-e" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-TREMSUCS-e">
+<span id="cmdoption-TREMSUCS-execute"></span><span class="sig-name descname"><span class="pre">-e</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--execute</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;execute&gt;</span></span><a class="headerlink" href="#cmdoption-TREMSUCS-e" title="Link to this definition">¶</a></dt>
 <dd><p>choose which pipeline shall be executed</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">DESeq2,</span> <span class="pre">metilene</span></code></p>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">'DESeq2',</span> <span class="pre">'metilene'</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-TreSucMs-N">
-<span id="cmdoption-TreSucMs-dryrun"></span><span class="sig-name descname"><span class="pre">-N</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--dryrun</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-TreSucMs-N" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-TREMSUCS-N">
+<span id="cmdoption-TREMSUCS-dryrun"></span><span class="sig-name descname"><span class="pre">-N</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--dryrun</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-TREMSUCS-N" title="Link to this definition">¶</a></dt>
 <dd><p>snakemake dryrun</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
@@ -153,8 +153,8 @@ help setting all needed parameters for the analysis.</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-TreSucMs-D">
-<span id="cmdoption-TreSucMs-download"></span><span class="sig-name descname"><span class="pre">-D</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--download</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-TreSucMs-D" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-TREMSUCS-D">
+<span id="cmdoption-TREMSUCS-download"></span><span class="sig-name descname"><span class="pre">-D</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--download</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-TREMSUCS-D" title="Link to this definition">¶</a></dt>
 <dd><p>if set, just download raw
 and meta data for given projects and analysis types, revise them,
 link them, but do not run any analysis</p>
@@ -166,8 +166,8 @@ link them, but do not run any analysis</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-TreSucMs-u">
-<span id="cmdoption-TreSucMs-unlock"></span><span class="sig-name descname"><span class="pre">-u</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--unlock</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-TreSucMs-u" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-TREMSUCS-u">
+<span id="cmdoption-TREMSUCS-unlock"></span><span class="sig-name descname"><span class="pre">-u</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--unlock</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-TREMSUCS-u" title="Link to this definition">¶</a></dt>
 <dd><p>in case the analysis
 crashs, snakemake locks the output directory, run with -u to
 unlock, then repeat the analysis</p>
@@ -179,8 +179,8 @@ unlock, then repeat the analysis</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-TreSucMs-v">
-<span id="cmdoption-TreSucMs-version"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--version</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-TreSucMs-v" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-TREMSUCS-v">
+<span id="cmdoption-TREMSUCS-version"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--version</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-TREMSUCS-v" title="Link to this definition">¶</a></dt>
 <dd><p>printing out version information: Version 1.0</p>
 </dd></dl>
 
@@ -191,18 +191,18 @@ unlock, then repeat the analysis</p>
 <section id="usage-of-the-interactive-mode">
 <h3>Usage of the interactive mode:<a class="headerlink" href="#usage-of-the-interactive-mode" title="Link to this heading">¶</a></h3>
 <p>The following example composition of projects, drugs and parameters creates the
-configuration given in the example report <a class="reference external" href="https://media.githubusercontent.com/media/dendemayer/TreSucMs-TCGA/main/suppl/report.html?download=true">here</a>.</p>
+configuration given in the example report <a class="reference external" href="https://media.githubusercontent.com/media/dendemayer/TREMSUCS-TCGA/main/suppl/report.html?download=true">here</a>.</p>
 <p>The same configuration can be applied by issuing the following command (the
 number of cores hereby can be adjusted and would also give the same results):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>TreSucMs<span class="w"> </span>-p<span class="w"> </span>TCGA-CESC<span class="w"> </span>-p<span class="w"> </span>TCGA-HNSC<span class="w"> </span>-p<span class="w"> </span>TCGA-LUSC<span class="w"> </span>-d<span class="w"> </span>cisplatin<span class="w"> </span>-d<span class="w"> </span>carboplatin,paclitaxel<span class="w"> </span><span class="se">\</span>
--d<span class="w"> </span>carboplatin<span class="w"> </span>-o<span class="w"> </span>/scr/TreSucMs_out<span class="w"> </span>-c<span class="w"> </span><span class="m">40</span><span class="w"> </span>-t<span class="w"> </span><span class="m">5</span><span class="w"> </span>-t<span class="w"> </span><span class="m">10</span><span class="w"> </span>-t<span class="w"> </span><span class="m">20</span><span class="w"> </span>-C<span class="w"> </span><span class="m">5</span><span class="w"> </span>-C<span class="w"> </span><span class="m">8</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>TREMSUCS<span class="w"> </span>-p<span class="w"> </span>TCGA-CESC<span class="w"> </span>-p<span class="w"> </span>TCGA-HNSC<span class="w"> </span>-p<span class="w"> </span>TCGA-LUSC<span class="w"> </span>-d<span class="w"> </span>cisplatin<span class="w"> </span>-d<span class="w"> </span>carboplatin,paclitaxel<span class="w"> </span><span class="se">\</span>
+-d<span class="w"> </span>carboplatin<span class="w"> </span>-o<span class="w"> </span>/scr/TREMSUCS_out<span class="w"> </span>-c<span class="w"> </span><span class="m">40</span><span class="w"> </span>-t<span class="w"> </span><span class="m">5</span><span class="w"> </span>-t<span class="w"> </span><span class="m">10</span><span class="w"> </span>-t<span class="w"> </span><span class="m">20</span><span class="w"> </span>-C<span class="w"> </span><span class="m">5</span><span class="w"> </span>-C<span class="w"> </span><span class="m">8</span>
 </pre></div>
 </div>
 <p>Calling the pipeline without any argument starts the interactive mode:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ TreSucMs
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ TREMSUCS
 
- OUTPUT_PATH:             /homes/biertruck/gabor/TreSucMs
- SCRIPT_PATH:             /homes/biertruck/gabor/phd/test_git_doc/TreSucMs/src/shared/modules
+ OUTPUT_PATH:             /homes/biertruck/gabor/TREMSUCS
+ SCRIPT_PATH:             /homes/biertruck/gabor/phd/test_git_doc/TREMSUCS/src/shared/modules
  PIPELINES executed:      [&#39;DESeq2&#39;, &#39;metilene&#39;]
 
  which projects do you want to include in your analysis:
@@ -290,7 +290,7 @@ paclitaxel and cases which got solely treated with carboplatin. In the
 following, every other parameter is requested. With the next prompt, the
 default OUTPUT_PATH can be confirmed or replaced:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>do you want to keep the default OUTPUT_PATH of:
-/homes/biertruck/gabor/TreSucMs
+/homes/biertruck/gabor/TREMSUCS
 if so, press ENTER, if not, enter your custom output path:
 </pre></div>
 </div>
@@ -333,7 +333,7 @@ if not, just press ENTER, if so enter the thresholds one by one:
 </div>
 <p>We apply thresholds of 5, 10 and 20. All mandatory and optional parameters are
 set with that and are finally listed before the whole approach is started:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>OUTPUT_PATH:             /homes/biertruck/gabor/TreSucMs
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>OUTPUT_PATH:             /homes/biertruck/gabor/TREMSUCS
 PROJECT:                 [&#39;TCGA-CESC&#39;, &#39;TCGA-HNSC&#39;, &#39;TCGA-LUSC&#39;]
 DRUGS:                   [&#39;carboplatin&#39;, &#39;carboplatin,paclitaxel&#39;, &#39;cisplatin&#39;]
 pipelines executed:      [&#39;DESeq2&#39;, &#39;metilene&#39;]
@@ -358,11 +358,11 @@ press ENTER to start or q to quit:
   <div>
     <h3><a href="#">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#">Documentation: TreSucMs for TCGA</a><ul>
+<li><a class="reference internal" href="#">Documentation: TREMSUCS for TCGA</a><ul>
 <li><a class="reference internal" href="#example-report">Example report:</a></li>
 <li><a class="reference internal" href="#installing-from-github-com">Installing from github.com:</a></li>
 <li><a class="reference internal" href="#help-page-of-the-pipeline">Help Page of the pipeline:</a><ul>
-<li><a class="reference internal" href="#tresucms">TreSucMs</a></li>
+<li><a class="reference internal" href="#tremsucs">TREMSUCS</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#short-tutorial">Short tutorial:</a><ul>
@@ -401,8 +401,8 @@ press ENTER to start or q to quit:
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="#">TreSucMs 1.0 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Documentation: TreSucMs for TCGA</a></li> 
+        <li class="nav-item nav-item-0"><a href="#">TREMSUCS 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Documentation: TREMSUCS for TCGA</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
